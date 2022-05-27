@@ -23,6 +23,7 @@ pub struct ReadCache<R: Read + Seek> {
 }
 
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct ReadCacheInternal<R: Read + Seek> {
     read: R,
     bufs: HashMap<(u64, u64), Box<[u8]>>,

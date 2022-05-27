@@ -10,6 +10,7 @@ pub fn print(w: &'_ mut dyn Write, e: &'_ mut dyn Write, file: &[u8]) {
     print_object(&mut printer, &*file);
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct Printer<'a> {
     w: &'a mut dyn Write,
     e: &'a mut dyn Write,
@@ -156,6 +157,7 @@ impl<'a> Printer<'a> {
     }
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct Flag<T> {
     value: T,
     name: &'static str,

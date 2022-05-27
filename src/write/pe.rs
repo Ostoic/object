@@ -811,6 +811,7 @@ pub struct NtHeaders {
 }
 
 #[derive(Default, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct DataDirectory {
     virtual_address: u32,
     size: u32,
@@ -835,6 +836,7 @@ pub struct SectionRange {
     pub file_size: u32,
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct RelocBlock {
     virtual_address: u32,
     count: u32,

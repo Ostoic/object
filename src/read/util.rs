@@ -177,6 +177,7 @@ fn debug_list_bytes(bytes: &[u8], fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
     list.finish()
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct DebugByte(u8);
 
 impl fmt::Debug for DebugByte {
@@ -185,6 +186,7 @@ impl fmt::Debug for DebugByte {
     }
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct DebugLen(usize);
 
 impl fmt::Debug for DebugLen {

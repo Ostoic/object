@@ -8,6 +8,7 @@ use crate::write::*;
 use crate::AddressSize;
 
 #[derive(Default, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct SectionOffsets {
     index: usize,
     offset: usize,
@@ -16,6 +17,7 @@ struct SectionOffsets {
 }
 
 #[derive(Default, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct SymbolOffsets {
     emit: bool,
     index: usize,
@@ -624,6 +626,7 @@ impl<'a> Object<'a> {
     }
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct MachHeader {
     cputype: u32,
     cpusubtype: u32,
@@ -633,6 +636,7 @@ struct MachHeader {
     flags: u32,
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct SegmentCommand {
     cmdsize: u32,
     segname: [u8; 16],
@@ -658,6 +662,7 @@ pub struct SectionHeader {
     flags: u32,
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct Nlist {
     n_strx: u32,
     n_type: u8,
@@ -677,6 +682,7 @@ trait MachO {
     fn write_nlist(&self, buffer: &mut dyn WritableBuffer, nlist: Nlist);
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct MachO32<E> {
     endian: E,
 }
@@ -766,6 +772,7 @@ impl<E: Endian> MachO for MachO32<E> {
     }
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct MachO64<E> {
     endian: E,
 }

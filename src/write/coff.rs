@@ -8,6 +8,7 @@ use crate::write::util::*;
 use crate::write::*;
 
 #[derive(Default, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct SectionOffsets {
     offset: usize,
     str_id: Option<StringId>,
@@ -17,6 +18,7 @@ struct SectionOffsets {
 }
 
 #[derive(Default, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct SymbolOffsets {
     index: usize,
     str_id: Option<StringId>,

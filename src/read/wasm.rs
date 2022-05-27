@@ -786,6 +786,7 @@ pub struct WasmSymbol<'data, 'file> {
 }
 
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct WasmSymbolInternal<'data> {
     name: &'data str,
     address: u64,

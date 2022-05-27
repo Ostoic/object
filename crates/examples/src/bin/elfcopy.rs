@@ -54,11 +54,13 @@ fn main() {
     }
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct Section {
     name: Option<object::write::StringId>,
     offset: usize,
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct Dynamic {
     tag: u32,
     // Ignored if `string` is set.
@@ -66,12 +68,14 @@ struct Dynamic {
     string: Option<object::write::StringId>,
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct Symbol {
     in_sym: usize,
     name: Option<object::write::StringId>,
     section: Option<object::write::elf::SectionIndex>,
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct DynamicSymbol {
     in_sym: usize,
     name: Option<object::write::StringId>,

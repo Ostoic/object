@@ -7,12 +7,14 @@ use crate::write::*;
 use crate::AddressSize;
 
 #[derive(Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct ComdatOffsets {
     offset: usize,
     str_id: StringId,
 }
 
 #[derive(Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct SectionOffsets {
     index: SectionIndex,
     offset: usize,
@@ -22,6 +24,7 @@ struct SectionOffsets {
 }
 
 #[derive(Default, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct SymbolOffsets {
     index: SymbolIndex,
     str_id: Option<StringId>,
