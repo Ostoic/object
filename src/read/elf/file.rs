@@ -27,6 +27,7 @@ pub type ElfFile64<'data, Endian = Endianness, R = &'data [u8]> =
 ///
 /// Most of the functionality of this type is provided by the `Object` trait implementation.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfFile<'data, Elf, R = &'data [u8]>
 where
     Elf: FileHeader,

@@ -457,6 +457,7 @@ pub trait ObjectSymbol<'data>: read::private::Sealed {
 
 /// An iterator for files that don't have dynamic relocations.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct NoDynamicRelocationIterator;
 
 impl Iterator for NoDynamicRelocationIterator {

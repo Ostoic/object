@@ -17,6 +17,7 @@ pub type ElfSegmentIterator64<'data, 'file, Endian = Endianness, R = &'data [u8]
 
 /// An iterator over the segments of an `ElfFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSegmentIterator<'data, 'file, Elf, R = &'data [u8]>
 where
     Elf: FileHeader,
@@ -55,6 +56,7 @@ pub type ElfSegment64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A segment of an `ElfFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSegment<'data, 'file, Elf, R = &'data [u8]>
 where
     'data: 'file,

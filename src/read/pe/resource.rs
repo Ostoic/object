@@ -5,6 +5,7 @@ use crate::{pe, LittleEndian as LE, U16};
 
 /// The `.rsrc` section of a PE file.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ResourceDirectory<'data> {
     data: &'data [u8],
 }
@@ -23,6 +24,7 @@ impl<'data> ResourceDirectory<'data> {
 
 /// A table of resource entries.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ResourceDirectoryTable<'data> {
     /// The table header.
     pub header: &'data pe::ImageResourceDirectory,
@@ -136,6 +138,7 @@ impl<'data> ResourceDirectoryEntryData<'data> {
 
 /// A resource name.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ResourceName {
     offset: u32,
 }

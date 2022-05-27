@@ -88,6 +88,7 @@ impl WritableBuffer for Vec<u8> {
 /// instead of an unbuffered writer like [`File`](std::fs::File).
 #[cfg(feature = "std")]
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct StreamingBuffer<W> {
     writer: W,
     len: usize,

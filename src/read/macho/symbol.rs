@@ -18,6 +18,7 @@ use super::{MachHeader, MachOFile};
 ///
 /// Also includes the string table used for the symbol names.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolTable<'data, Mach: MachHeader, R = &'data [u8]>
 where
     R: ReadRef<'data>,
@@ -152,6 +153,7 @@ pub type MachOSymbolTable64<'data, 'file, Endian = Endianness, R = &'data [u8]> 
 
 /// A symbol table of a `MachOFile`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSymbolTable<'data, 'file, Mach, R = &'data [u8]>
 where
     Mach: MachHeader,
@@ -196,6 +198,7 @@ pub type MachOSymbolIterator64<'data, 'file, Endian = Endianness, R = &'data [u8
     MachOSymbolIterator<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// An iterator over the symbols of a `MachOFile`.
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSymbolIterator<'data, 'file, Mach, R = &'data [u8]>
 where
     Mach: MachHeader,
@@ -243,6 +246,7 @@ pub type MachOSymbol64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A symbol of a `MachOFile`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSymbol<'data, 'file, Mach, R = &'data [u8]>
 where
     Mach: MachHeader,

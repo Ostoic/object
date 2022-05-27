@@ -19,6 +19,7 @@ use super::{FileHeader, SectionHeader, SectionTable};
 ///
 /// Also includes the string table used for the symbol names.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolTable<'data, Elf: FileHeader, R = &'data [u8]>
 where
     R: ReadRef<'data>,
@@ -206,6 +207,7 @@ pub type ElfSymbolTable64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A symbol table of an `ElfFile`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSymbolTable<'data, 'file, Elf, R = &'data [u8]>
 where
     'data: 'file,
@@ -254,6 +256,7 @@ pub type ElfSymbolIterator64<'data, 'file, Endian = Endianness, R = &'data [u8]>
     ElfSymbolIterator<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// An iterator over the symbols of an `ElfFile`.
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSymbolIterator<'data, 'file, Elf, R = &'data [u8]>
 where
     'data: 'file,
@@ -300,6 +303,7 @@ pub type ElfSymbol64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A symbol of an `ElfFile`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSymbol<'data, 'file, Elf, R = &'data [u8]>
 where
     'data: 'file,

@@ -23,6 +23,7 @@ pub type PeFile64<'data, R = &'data [u8]> = PeFile<'data, pe::ImageNtHeaders64, 
 
 /// A PE object file.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeFile<'data, Pe, R = &'data [u8]>
 where
     Pe: ImageNtHeaders,
@@ -378,6 +379,7 @@ pub type PeComdatIterator64<'data, 'file, R = &'data [u8]> =
 
 /// An iterator over the COMDAT section groups of a `PeFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeComdatIterator<'data, 'file, Pe, R = &'data [u8]>
 where
     Pe: ImageNtHeaders,
@@ -409,6 +411,7 @@ pub type PeComdat64<'data, 'file, R = &'data [u8]> =
 
 /// A COMDAT section group of a `PeFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeComdat<'data, 'file, Pe, R = &'data [u8]>
 where
     Pe: ImageNtHeaders,
@@ -467,6 +470,7 @@ pub type PeComdatSectionIterator64<'data, 'file, R = &'data [u8]> =
 
 /// An iterator over the sections in a COMDAT section group of a `PeFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeComdatSectionIterator<'data, 'file, Pe, R = &'data [u8]>
 where
     Pe: ImageNtHeaders,

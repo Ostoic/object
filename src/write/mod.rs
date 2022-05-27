@@ -37,6 +37,7 @@ pub use util::*;
 
 /// The error type used within the write module.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Error(String);
 
 impl fmt::Display for Error {
@@ -54,6 +55,7 @@ pub type Result<T> = result::Result<T, Error>;
 
 /// A writable object file.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Object<'a> {
     format: BinaryFormat,
     architecture: Architecture,
@@ -646,10 +648,12 @@ impl StandardSection {
 
 /// An identifier used to reference a section.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionId(usize);
 
 /// A section in an object file.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Section<'a> {
     segment: Vec<u8>,
     name: Vec<u8>,
@@ -785,10 +789,12 @@ impl SymbolSection {
 
 /// An identifier used to reference a symbol.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolId(usize);
 
 /// A symbol in an object file.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Symbol {
     /// The name of the symbol.
     pub name: Vec<u8>,
@@ -840,6 +846,7 @@ impl Symbol {
 
 /// A relocation in an object file.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Relocation {
     /// The section offset of the place of the relocation.
     pub offset: u64,
@@ -861,10 +868,12 @@ pub struct Relocation {
 
 /// An identifier used to reference a COMDAT section group.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ComdatId(usize);
 
 /// A COMDAT section group.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Comdat {
     /// The COMDAT selection kind.
     ///

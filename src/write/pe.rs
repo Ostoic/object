@@ -16,6 +16,7 @@ use crate::write::{Error, Result, WritableBuffer};
 /// The second phase writes everything out in order. Thus the caller must ensure writing
 /// is in the same order that file ranges were reserved.
 #[allow(missing_debug_implementations)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Writer<'a> {
     is_64: bool,
     section_alignment: u32,
@@ -786,6 +787,7 @@ impl<'a> Writer<'a> {
 /// Information required for writing [`pe::ImageNtHeaders32`] or [`pe::ImageNtHeaders64`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct NtHeaders {
     // ImageFileHeader
     pub machine: u16,
@@ -820,6 +822,7 @@ struct DataDirectory {
 /// Information required for writing [`pe::ImageSectionHeader`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Section {
     pub name: [u8; pe::IMAGE_SIZEOF_SHORT_NAME],
     pub characteristics: u32,
@@ -829,6 +832,7 @@ pub struct Section {
 /// The file range and virtual address range for a section.
 #[allow(missing_docs)]
 #[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionRange {
     pub virtual_address: u32,
     pub virtual_size: u32,

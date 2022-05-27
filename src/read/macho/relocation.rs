@@ -17,6 +17,7 @@ pub type MachORelocationIterator64<'data, 'file, Endian = Endianness, R = &'data
     MachORelocationIterator<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// An iterator over the relocations in a `MachOSection`.
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachORelocationIterator<'data, 'file, Mach, R = &'data [u8]>
 where
     'data: 'file,

@@ -11,6 +11,7 @@ use super::FileHeader;
 
 /// An iterator over the notes in an ELF section or segment.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct NoteIterator<'data, Elf>
 where
     Elf: FileHeader,
@@ -83,6 +84,7 @@ where
 
 /// A parsed `NoteHeader`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Note<'data, Elf>
 where
     Elf: FileHeader,

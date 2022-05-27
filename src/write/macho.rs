@@ -650,6 +650,7 @@ struct SegmentCommand {
     flags: u32,
 }
 
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionHeader {
     sectname: [u8; 16],
     segname: [u8; 16],

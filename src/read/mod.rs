@@ -61,6 +61,7 @@ mod private {
 
 /// The error type used within the read module.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Error(&'static str);
 
 impl fmt::Display for Error {
@@ -260,10 +261,12 @@ pub enum ObjectKind {
 
 /// The index used to identify a section of a file.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionIndex(pub usize);
 
 /// The index used to identify a symbol of a file.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolIndex(pub usize);
 
 /// The section where a symbol is defined.
@@ -306,6 +309,7 @@ pub trait SymbolMapEntry {
 
 /// A map from addresses to symbols.
 #[derive(Debug, Default, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolMap<T: SymbolMapEntry> {
     symbols: Vec<T>,
 }
@@ -340,6 +344,7 @@ impl<T: SymbolMapEntry> SymbolMap<T> {
 
 /// A `SymbolMap` entry for symbol names.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolMapName<'data> {
     address: u64,
     name: &'data str,
@@ -375,6 +380,7 @@ impl<'data> SymbolMapEntry for SymbolMapName<'data> {
 ///
 /// This is derived from STAB entries in Mach-O files.
 #[derive(Debug, Default, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ObjectMap<'data> {
     symbols: SymbolMap<ObjectMapEntry<'data>>,
     objects: Vec<&'data [u8]>,
@@ -403,6 +409,7 @@ impl<'data> ObjectMap<'data> {
 
 /// A `ObjectMap` entry.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ObjectMapEntry<'data> {
     address: u64,
     size: u64,
@@ -453,6 +460,7 @@ impl<'data> SymbolMapEntry for ObjectMapEntry<'data> {
 
 /// An imported symbol.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Import<'data> {
     library: ByteString<'data>,
     // TODO: or ordinal
@@ -475,6 +483,7 @@ impl<'data> Import<'data> {
 
 /// An exported symbol.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Export<'data> {
     // TODO: and ordinal?
     name: ByteString<'data>,
@@ -497,6 +506,7 @@ impl<'data> Export<'data> {
 
 /// PDB Information
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CodeView<'data> {
     guid: [u8; 16],
     path: ByteString<'data>,
@@ -537,6 +547,7 @@ pub enum RelocationTarget {
 
 /// A relocation entry.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Relocation {
     kind: RelocationKind,
     encoding: RelocationEncoding,
@@ -609,6 +620,7 @@ pub enum CompressionFormat {
 
 /// A range in a file that may be compressed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CompressedFileRange {
     /// The data compression format.
     pub format: CompressionFormat,
@@ -656,6 +668,7 @@ impl CompressedFileRange {
 
 /// Data that may be compressed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CompressedData<'data> {
     /// The data compression format.
     pub format: CompressionFormat,

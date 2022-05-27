@@ -19,6 +19,7 @@ pub type MachOSectionIterator64<'data, 'file, Endian = Endianness, R = &'data [u
     MachOSectionIterator<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// An iterator over the sections of a `MachOFile`.
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSectionIterator<'data, 'file, Mach, R = &'data [u8]>
 where
     'data: 'file,
@@ -64,6 +65,7 @@ pub type MachOSection64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A section of a `MachOFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSection<'data, 'file, Mach, R = &'data [u8]>
 where
     'data: 'file,

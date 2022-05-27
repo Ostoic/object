@@ -19,6 +19,7 @@ pub const TERMINATOR: [u8; 2] = *b"`\n";
 /// The header at the start of an archive member.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Header {
     /// The file name.
     pub name: [u8; 16],

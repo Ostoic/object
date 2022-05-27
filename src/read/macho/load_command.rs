@@ -8,6 +8,7 @@ use crate::read::{Bytes, ReadError, ReadRef, Result, StringTable};
 
 /// An iterator over the load commands of a `MachHeader`.
 #[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct LoadCommandIterator<'data, E: Endian> {
     endian: E,
     data: Bytes<'data>,
@@ -49,6 +50,7 @@ impl<'data, E: Endian> LoadCommandIterator<'data, E> {
 
 /// The data for a `LoadCommand`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct LoadCommandData<'data, E: Endian> {
     cmd: u32,
     // Includes the header.

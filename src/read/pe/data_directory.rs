@@ -7,6 +7,7 @@ use super::{ExportTable, ImportTable, RelocationBlockIterator, ResourceDirectory
 
 /// The table of data directories in a PE file.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DataDirectories<'data> {
     entries: &'data [pe::ImageDataDirectory],
 }

@@ -35,6 +35,7 @@ const MAX_SECTION_ID: usize = SECTION_DATA_COUNT;
 
 /// A WebAssembly object file.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmFile<'data, R = &'data [u8]> {
     // All sections, including custom sections.
     sections: Vec<wp::Section<'data>>,
@@ -442,6 +443,7 @@ where
 
 /// An iterator over the segments of a `WasmFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSegmentIterator<'data, 'file, R = &'data [u8]> {
     #[allow(unused)]
     file: &'file WasmFile<'data, R>,
@@ -458,6 +460,7 @@ impl<'data, 'file, R> Iterator for WasmSegmentIterator<'data, 'file, R> {
 
 /// A segment of a `WasmFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSegment<'data, 'file, R = &'data [u8]> {
     #[allow(unused)]
     file: &'file WasmFile<'data, R>,
@@ -512,6 +515,7 @@ impl<'data, 'file, R> ObjectSegment<'data> for WasmSegment<'data, 'file, R> {
 
 /// An iterator over the sections of a `WasmFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSectionIterator<'data, 'file, R = &'data [u8]> {
     sections: slice::Iter<'file, wp::Section<'data>>,
     marker: PhantomData<R>,
@@ -531,6 +535,7 @@ impl<'data, 'file, R> Iterator for WasmSectionIterator<'data, 'file, R> {
 
 /// A section of a `WasmFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSection<'data, 'file, R = &'data [u8]> {
     section: &'file wp::Section<'data>,
     marker: PhantomData<R>,
@@ -663,6 +668,7 @@ impl<'data, 'file, R> ObjectSection<'data> for WasmSection<'data, 'file, R> {
 
 /// An iterator over the COMDAT section groups of a `WasmFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmComdatIterator<'data, 'file, R = &'data [u8]> {
     #[allow(unused)]
     file: &'file WasmFile<'data, R>,
@@ -679,6 +685,7 @@ impl<'data, 'file, R> Iterator for WasmComdatIterator<'data, 'file, R> {
 
 /// A COMDAT section group of a `WasmFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmComdat<'data, 'file, R = &'data [u8]> {
     #[allow(unused)]
     file: &'file WasmFile<'data, R>,
@@ -717,6 +724,7 @@ impl<'data, 'file, R> ObjectComdat<'data> for WasmComdat<'data, 'file, R> {
 
 /// An iterator over the sections in a COMDAT section group of a `WasmFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmComdatSectionIterator<'data, 'file, R = &'data [u8]>
 where
     'data: 'file,
@@ -735,6 +743,7 @@ impl<'data, 'file, R> Iterator for WasmComdatSectionIterator<'data, 'file, R> {
 
 /// A symbol table of a `WasmFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSymbolTable<'data, 'file> {
     symbols: &'file [WasmSymbolInternal<'data>],
 }
@@ -762,6 +771,7 @@ impl<'data, 'file> ObjectSymbolTable<'data> for WasmSymbolTable<'data, 'file> {
 
 /// An iterator over the symbols of a `WasmFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSymbolIterator<'data, 'file> {
     symbols: core::iter::Enumerate<slice::Iter<'file, WasmSymbolInternal<'data>>>,
 }
@@ -780,6 +790,7 @@ impl<'data, 'file> Iterator for WasmSymbolIterator<'data, 'file> {
 
 /// A symbol of a `WasmFile`.
 #[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSymbol<'data, 'file> {
     index: SymbolIndex,
     symbol: &'file WasmSymbolInternal<'data>,
@@ -877,6 +888,7 @@ impl<'data, 'file> ObjectSymbol<'data> for WasmSymbol<'data, 'file> {
 
 /// An iterator over the relocations in a `WasmSection`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmRelocationIterator<'data, 'file, R = &'data [u8]>(
     PhantomData<(&'data (), &'file (), R)>,
 );

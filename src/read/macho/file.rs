@@ -26,6 +26,7 @@ pub type MachOFile64<'data, Endian = Endianness, R = &'data [u8]> =
 ///
 /// Most of the functionality of this type is provided by the `Object` trait implementation.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOFile<'data, Mach, R = &'data [u8]>
 where
     Mach: MachHeader,
@@ -437,6 +438,7 @@ pub type MachOComdatIterator64<'data, 'file, Endian = Endianness, R = &'data [u8
 
 /// An iterator over the COMDAT section groups of a `MachOFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOComdatIterator<'data, 'file, Mach, R = &'data [u8]>
 where
     Mach: MachHeader,
@@ -469,6 +471,7 @@ pub type MachOComdat64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A COMDAT section group of a `MachOFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOComdat<'data, 'file, Mach, R = &'data [u8]>
 where
     Mach: MachHeader,
@@ -527,6 +530,7 @@ pub type MachOComdatSectionIterator64<'data, 'file, Endian = Endianness, R = &'d
 
 /// An iterator over the sections in a COMDAT section group of a `MachOFile`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOComdatSectionIterator<'data, 'file, Mach, R = &'data [u8]>
 where
     'data: 'file,

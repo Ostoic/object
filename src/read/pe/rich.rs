@@ -8,6 +8,7 @@ use crate::{pe, LittleEndian as LE, ReadRef, U32};
 
 /// Parsed information about a Rich Header.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RichHeaderInfo<'data> {
     /// The offset at which the rich header starts.
     pub offset: usize,
@@ -29,6 +30,7 @@ pub struct RichHeaderInfo<'data> {
 /// See [`pe::MaskedRichHeaderEntry`].
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RichHeaderEntry {
     /// ID of the component.
     pub comp_id: u32,

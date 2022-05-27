@@ -170,6 +170,7 @@ macro_rules! next_inner {
 ///
 /// Most functionality is provided by the `Object` trait implementation.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct File<'data, R: ReadRef<'data> = &'data [u8]> {
     inner: FileInternal<'data, R>,
 }
@@ -440,6 +441,7 @@ where
 
 /// An iterator over the segments of a `File`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SegmentIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -480,6 +482,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for SegmentIterator<'data, 'file,
 }
 
 /// A segment of a `File`.
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Segment<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -571,6 +574,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSegment<'data> for Segment<'data, 'f
 
 /// An iterator of the sections of a `File`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -612,6 +616,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for SectionIterator<'data, 'file,
 }
 
 /// A Section of a File
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Section<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -743,6 +748,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for Section<'data, 'f
 
 /// An iterator of the COMDAT section groups of a `File`.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ComdatIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -783,6 +789,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for ComdatIterator<'data, 'file, 
 }
 
 /// A COMDAT section group of a `File`.
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Comdat<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -857,6 +864,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectComdat<'data> for Comdat<'data, 'fil
 
 /// An iterator over COMDAT section entries.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ComdatSectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -897,6 +905,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for ComdatSectionIterator<'data, 
 
 /// A symbol table.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolTable<'data, 'file, R = &'data [u8]>
 where
     'data: 'file,
@@ -977,6 +986,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbolTable<'data> for SymbolTable<'
 
 /// An iterator over symbol table entries.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolIterator<'data, 'file, R = &'data [u8]>
 where
     'data: 'file,
@@ -1041,6 +1051,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for SymbolIterator<'data, 'file, 
 }
 
 /// A symbol table entry.
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Symbol<'data, 'file, R = &'data [u8]>
 where
     'data: 'file,
@@ -1173,6 +1184,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for Symbol<'data, 'fil
 
 /// An iterator over dynamic relocation entries.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DynamicRelocationIterator<'data, 'file, R = &'data [u8]>
 where
     'data: 'file,
@@ -1212,6 +1224,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for DynamicRelocationIterator<'da
 
 /// An iterator over section relocation entries.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionRelocationIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,

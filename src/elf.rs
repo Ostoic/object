@@ -13,6 +13,7 @@ use crate::pod::Pod;
 /// The header at the start of every 32-bit ELF file.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct FileHeader32<E: Endian> {
     /// Magic number and other information.
     pub e_ident: Ident,
@@ -59,6 +60,7 @@ pub struct FileHeader32<E: Endian> {
 /// The header at the start of every 64-bit ELF file.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct FileHeader64<E: Endian> {
     /// Magic number and other information.
     pub e_ident: Ident,
@@ -107,6 +109,7 @@ pub struct FileHeader64<E: Endian> {
 /// Contained in the file header.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Ident {
     /// Magic number. Must be `ELFMAG`.
     pub magic: [u8; 4],
@@ -576,6 +579,7 @@ pub const EV_CURRENT: u8 = 1;
 /// Section header.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionHeader32<E: Endian> {
     /// Section name.
     ///
@@ -608,6 +612,7 @@ pub struct SectionHeader32<E: Endian> {
 /// Section header.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionHeader64<E: Endian> {
     /// Section name.
     ///
@@ -775,6 +780,7 @@ pub const SHF_EXCLUDE: u32 = 0x8000_0000;
 /// changed in a future version.
 #[derive(Debug, Default, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CompressionHeader32<E: Endian> {
     /// Compression format. One of the `ELFCOMPRESS_*` values.
     pub ch_type: U32Bytes<E>,
@@ -792,6 +798,7 @@ pub struct CompressionHeader32<E: Endian> {
 /// changed in a future version.
 #[derive(Debug, Default, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CompressionHeader64<E: Endian> {
     /// Compression format. One of the `ELFCOMPRESS_*` values.
     pub ch_type: U32Bytes<E>,
@@ -821,6 +828,7 @@ pub const GRP_COMDAT: u32 = 1;
 /// Symbol table entry.
 #[derive(Debug, Default, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Sym32<E: Endian> {
     /// Symbol name.
     ///
@@ -871,6 +879,7 @@ impl<E: Endian> Sym32<E> {
 /// Symbol table entry.
 #[derive(Debug, Default, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Sym64<E: Endian> {
     /// Symbol name.
     ///
@@ -921,6 +930,7 @@ impl<E: Endian> Sym64<E> {
 /// Additional information about a `Sym32`.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Syminfo32<E: Endian> {
     /// Direct bindings, symbol bound to.
     pub si_boundto: U16<E>,
@@ -931,6 +941,7 @@ pub struct Syminfo32<E: Endian> {
 /// Additional information about a `Sym64`.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Syminfo64<E: Endian> {
     /// Direct bindings, symbol bound to.
     pub si_boundto: U16<E>,
@@ -1021,6 +1032,7 @@ pub const STV_PROTECTED: u8 = 3;
 /// Relocation table entry without explicit addend.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Rel32<E: Endian> {
     /// Relocation address.
     pub r_offset: U32<E>,
@@ -1055,6 +1067,7 @@ impl<E: Endian> Rel32<E> {
 /// Relocation table entry with explicit addend.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Rela32<E: Endian> {
     /// Relocation address.
     pub r_offset: U32<E>,
@@ -1101,6 +1114,7 @@ impl<E: Endian> From<Rel32<E>> for Rela32<E> {
 /// Relocation table entry without explicit addend.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Rel64<E: Endian> {
     /// Relocation address.
     pub r_offset: U64<E>,
@@ -1145,6 +1159,7 @@ impl<E: Endian> From<Rel64<E>> for Rela64<E> {
 /// Relocation table entry with explicit addend.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Rela64<E: Endian> {
     /// Relocation address.
     pub r_offset: U64<E>,
@@ -1201,6 +1216,7 @@ impl<E: Endian> Rela64<E> {
 /// Program segment header.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ProgramHeader32<E: Endian> {
     /// Segment type. One of the `PT_*` constants.
     pub p_type: U32<E>,
@@ -1223,6 +1239,7 @@ pub struct ProgramHeader32<E: Endian> {
 /// Program segment header.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ProgramHeader64<E: Endian> {
     /// Segment type. One of the `PT_*` constants.
     pub p_type: U32<E>,
@@ -1439,6 +1456,7 @@ pub const NT_VERSION: u32 = 1;
 /// Dynamic section entry.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Dyn32<E: Endian> {
     /// Dynamic entry type.
     pub d_tag: U32<E>,
@@ -1449,6 +1467,7 @@ pub struct Dyn32<E: Endian> {
 /// Dynamic section entry.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Dyn64<E: Endian> {
     /// Dynamic entry type.
     pub d_tag: U64<E>,
@@ -1694,6 +1713,7 @@ pub const DF_1_PIE: u32 = 0x0800_0000;
 /// Version symbol information
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Versym<E: Endian>(pub U16<E>);
 
 /// Symbol is hidden.
@@ -1704,6 +1724,7 @@ pub const VERSYM_VERSION: u16 = 0x7fff;
 /// Version definition sections
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Verdef<E: Endian> {
     /// Version revision
     pub vd_version: U16<E>,
@@ -1743,6 +1764,7 @@ pub const VER_NDX_GLOBAL: u16 = 1;
 /// Auxiliary version information.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Verdaux<E: Endian> {
     /// Version or dependency names
     pub vda_name: U32<E>,
@@ -1753,6 +1775,7 @@ pub struct Verdaux<E: Endian> {
 /// Version dependency.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Verneed<E: Endian> {
     /// Version of structure
     pub vn_version: U16<E>,
@@ -1775,6 +1798,7 @@ pub const VER_NEED_CURRENT: u16 = 1;
 /// Auxiliary needed version information.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Vernaux<E: Endian> {
     /// Hash value of dependency name
     pub vna_hash: U32<E>,
@@ -1795,6 +1819,7 @@ pub struct Vernaux<E: Endian> {
 /// A note consists of a header followed by a variable length name and descriptor.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct NoteHeader32<E: Endian> {
     /// Length of the note's name.
     ///
@@ -1814,6 +1839,7 @@ pub struct NoteHeader32<E: Endian> {
 /// Note section entry header.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct NoteHeader64<E: Endian> {
     /// Length of the note's name.
     ///
@@ -1887,6 +1913,7 @@ pub const NT_GNU_PROPERTY_TYPE_0: u32 = 5;
 /// Header of `SHT_HASH` section.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct HashHeader<E: Endian> {
     /// The number of hash buckets.
     pub bucket_count: U32<E>,
@@ -1913,6 +1940,7 @@ pub fn hash(name: &[u8]) -> u32 {
 /// Header of `SHT_GNU_HASH` section.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct GnuHashHeader<E: Endian> {
     /// The number of hash buckets.
     pub bucket_count: U32<E>,

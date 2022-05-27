@@ -11,10 +11,12 @@ use crate::write::{Error, Result, WritableBuffer};
 
 /// The index of an ELF section.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionIndex(pub u32);
 
 /// The index of an ELF symbol.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolIndex(pub u32);
 
 /// A helper for writing ELF files.
@@ -35,6 +37,7 @@ pub struct SymbolIndex(pub u32);
 /// is in the same order that file ranges were reserved. There are debug asserts to assist
 /// with checking this.
 #[allow(missing_debug_implementations)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Writer<'a> {
     endian: Endianness,
     is_64: bool,
@@ -1862,6 +1865,7 @@ impl<'a> Writer<'a> {
 /// Native endian version of [`elf::FileHeader64`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct FileHeader {
     pub os_abi: u8,
     pub abi_version: u8,
@@ -1874,6 +1878,7 @@ pub struct FileHeader {
 /// Native endian version of [`elf::ProgramHeader64`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ProgramHeader {
     pub p_type: u32,
     pub p_flags: u32,
@@ -1888,6 +1893,7 @@ pub struct ProgramHeader {
 /// Native endian version of [`elf::SectionHeader64`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionHeader {
     pub name: Option<StringId>,
     pub sh_type: u32,
@@ -1904,6 +1910,7 @@ pub struct SectionHeader {
 /// Native endian version of [`elf::Sym64`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Sym {
     pub name: Option<StringId>,
     pub section: Option<SectionIndex>,
@@ -1917,6 +1924,7 @@ pub struct Sym {
 /// Unified native endian version of [`elf::Rel64`] and [`elf::Rela64`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Rel {
     pub r_offset: u64,
     pub r_sym: u32,
@@ -1927,6 +1935,7 @@ pub struct Rel {
 /// Information required for writing [`elf::Verdef`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Verdef {
     pub version: u16,
     pub flags: u16,
@@ -1939,6 +1948,7 @@ pub struct Verdef {
 /// Information required for writing [`elf::Verneed`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Verneed {
     pub version: u16,
     pub aux_count: u16,
@@ -1948,6 +1958,7 @@ pub struct Verneed {
 /// Information required for writing [`elf::Vernaux`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Vernaux {
     pub flags: u16,
     pub index: u16,

@@ -8,6 +8,7 @@ use super::ImageNtHeaders;
 
 /// Information for parsing a PE import table.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ImportTable<'data> {
     section_data: Bytes<'data>,
     section_address: u32,
@@ -95,6 +96,7 @@ impl<'data> ImportTable<'data> {
 
 /// A fallible iterator for the descriptors in the import data directory.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ImportDescriptorIterator<'data> {
     data: Bytes<'data>,
 }
@@ -120,6 +122,7 @@ impl<'data> ImportDescriptorIterator<'data> {
 ///
 /// These may be in the import lookup table, or the import address table.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ImportThunkList<'data> {
     data: Bytes<'data>,
 }

@@ -15,6 +15,7 @@ use super::{ElfFile, FileHeader, SectionHeader, SectionTable};
 
 /// A mapping from section index to associated relocation sections.
 #[derive(Debug)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RelocationSections {
     relocations: Vec<usize>,
 }
@@ -99,6 +100,7 @@ pub type ElfDynamicRelocationIterator64<'data, 'file, Endian = Endianness, R = &
     ElfDynamicRelocationIterator<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// An iterator over the dynamic relocations for an `ElfFile`.
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfDynamicRelocationIterator<'data, 'file, Elf, R = &'data [u8]>
 where
     Elf: FileHeader,
@@ -172,6 +174,7 @@ pub type ElfSectionRelocationIterator64<'data, 'file, Endian = Endianness, R = &
     ElfSectionRelocationIterator<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// An iterator over the relocations for an `ElfSection`.
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSectionRelocationIterator<'data, 'file, Elf, R = &'data [u8]>
 where
     Elf: FileHeader,

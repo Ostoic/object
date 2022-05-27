@@ -7,6 +7,7 @@ type IndexSet<K> = indexmap::IndexSet<K, hashbrown::hash_map::DefaultHashBuilder
 
 /// An identifer for an entry in a string table.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct StringId(usize);
 
 #[derive(Debug, Default)]
