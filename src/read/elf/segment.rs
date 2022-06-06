@@ -87,27 +87,32 @@ where
     Elf: FileHeader,
     R: ReadRef<'data>,
 {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         self.segment.p_vaddr(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         self.segment.p_memsz(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
         self.segment.p_align(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> (u64, u64) {
         self.segment.file_range(self.file.endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> read::Result<&'data [u8]> {
         self.bytes()
     }
@@ -121,17 +126,20 @@ where
         ))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> read::Result<Option<&[u8]>> {
         Ok(None)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> read::Result<Option<&str>> {
         Ok(None)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SegmentFlags {
         let p_flags = self.segment.p_flags(self.file.endian);
         SegmentFlags::Elf { p_flags }
@@ -247,42 +255,50 @@ impl<Endian: endian::Endian> ProgramHeader for elf::ProgramHeader32<Endian> {
     type Endian = Endian;
     type Elf = elf::FileHeader32<Endian>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_type(&self, endian: Self::Endian) -> u32 {
         self.p_type.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_flags(&self, endian: Self::Endian) -> u32 {
         self.p_flags.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_offset(&self, endian: Self::Endian) -> Self::Word {
         self.p_offset.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_vaddr(&self, endian: Self::Endian) -> Self::Word {
         self.p_vaddr.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_paddr(&self, endian: Self::Endian) -> Self::Word {
         self.p_paddr.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_filesz(&self, endian: Self::Endian) -> Self::Word {
         self.p_filesz.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_memsz(&self, endian: Self::Endian) -> Self::Word {
         self.p_memsz.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_align(&self, endian: Self::Endian) -> Self::Word {
         self.p_align.get(endian)
     }
@@ -293,42 +309,50 @@ impl<Endian: endian::Endian> ProgramHeader for elf::ProgramHeader64<Endian> {
     type Endian = Endian;
     type Elf = elf::FileHeader64<Endian>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_type(&self, endian: Self::Endian) -> u32 {
         self.p_type.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_flags(&self, endian: Self::Endian) -> u32 {
         self.p_flags.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_offset(&self, endian: Self::Endian) -> Self::Word {
         self.p_offset.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_vaddr(&self, endian: Self::Endian) -> Self::Word {
         self.p_vaddr.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_paddr(&self, endian: Self::Endian) -> Self::Word {
         self.p_paddr.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_filesz(&self, endian: Self::Endian) -> Self::Word {
         self.p_filesz.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_memsz(&self, endian: Self::Endian) -> Self::Word {
         self.p_memsz.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_align(&self, endian: Self::Endian) -> Self::Word {
         self.p_align.get(endian)
     }

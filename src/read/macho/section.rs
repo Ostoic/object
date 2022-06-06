@@ -105,32 +105,38 @@ where
 {
     type RelocationIterator = MachORelocationIterator<'data, 'file, Mach, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SectionIndex {
         self.internal.index
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         self.internal.section.addr(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         self.internal.section.size(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
         1 << self.internal.section.align(self.file.endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> Option<(u64, u64)> {
         self.internal.section.file_range(self.file.endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]> {
         self.bytes()
     }
@@ -144,34 +150,40 @@ where
         ))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_file_range(&self) -> Result<CompressedFileRange> {
         Ok(CompressedFileRange::none(self.file_range()))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_data(&self) -> Result<CompressedData<'data>> {
         self.data().map(CompressedData::none)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&[u8]> {
         Ok(self.internal.section.name())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&str> {
         str::from_utf8(self.internal.section.name())
             .ok()
             .read_error("Non UTF-8 Mach-O section name")
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name_bytes(&self) -> Result<Option<&[u8]>> {
         Ok(Some(self.internal.section.segment_name()))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name(&self) -> Result<Option<&str>> {
         Ok(Some(
             str::from_utf8(self.internal.section.segment_name())

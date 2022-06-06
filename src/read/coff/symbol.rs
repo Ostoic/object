@@ -64,13 +64,15 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
     }
 
     /// Return the string table used for the symbol names.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn strings(&self) -> StringTable<'data, R> {
         self.strings
     }
 
     /// Return true if the symbol table is empty.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_empty(&self) -> bool {
         self.symbols.is_empty()
     }
@@ -78,13 +80,15 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
     /// The number of symbol table entries.
     ///
     /// This includes auxiliary symbol table entries.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn len(&self) -> usize {
         self.symbols.len()
     }
 
     /// Iterate over the symbols.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn iter<'table>(&'table self) -> SymbolIterator<'data, 'table, R> {
         SymbolIterator {
             symbols: self,
@@ -93,7 +97,8 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
     }
 
     /// Return the symbol table entry at the given index.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol(&self, index: usize) -> Result<&'data pe::ImageSymbol> {
         self.get::<pe::ImageSymbol>(index, 0)
     }
@@ -101,7 +106,8 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
     /// Return the auxiliary function symbol for the symbol table entry at the given index.
     ///
     /// Note that the index is of the symbol, not the first auxiliary record.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn aux_function(&self, index: usize) -> Result<&'data pe::ImageAuxSymbolFunction> {
         self.get::<pe::ImageAuxSymbolFunction>(index, 1)
     }
@@ -109,7 +115,8 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
     /// Return the auxiliary section symbol for the symbol table entry at the given index.
     ///
     /// Note that the index is of the symbol, not the first auxiliary record.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn aux_section(&self, index: usize) -> Result<&'data pe::ImageAuxSymbolSection> {
         self.get::<pe::ImageAuxSymbolSection>(index, 1)
     }
@@ -333,7 +340,8 @@ where
 impl<'data, 'file, R: ReadRef<'data>> read::private::Sealed for CoffSymbol<'data, 'file, R> {}
 
 impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 'file, R> {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SymbolIndex {
         self.index
     }
@@ -455,31 +463,36 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_undefined(&self) -> bool {
         self.symbol.storage_class == pe::IMAGE_SYM_CLASS_EXTERNAL
             && self.symbol.section_number.get(LE) == pe::IMAGE_SYM_UNDEFINED
             && self.symbol.value.get(LE) == 0
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_definition(&self) -> bool {
         self.symbol.is_definition()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_common(&self) -> bool {
         self.symbol.storage_class == pe::IMAGE_SYM_CLASS_EXTERNAL
             && self.symbol.section_number.get(LE) == pe::IMAGE_SYM_UNDEFINED
             && self.symbol.value.get(LE) != 0
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_weak(&self) -> bool {
         self.symbol.storage_class == pe::IMAGE_SYM_CLASS_WEAK_EXTERNAL
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn scope(&self) -> SymbolScope {
         match self.symbol.storage_class {
             pe::IMAGE_SYM_CLASS_EXTERNAL | pe::IMAGE_SYM_CLASS_WEAK_EXTERNAL => {
@@ -490,7 +503,8 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_global(&self) -> bool {
         match self.symbol.storage_class {
             pe::IMAGE_SYM_CLASS_EXTERNAL | pe::IMAGE_SYM_CLASS_WEAK_EXTERNAL => true,
@@ -498,7 +512,8 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_local(&self) -> bool {
         !self.is_global()
     }

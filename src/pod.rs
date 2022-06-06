@@ -23,7 +23,8 @@ pub unsafe trait Pod: Copy + 'static {}
 /// Cast a byte slice to a `Pod` type.
 ///
 /// Returns the type and the tail of the slice.
-#[inline]
+#[cfg_attr(not(feature = "aggressive-inline"), inline)]
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn from_bytes<T: Pod>(data: &[u8]) -> Result<(&T, &[u8])> {
     let size = mem::size_of::<T>();
     let tail = data.get(size..).ok_or(())?;
@@ -41,7 +42,8 @@ pub fn from_bytes<T: Pod>(data: &[u8]) -> Result<(&T, &[u8])> {
 /// Cast a mutable byte slice to a `Pod` type.
 ///
 /// Returns the type and the tail of the slice.
-#[inline]
+#[cfg_attr(not(feature = "aggressive-inline"), inline)]
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn from_bytes_mut<T: Pod>(data: &mut [u8]) -> Result<(&mut T, &mut [u8])> {
     let size = mem::size_of::<T>();
     if size > data.len() {
@@ -62,7 +64,8 @@ pub fn from_bytes_mut<T: Pod>(data: &mut [u8]) -> Result<(&mut T, &mut [u8])> {
 /// Cast a byte slice to a slice of a `Pod` type.
 ///
 /// Returns the type slice and the tail of the byte slice.
-#[inline]
+#[cfg_attr(not(feature = "aggressive-inline"), inline)]
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn slice_from_bytes<T: Pod>(data: &[u8], count: usize) -> Result<(&[T], &[u8])> {
     let size = count.checked_mul(mem::size_of::<T>()).ok_or(())?;
     let tail = data.get(size..).ok_or(())?;
@@ -80,7 +83,8 @@ pub fn slice_from_bytes<T: Pod>(data: &[u8], count: usize) -> Result<(&[T], &[u8
 /// Cast a mutable byte slice to a slice of a `Pod` type.
 ///
 /// Returns the type slice and the tail of the byte slice.
-#[inline]
+#[cfg_attr(not(feature = "aggressive-inline"), inline)]
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn slice_from_bytes_mut<T: Pod>(
     data: &mut [u8],
     count: usize,
@@ -102,7 +106,8 @@ pub fn slice_from_bytes_mut<T: Pod>(
 }
 
 /// Cast a `Pod` type to a byte slice.
-#[inline]
+#[cfg_attr(not(feature = "aggressive-inline"), inline)]
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn bytes_of<T: Pod>(val: &T) -> &[u8] {
     let size = mem::size_of::<T>();
     // Safety:
@@ -113,7 +118,8 @@ pub fn bytes_of<T: Pod>(val: &T) -> &[u8] {
 }
 
 /// Cast a `Pod` type to a mutable byte slice.
-#[inline]
+#[cfg_attr(not(feature = "aggressive-inline"), inline)]
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn bytes_of_mut<T: Pod>(val: &mut T) -> &mut [u8] {
     let size = mem::size_of::<T>();
     // Safety:
@@ -124,7 +130,8 @@ pub fn bytes_of_mut<T: Pod>(val: &mut T) -> &mut [u8] {
 }
 
 /// Cast a slice of a `Pod` type to a byte slice.
-#[inline]
+#[cfg_attr(not(feature = "aggressive-inline"), inline)]
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn bytes_of_slice<T: Pod>(val: &[T]) -> &[u8] {
     let size = val.len().wrapping_mul(mem::size_of::<T>());
     // Safety:
@@ -135,7 +142,8 @@ pub fn bytes_of_slice<T: Pod>(val: &[T]) -> &[u8] {
 }
 
 /// Cast a slice of a `Pod` type to a mutable byte slice.
-#[inline]
+#[cfg_attr(not(feature = "aggressive-inline"), inline)]
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn bytes_of_slice_mut<T: Pod>(val: &mut [T]) -> &mut [u8] {
     let size = val.len().wrapping_mul(mem::size_of::<T>());
     // Safety:

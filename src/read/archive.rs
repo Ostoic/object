@@ -139,7 +139,8 @@ impl<'data, R: ReadRef<'data>> ArchiveFile<'data, R> {
     }
 
     /// Return the archive format.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn kind(&self) -> ArchiveKind {
         self.kind
     }
@@ -147,7 +148,8 @@ impl<'data, R: ReadRef<'data>> ArchiveFile<'data, R> {
     /// Iterate over the members of the archive.
     ///
     /// This does not return special members.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn members(&self) -> ArchiveMemberIterator<'data, R> {
         ArchiveMemberIterator {
             data: self.data,
@@ -247,7 +249,8 @@ impl<'data> ArchiveMember<'data> {
     }
 
     /// Return the raw header.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn header(&self) -> &'data archive::Header {
         self.header
     }
@@ -255,31 +258,36 @@ impl<'data> ArchiveMember<'data> {
     /// Return the parsed file name.
     ///
     /// This may be an extended file name.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(&self) -> &'data [u8] {
         self.name
     }
 
     /// Parse the file modification timestamp from the header.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn date(&self) -> Option<u64> {
         parse_u64_digits(&self.header.date, 10)
     }
 
     /// Parse the user ID from the header.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn uid(&self) -> Option<u64> {
         parse_u64_digits(&self.header.uid, 10)
     }
 
     /// Parse the group ID from the header.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn gid(&self) -> Option<u64> {
         parse_u64_digits(&self.header.gid, 10)
     }
 
     /// Parse the file mode from the header.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn mode(&self) -> Option<u64> {
         parse_u64_digits(&self.header.mode, 8)
     }
@@ -290,7 +298,8 @@ impl<'data> ArchiveMember<'data> {
     }
 
     /// Return the file data.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data<R: ReadRef<'data>>(&self, data: R) -> read::Result<&'data [u8]> {
         data.read_bytes_at(self.offset, self.size)
             .read_error("Archive member size is too large")

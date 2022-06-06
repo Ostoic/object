@@ -65,7 +65,8 @@ mod private {
 pub struct Error(&'static str);
 
 impl fmt::Display for Error {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_str(self.0)
     }
@@ -291,7 +292,8 @@ impl SymbolSection {
     /// Returns the section index for the section where the symbol is defined.
     ///
     /// May return `None` if the symbol is not defined in a section.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn index(self) -> Option<SectionIndex> {
         if let SymbolSection::Section(index) = self {
             Some(index)
@@ -336,7 +338,8 @@ impl<T: SymbolMapEntry> SymbolMap<T> {
     }
 
     /// Get all symbols in the map.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbols(&self) -> &[T] {
         &self.symbols
     }
@@ -357,20 +360,23 @@ impl<'data> SymbolMapName<'data> {
     }
 
     /// The symbol address.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn address(&self) -> u64 {
         self.address
     }
 
     /// The symbol name.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(&self) -> &'data str {
         self.name
     }
 }
 
 impl<'data> SymbolMapEntry for SymbolMapName<'data> {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         self.address
     }
@@ -395,13 +401,15 @@ impl<'data> ObjectMap<'data> {
     }
 
     /// Get all symbols in the map.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbols(&self) -> &[ObjectMapEntry<'data>] {
         self.symbols.symbols()
     }
 
     /// Get all objects in the map.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn objects(&self) -> &[&'data [u8]] {
         &self.objects
     }
@@ -419,7 +427,8 @@ pub struct ObjectMapEntry<'data> {
 
 impl<'data> ObjectMapEntry<'data> {
     /// Get the symbol address.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn address(&self) -> u64 {
         self.address
     }
@@ -427,32 +436,37 @@ impl<'data> ObjectMapEntry<'data> {
     /// Get the symbol size.
     ///
     /// This may be 0 if the size is unknown.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn size(&self) -> u64 {
         self.size
     }
 
     /// Get the symbol name.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(&self) -> &'data [u8] {
         self.name
     }
 
     /// Get the index of the object file name.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn object_index(&self) -> usize {
         self.object
     }
 
     /// Get the object file name.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn object(&self, map: &ObjectMap<'data>) -> &'data [u8] {
         map.objects[self.object]
     }
 }
 
 impl<'data> SymbolMapEntry for ObjectMapEntry<'data> {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         self.address
     }
@@ -469,13 +483,15 @@ pub struct Import<'data> {
 
 impl<'data> Import<'data> {
     /// The symbol name.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(&self) -> &'data [u8] {
         self.name.0
     }
 
     /// The name of the library to import the symbol from.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn library(&self) -> &'data [u8] {
         self.library.0
     }
@@ -492,13 +508,15 @@ pub struct Export<'data> {
 
 impl<'data> Export<'data> {
     /// The symbol name.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(&self) -> &'data [u8] {
         self.name.0
     }
 
     /// The virtual address of the symbol.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn address(&self) -> u64 {
         self.address
     }
@@ -515,19 +533,22 @@ pub struct CodeView<'data> {
 
 impl<'data> CodeView<'data> {
     /// The path to the PDB as stored in CodeView
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn path(&self) -> &'data [u8] {
         self.path.0
     }
 
     /// The age of the PDB
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn age(&self) -> u32 {
         self.age
     }
 
     /// The GUID of the PDB.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn guid(&self) -> [u8; 16] {
         self.guid
     }
@@ -559,13 +580,15 @@ pub struct Relocation {
 
 impl Relocation {
     /// The operation used to calculate the result of the relocation.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn kind(&self) -> RelocationKind {
         self.kind
     }
 
     /// Information about how the result of the relocation operation is encoded in the place.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn encoding(&self) -> RelocationEncoding {
         self.encoding
     }
@@ -573,32 +596,37 @@ impl Relocation {
     /// The size in bits of the place of the relocation.
     ///
     /// If 0, then the size is determined by the relocation kind.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn size(&self) -> u8 {
         self.size
     }
 
     /// The target of the relocation.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn target(&self) -> RelocationTarget {
         self.target
     }
 
     /// The addend to use in the relocation calculation.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn addend(&self) -> i64 {
         self.addend
     }
 
     /// Set the addend to use in the relocation calculation.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_addend(&mut self, addend: i64) {
         self.addend = addend
     }
 
     /// Returns true if there is an implicit addend stored in the data at the offset
     /// to be relocated.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn has_implicit_addend(&self) -> bool {
         self.implicit_addend
     }
@@ -634,7 +662,8 @@ pub struct CompressedFileRange {
 
 impl CompressedFileRange {
     /// Data that is uncompressed.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn none(range: Option<(u64, u64)>) -> Self {
         if let Some((offset, size)) = range {
             CompressedFileRange {
@@ -680,7 +709,8 @@ pub struct CompressedData<'data> {
 
 impl<'data> CompressedData<'data> {
     /// Data that is uncompressed.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn none(data: &'data [u8]) -> Self {
         CompressedData {
             format: CompressionFormat::None,

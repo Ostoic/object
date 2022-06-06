@@ -181,12 +181,14 @@ where
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_little_endian(&self) -> bool {
         self.header.is_little_endian()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_64(&self) -> bool {
         self.header.is_class_64()
     }
@@ -709,77 +711,92 @@ impl<Endian: endian::Endian> FileHeader for elf::FileHeader32<Endian> {
     type Rel = elf::Rel32<Endian>;
     type Rela = elf::Rela32<Endian>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_type_64(&self) -> bool {
         false
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_ident(&self) -> &elf::Ident {
         &self.e_ident
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_type(&self, endian: Self::Endian) -> u16 {
         self.e_type.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_machine(&self, endian: Self::Endian) -> u16 {
         self.e_machine.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_version(&self, endian: Self::Endian) -> u32 {
         self.e_version.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_entry(&self, endian: Self::Endian) -> Self::Word {
         self.e_entry.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_phoff(&self, endian: Self::Endian) -> Self::Word {
         self.e_phoff.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_shoff(&self, endian: Self::Endian) -> Self::Word {
         self.e_shoff.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_flags(&self, endian: Self::Endian) -> u32 {
         self.e_flags.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_ehsize(&self, endian: Self::Endian) -> u16 {
         self.e_ehsize.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_phentsize(&self, endian: Self::Endian) -> u16 {
         self.e_phentsize.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_phnum(&self, endian: Self::Endian) -> u16 {
         self.e_phnum.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_shentsize(&self, endian: Self::Endian) -> u16 {
         self.e_shentsize.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_shnum(&self, endian: Self::Endian) -> u16 {
         self.e_shnum.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_shstrndx(&self, endian: Self::Endian) -> u16 {
         self.e_shstrndx.get(endian)
     }
@@ -798,77 +815,92 @@ impl<Endian: endian::Endian> FileHeader for elf::FileHeader64<Endian> {
     type Rel = elf::Rel64<Endian>;
     type Rela = elf::Rela64<Endian>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_type_64(&self) -> bool {
         true
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_ident(&self) -> &elf::Ident {
         &self.e_ident
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_type(&self, endian: Self::Endian) -> u16 {
         self.e_type.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_machine(&self, endian: Self::Endian) -> u16 {
         self.e_machine.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_version(&self, endian: Self::Endian) -> u32 {
         self.e_version.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_entry(&self, endian: Self::Endian) -> Self::Word {
         self.e_entry.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_phoff(&self, endian: Self::Endian) -> Self::Word {
         self.e_phoff.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_shoff(&self, endian: Self::Endian) -> Self::Word {
         self.e_shoff.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_flags(&self, endian: Self::Endian) -> u32 {
         self.e_flags.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_ehsize(&self, endian: Self::Endian) -> u16 {
         self.e_ehsize.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_phentsize(&self, endian: Self::Endian) -> u16 {
         self.e_phentsize.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_phnum(&self, endian: Self::Endian) -> u16 {
         self.e_phnum.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_shentsize(&self, endian: Self::Endian) -> u16 {
         self.e_shentsize.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_shnum(&self, endian: Self::Endian) -> u16 {
         self.e_shnum.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn e_shstrndx(&self, endian: Self::Endian) -> u16 {
         self.e_shstrndx.get(endian)
     }

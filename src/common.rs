@@ -72,7 +72,8 @@ pub enum AddressSize {
 
 impl AddressSize {
     /// The size in bytes of an address value.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn bytes(self) -> u8 {
         self as u8
     }

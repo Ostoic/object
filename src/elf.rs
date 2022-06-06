@@ -852,25 +852,29 @@ pub struct Sym32<E: Endian> {
 
 impl<E: Endian> Sym32<E> {
     /// Get the `st_bind` component of the `st_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn st_bind(&self) -> u8 {
         self.st_info >> 4
     }
 
     /// Get the `st_type` component of the `st_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn st_type(&self) -> u8 {
         self.st_info & 0xf
     }
 
     /// Set the `st_info` field given the `st_bind` and `st_type` components.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_st_info(&mut self, st_bind: u8, st_type: u8) {
         self.st_info = (st_bind << 4) + (st_type & 0xf);
     }
 
     /// Get the `st_visibility` component of the `st_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn st_visibility(&self) -> u8 {
         self.st_other & 0x3
     }
@@ -903,25 +907,29 @@ pub struct Sym64<E: Endian> {
 
 impl<E: Endian> Sym64<E> {
     /// Get the `st_bind` component of the `st_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn st_bind(&self) -> u8 {
         self.st_info >> 4
     }
 
     /// Get the `st_type` component of the `st_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn st_type(&self) -> u8 {
         self.st_info & 0xf
     }
 
     /// Set the `st_info` field given the `st_bind` and `st_type` components.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_st_info(&mut self, st_bind: u8, st_type: u8) {
         self.st_info = (st_bind << 4) + (st_type & 0xf);
     }
 
     /// Get the `st_visibility` component of the `st_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn st_visibility(&self) -> u8 {
         self.st_other & 0x3
     }
@@ -1042,13 +1050,15 @@ pub struct Rel32<E: Endian> {
 
 impl<E: Endian> Rel32<E> {
     /// Get the `r_sym` component of the `r_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_sym(&self, endian: E) -> u32 {
         self.r_info.get(endian) >> 8
     }
 
     /// Get the `r_type` component of the `r_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_type(&self, endian: E) -> u32 {
         self.r_info.get(endian) & 0xff
     }
@@ -1079,13 +1089,15 @@ pub struct Rela32<E: Endian> {
 
 impl<E: Endian> Rela32<E> {
     /// Get the `r_sym` component of the `r_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_sym(&self, endian: E) -> u32 {
         self.r_info.get(endian) >> 8
     }
 
     /// Get the `r_type` component of the `r_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_type(&self, endian: E) -> u32 {
         self.r_info.get(endian) & 0xff
     }
@@ -1124,13 +1136,15 @@ pub struct Rel64<E: Endian> {
 
 impl<E: Endian> Rel64<E> {
     /// Get the `r_sym` component of the `r_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_sym(&self, endian: E) -> u32 {
         (self.r_info.get(endian) >> 32) as u32
     }
 
     /// Get the `r_type` component of the `r_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_type(&self, endian: E) -> u32 {
         (self.r_info.get(endian) & 0xffff_ffff) as u32
     }
@@ -1183,13 +1197,15 @@ impl<E: Endian> Rela64<E> {
     }
 
     /// Get the `r_sym` component of the `r_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_sym(&self, endian: E, is_mips64el: bool) -> u32 {
         (self.get_r_info(endian, is_mips64el) >> 32) as u32
     }
 
     /// Get the `r_type` component of the `r_info` field.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_type(&self, endian: E, is_mips64el: bool) -> u32 {
         (self.get_r_info(endian, is_mips64el) & 0xffff_ffff) as u32
     }

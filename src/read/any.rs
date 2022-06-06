@@ -401,27 +401,32 @@ where
         with_inner!(self.inner, FileInternal, |x| x.has_debug_symbols())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn mach_uuid(&self) -> Result<Option<[u8; 16]>> {
         with_inner!(self.inner, FileInternal, |x| x.mach_uuid())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn build_id(&self) -> Result<Option<&'data [u8]>> {
         with_inner!(self.inner, FileInternal, |x| x.build_id())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn gnu_debuglink(&self) -> Result<Option<(&'data [u8], u32)>> {
         with_inner!(self.inner, FileInternal, |x| x.gnu_debuglink())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn gnu_debugaltlink(&self) -> Result<Option<(&'data [u8], &'data [u8])>> {
         with_inner!(self.inner, FileInternal, |x| x.gnu_debugaltlink())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn pdb_info(&self) -> Result<Option<CodeView>> {
         with_inner!(self.inner, FileInternal, |x| x.pdb_info())
     }

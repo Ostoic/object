@@ -32,6 +32,8 @@ default-features = false
 features = ["derive"]
 
 [features]
+aggressive-inline = []
+
 #=======================================
 # Read/write features.
 

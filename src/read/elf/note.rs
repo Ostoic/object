@@ -151,17 +151,20 @@ pub trait NoteHeader: Debug + Pod {
 impl<Endian: endian::Endian> NoteHeader for elf::NoteHeader32<Endian> {
     type Endian = Endian;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_namesz(&self, endian: Self::Endian) -> u32 {
         self.n_namesz.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_descsz(&self, endian: Self::Endian) -> u32 {
         self.n_descsz.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_type(&self, endian: Self::Endian) -> u32 {
         self.n_type.get(endian)
     }
@@ -170,17 +173,20 @@ impl<Endian: endian::Endian> NoteHeader for elf::NoteHeader32<Endian> {
 impl<Endian: endian::Endian> NoteHeader for elf::NoteHeader64<Endian> {
     type Endian = Endian;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_namesz(&self, endian: Self::Endian) -> u32 {
         self.n_namesz.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_descsz(&self, endian: Self::Endian) -> u32 {
         self.n_descsz.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_type(&self, endian: Self::Endian) -> u32 {
         self.n_type.get(endian)
     }

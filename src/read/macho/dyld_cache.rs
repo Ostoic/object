@@ -108,7 +108,8 @@ where
     }
 
     /// Get the endianness of the file.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn endianness(&self) -> Endianness {
         if self.is_little_endian() {
             Endianness::Little

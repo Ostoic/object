@@ -52,7 +52,8 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     fn architecture(&self) -> Architecture;
 
     /// Get the endianness of the file.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn endianness(&self) -> Endianness {
         if self.is_little_endian() {
             Endianness::Little
@@ -185,31 +186,36 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     fn has_debug_symbols(&self) -> bool;
 
     /// The UUID from a Mach-O `LC_UUID` load command.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn mach_uuid(&self) -> Result<Option<[u8; 16]>> {
         Ok(None)
     }
 
     /// The build ID from an ELF `NT_GNU_BUILD_ID` note.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn build_id(&self) -> Result<Option<&'data [u8]>> {
         Ok(None)
     }
 
     /// The filename and CRC from a `.gnu_debuglink` section.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn gnu_debuglink(&self) -> Result<Option<(&'data [u8], u32)>> {
         Ok(None)
     }
 
     /// The filename and build ID from a `.gnu_debugaltlink` section.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn gnu_debugaltlink(&self) -> Result<Option<(&'data [u8], &'data [u8])>> {
         Ok(None)
     }
 
     /// The filename and GUID from the PE CodeView section
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn pdb_info(&self) -> Result<Option<CodeView>> {
         Ok(None)
     }
@@ -463,7 +469,8 @@ pub struct NoDynamicRelocationIterator;
 impl Iterator for NoDynamicRelocationIterator {
     type Item = (u64, Relocation);
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         None
     }

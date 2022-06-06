@@ -76,22 +76,26 @@ where
     Pe: ImageNtHeaders,
     R: ReadRef<'data>,
 {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         u64::from(self.section.virtual_address.get(LE)).wrapping_add(self.file.common.image_base)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         u64::from(self.section.virtual_size.get(LE))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
         self.file.section_alignment()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> (u64, u64) {
         let (offset, size) = self.section.pe_file_range();
         (u64::from(offset), u64::from(size))
@@ -110,14 +114,16 @@ where
         ))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<Option<&[u8]>> {
         self.section
             .name(self.file.common.symbols.strings())
             .map(Some)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<Option<&str>> {
         let name = self.section.name(self.file.common.symbols.strings())?;
         Ok(Some(
@@ -127,7 +133,8 @@ where
         ))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SegmentFlags {
         let characteristics = self.section.characteristics.get(LE);
         SegmentFlags::Coff { characteristics }
@@ -205,27 +212,32 @@ where
 {
     type RelocationIterator = PeRelocationIterator<'data, 'file, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SectionIndex {
         self.index
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         u64::from(self.section.virtual_address.get(LE)).wrapping_add(self.file.common.image_base)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         u64::from(self.section.virtual_size.get(LE))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
         self.file.section_alignment()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> Option<(u64, u64)> {
         let (offset, size) = self.section.pe_file_range();
         if size == 0 {
@@ -248,22 +260,26 @@ where
         ))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_file_range(&self) -> Result<CompressedFileRange> {
         Ok(CompressedFileRange::none(self.file_range()))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_data(&self) -> Result<CompressedData<'data>> {
         self.data().map(CompressedData::none)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&[u8]> {
         self.section.name(self.file.common.symbols.strings())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&str> {
         let name = self.name_bytes()?;
         str::from_utf8(name)
@@ -271,17 +287,20 @@ where
             .read_error("Non UTF-8 PE section name")
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name_bytes(&self) -> Result<Option<&[u8]>> {
         Ok(None)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name(&self) -> Result<Option<&str>> {
         Ok(None)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SectionKind {
         self.section.kind()
     }

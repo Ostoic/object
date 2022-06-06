@@ -27,13 +27,15 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     fn is_big_endian(self) -> bool;
 
     /// Return true for little endian byte order.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_little_endian(self) -> bool {
         !self.is_big_endian()
     }
 
     /// Converts an unsigned 16 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_u16(self, n: u16) -> u16 {
         if self.is_big_endian() {
             u16::from_be(n)
@@ -43,7 +45,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unsigned 32 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_u32(self, n: u32) -> u32 {
         if self.is_big_endian() {
             u32::from_be(n)
@@ -53,7 +56,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unsigned 64 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_u64(self, n: u64) -> u64 {
         if self.is_big_endian() {
             u64::from_be(n)
@@ -63,7 +67,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts a signed 16 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_i16(self, n: i16) -> i16 {
         if self.is_big_endian() {
             i16::from_be(n)
@@ -73,7 +78,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts a signed 32 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_i32(self, n: i32) -> i32 {
         if self.is_big_endian() {
             i32::from_be(n)
@@ -83,7 +89,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts a signed 64 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_i64(self, n: i64) -> i64 {
         if self.is_big_endian() {
             i64::from_be(n)
@@ -93,7 +100,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned unsigned 16 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_u16_bytes(self, n: [u8; 2]) -> u16 {
         if self.is_big_endian() {
             u16::from_be_bytes(n)
@@ -103,7 +111,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned unsigned 32 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_u32_bytes(self, n: [u8; 4]) -> u32 {
         if self.is_big_endian() {
             u32::from_be_bytes(n)
@@ -113,7 +122,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned unsigned 64 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_u64_bytes(self, n: [u8; 8]) -> u64 {
         if self.is_big_endian() {
             u64::from_be_bytes(n)
@@ -123,7 +133,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned signed 16 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_i16_bytes(self, n: [u8; 2]) -> i16 {
         if self.is_big_endian() {
             i16::from_be_bytes(n)
@@ -133,7 +144,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned signed 32 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_i32_bytes(self, n: [u8; 4]) -> i32 {
         if self.is_big_endian() {
             i32::from_be_bytes(n)
@@ -143,7 +155,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned signed 64 bit integer to native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_i64_bytes(self, n: [u8; 8]) -> i64 {
         if self.is_big_endian() {
             i64::from_be_bytes(n)
@@ -153,7 +166,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unsigned 16 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_u16(self, n: u16) -> u16 {
         if self.is_big_endian() {
             u16::to_be(n)
@@ -163,7 +177,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unsigned 32 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_u32(self, n: u32) -> u32 {
         if self.is_big_endian() {
             u32::to_be(n)
@@ -173,7 +188,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unsigned 64 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_u64(self, n: u64) -> u64 {
         if self.is_big_endian() {
             u64::to_be(n)
@@ -183,7 +199,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts a signed 16 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_i16(self, n: i16) -> i16 {
         if self.is_big_endian() {
             i16::to_be(n)
@@ -193,7 +210,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts a signed 32 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_i32(self, n: i32) -> i32 {
         if self.is_big_endian() {
             i32::to_be(n)
@@ -203,7 +221,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts a signed 64 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_i64(self, n: i64) -> i64 {
         if self.is_big_endian() {
             i64::to_be(n)
@@ -213,7 +232,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned unsigned 16 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_u16_bytes(self, n: u16) -> [u8; 2] {
         if self.is_big_endian() {
             u16::to_be_bytes(n)
@@ -223,7 +243,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned unsigned 32 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_u32_bytes(self, n: u32) -> [u8; 4] {
         if self.is_big_endian() {
             u32::to_be_bytes(n)
@@ -233,7 +254,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned unsigned 64 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_u64_bytes(self, n: u64) -> [u8; 8] {
         if self.is_big_endian() {
             u64::to_be_bytes(n)
@@ -243,7 +265,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned signed 16 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_i16_bytes(self, n: i16) -> [u8; 2] {
         if self.is_big_endian() {
             i16::to_be_bytes(n)
@@ -253,7 +276,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned signed 32 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_i32_bytes(self, n: i32) -> [u8; 4] {
         if self.is_big_endian() {
             i32::to_be_bytes(n)
@@ -263,7 +287,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
     }
 
     /// Converts an unaligned signed 64 bit integer from native endian.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_i64_bytes(self, n: i64) -> [u8; 8] {
         if self.is_big_endian() {
             i64::to_be_bytes(n)
@@ -284,20 +309,23 @@ pub enum Endianness {
 
 impl Default for Endianness {
     #[cfg(target_endian = "little")]
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn default() -> Endianness {
         Endianness::Little
     }
 
     #[cfg(target_endian = "big")]
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn default() -> Endianness {
         Endianness::Big
     }
 }
 
 impl Endian for Endianness {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn from_big_endian(big_endian: bool) -> Option<Self> {
         Some(if big_endian {
             Endianness::Big
@@ -306,7 +334,8 @@ impl Endian for Endianness {
         })
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_big_endian(self) -> bool {
         self != Endianness::Little
     }
@@ -318,14 +347,16 @@ impl Endian for Endianness {
 pub struct LittleEndian;
 
 impl Default for LittleEndian {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn default() -> LittleEndian {
         LittleEndian
     }
 }
 
 impl Endian for LittleEndian {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn from_big_endian(big_endian: bool) -> Option<Self> {
         if big_endian {
             None
@@ -334,7 +365,8 @@ impl Endian for LittleEndian {
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_big_endian(self) -> bool {
         false
     }
@@ -346,14 +378,16 @@ impl Endian for LittleEndian {
 pub struct BigEndian;
 
 impl Default for BigEndian {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn default() -> BigEndian {
         BigEndian
     }
 }
 
 impl Endian for BigEndian {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn from_big_endian(big_endian: bool) -> Option<Self> {
         if big_endian {
             Some(BigEndian)
@@ -362,7 +396,8 @@ impl Endian for BigEndian {
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_big_endian(self) -> bool {
         true
     }

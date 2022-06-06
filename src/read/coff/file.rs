@@ -78,12 +78,14 @@ where
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_little_endian(&self) -> bool {
         true
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_64(&self) -> bool {
         // Windows COFF is always 32-bit, even for 64-bit architectures. This could be confusing.
         false
@@ -147,7 +149,8 @@ where
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_table(&'file self) -> Option<CoffSymbolTable<'data, 'file, R>> {
         Some(CoffSymbolTable { file: &self.common })
     }
@@ -160,23 +163,27 @@ where
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbol_table(&'file self) -> Option<CoffSymbolTable<'data, 'file, R>> {
         None
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_relocations(&'file self) -> Option<NoDynamicRelocationIterator> {
         None
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn imports(&self) -> Result<Vec<Import<'data>>> {
         // TODO: this could return undefined symbols, but not needed yet.
         Ok(Vec::new())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn exports(&self) -> Result<Vec<Export<'data>>> {
         // TODO: this could return global symbols, but not needed yet.
         Ok(Vec::new())
@@ -190,7 +197,8 @@ where
         0
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn entry(&self) -> u64 {
         0
     }
@@ -226,7 +234,8 @@ impl pe::ImageFileHeader {
     ///
     /// `data` must be the entire file data.
     /// `offset` must be after the optional file header.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn sections<'data, R: ReadRef<'data>>(
         &self,
         data: R,
@@ -238,7 +247,8 @@ impl pe::ImageFileHeader {
     /// Read the symbol table and string table.
     ///
     /// `data` must be the entire file data.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbols<'data, R: ReadRef<'data>>(
         &self,
         data: R,

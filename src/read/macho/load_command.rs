@@ -72,7 +72,8 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     }
 
     /// Parse the data as the given type.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data<T: Pod>(&self) -> Result<&'data T> {
         self.data
             .read_at(0)

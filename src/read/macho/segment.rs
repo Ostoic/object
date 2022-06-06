@@ -88,23 +88,27 @@ where
     Mach: MachHeader,
     R: ReadRef<'data>,
 {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         self.internal.segment.vmaddr(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         self.internal.segment.vmsize(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
         // Page size.
         0x1000
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> (u64, u64) {
         self.internal.segment.file_range(self.file.endian)
     }
@@ -122,12 +126,14 @@ where
         ))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<Option<&[u8]>> {
         Ok(Some(self.internal.segment.name()))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<Option<&str>> {
         Ok(Some(
             str::from_utf8(self.internal.segment.name())
@@ -136,7 +142,8 @@ where
         ))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SegmentFlags {
         let flags = self.internal.segment.flags(self.file.endian);
         let maxprot = self.internal.segment.maxprot(self.file.endian);

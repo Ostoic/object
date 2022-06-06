@@ -37,31 +37,36 @@ impl<'data, Mach: MachHeader, R: ReadRef<'data>> Default for SymbolTable<'data, 
 }
 
 impl<'data, Mach: MachHeader, R: ReadRef<'data>> SymbolTable<'data, Mach, R> {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn new(symbols: &'data [Mach::Nlist], strings: StringTable<'data, R>) -> Self {
         SymbolTable { symbols, strings }
     }
 
     /// Return the string table used for the symbol names.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn strings(&self) -> StringTable<'data, R> {
         self.strings
     }
 
     /// Iterate over the symbols.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn iter(&self) -> slice::Iter<'data, Mach::Nlist> {
         self.symbols.iter()
     }
 
     /// Return true if the symbol table is empty.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_empty(&self) -> bool {
         self.symbols.is_empty()
     }
 
     /// The number of symbols.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn len(&self) -> usize {
         self.symbols.len()
     }
@@ -286,7 +291,8 @@ where
     Mach: MachHeader,
     R: ReadRef<'data>,
 {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SymbolIndex {
         self.index
     }
@@ -302,12 +308,14 @@ where
             .read_error("Non UTF-8 Mach-O symbol name")
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         self.nlist.n_value(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         0
     }
@@ -347,23 +355,27 @@ where
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_undefined(&self) -> bool {
         self.nlist.n_type() & macho::N_TYPE == macho::N_UNDF
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_definition(&self) -> bool {
         self.nlist.is_definition()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_common(&self) -> bool {
         // Mach-O common symbols are based on section, not symbol
         false
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_weak(&self) -> bool {
         self.nlist.n_desc(self.file.endian) & (macho::N_WEAK_REF | macho::N_WEAK_DEF) != 0
     }
@@ -381,17 +393,20 @@ where
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_global(&self) -> bool {
         self.scope() != SymbolScope::Compilation
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_local(&self) -> bool {
         self.scope() == SymbolScope::Compilation
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SymbolFlags<SectionIndex> {
         let n_desc = self.nlist.n_desc(self.file.endian);
         SymbolFlags::MachO { n_desc }
@@ -443,7 +458,8 @@ pub trait Nlist: Debug + Pod {
     ///
     /// This is either a 1-based index into the dylib load commands,
     /// or a special ordinal.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn library_ordinal(&self, endian: Self::Endian) -> u8 {
         (self.n_desc(endian) >> 8) as u8
     }

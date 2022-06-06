@@ -935,24 +935,28 @@ pub const N_TSHIFT: usize = 2;
 pub const IMAGE_SYM_DTYPE_SHIFT: usize = N_BTSHFT;
 
 impl ImageSymbol {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn base_type(&self) -> u16 {
         self.typ.get(LE) & N_BTMASK
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn derived_type(&self) -> u16 {
         (self.typ.get(LE) & N_TMASK) >> N_BTSHFT
     }
 }
 
 impl ImageSymbolEx {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn base_type(&self) -> u16 {
         self.typ.get(LE) & N_BTMASK
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn derived_type(&self) -> u16 {
         (self.typ.get(LE) & N_TMASK) >> N_BTSHFT
     }

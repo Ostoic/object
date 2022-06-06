@@ -99,12 +99,14 @@ where
 {
     type SectionIterator = ElfComdatSectionIterator<'data, 'file, Elf, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ComdatKind {
         ComdatKind::Any
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol(&self) -> SymbolIndex {
         SymbolIndex(self.section.sh_info(self.file.endian) as usize)
     }

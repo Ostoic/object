@@ -29,25 +29,29 @@ where
 
 impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     /// Create a new section table.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(sections: &'data [Elf::SectionHeader], strings: StringTable<'data, R>) -> Self {
         SectionTable { sections, strings }
     }
 
     /// Iterate over the section headers.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn iter(&self) -> slice::Iter<'data, Elf::SectionHeader> {
         self.sections.iter()
     }
 
     /// Return true if the section table is empty.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_empty(&self) -> bool {
         self.sections.is_empty()
     }
 
     /// The number of section headers.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn len(&self) -> usize {
         self.sections.len()
     }
@@ -85,7 +89,8 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     /// Return the string table at the given section index.
     ///
     /// Returns an error if the section is not a string table.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn strings(
         &self,
         endian: Elf::Endian,
@@ -100,7 +105,8 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     /// Return the symbol table of the given section type.
     ///
     /// Returns an empty symbol table if the symbol table does not exist.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbols(
         &self,
         endian: Elf::Endian,
@@ -124,7 +130,8 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     /// Return the symbol table at the given section index.
     ///
     /// Returns an error if the section is not a symbol table.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol_table_by_index(
         &self,
         endian: Elf::Endian,
@@ -140,7 +147,8 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     }
 
     /// Create a mapping from section index to associated relocation sections.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn relocation_sections(
         &self,
         endian: Elf::Endian,
@@ -468,32 +476,38 @@ where
 {
     type RelocationIterator = ElfSectionRelocationIterator<'data, 'file, Elf, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SectionIndex {
         self.index
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         self.section.sh_addr(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         self.section.sh_size(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
         self.section.sh_addralign(self.file.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> Option<(u64, u64)> {
         self.section.file_range(self.file.endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> read::Result<&'data [u8]> {
         self.bytes()
     }
@@ -534,12 +548,14 @@ where
             .read_error("Non UTF-8 ELF section name")
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name_bytes(&self) -> read::Result<Option<&[u8]>> {
         Ok(None)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name(&self) -> read::Result<Option<&str>> {
         Ok(None)
     }
@@ -985,52 +1001,62 @@ impl<Endian: endian::Endian> SectionHeader for elf::SectionHeader32<Endian> {
     type Word = u32;
     type Endian = Endian;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_name(&self, endian: Self::Endian) -> u32 {
         self.sh_name.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_type(&self, endian: Self::Endian) -> u32 {
         self.sh_type.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_flags(&self, endian: Self::Endian) -> Self::Word {
         self.sh_flags.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_addr(&self, endian: Self::Endian) -> Self::Word {
         self.sh_addr.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_offset(&self, endian: Self::Endian) -> Self::Word {
         self.sh_offset.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_size(&self, endian: Self::Endian) -> Self::Word {
         self.sh_size.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_link(&self, endian: Self::Endian) -> u32 {
         self.sh_link.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_info(&self, endian: Self::Endian) -> u32 {
         self.sh_info.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_addralign(&self, endian: Self::Endian) -> Self::Word {
         self.sh_addralign.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_entsize(&self, endian: Self::Endian) -> Self::Word {
         self.sh_entsize.get(endian)
     }
@@ -1041,52 +1067,62 @@ impl<Endian: endian::Endian> SectionHeader for elf::SectionHeader64<Endian> {
     type Endian = Endian;
     type Elf = elf::FileHeader64<Endian>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_name(&self, endian: Self::Endian) -> u32 {
         self.sh_name.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_type(&self, endian: Self::Endian) -> u32 {
         self.sh_type.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_flags(&self, endian: Self::Endian) -> Self::Word {
         self.sh_flags.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_addr(&self, endian: Self::Endian) -> Self::Word {
         self.sh_addr.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_offset(&self, endian: Self::Endian) -> Self::Word {
         self.sh_offset.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_size(&self, endian: Self::Endian) -> Self::Word {
         self.sh_size.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_link(&self, endian: Self::Endian) -> u32 {
         self.sh_link.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_info(&self, endian: Self::Endian) -> u32 {
         self.sh_info.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_addralign(&self, endian: Self::Endian) -> Self::Word {
         self.sh_addralign.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_entsize(&self, endian: Self::Endian) -> Self::Word {
         self.sh_entsize.get(endian)
     }

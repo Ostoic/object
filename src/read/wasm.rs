@@ -318,17 +318,20 @@ where
     type SymbolTable = WasmSymbolTable<'data, 'file>;
     type DynamicRelocationIterator = NoDynamicRelocationIterator;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn architecture(&self) -> Architecture {
         Architecture::Wasm32
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_little_endian(&self) -> bool {
         true
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_64(&self) -> bool {
         false
     }
@@ -375,7 +378,8 @@ where
         WasmComdatIterator { file: self }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&'file self, index: SymbolIndex) -> Result<WasmSymbol<'data, 'file>> {
         let symbol = self
             .symbols
@@ -402,12 +406,14 @@ where
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbol_table(&'file self) -> Option<WasmSymbolTable<'data, 'file>> {
         None
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_relocations(&self) -> Option<NoDynamicRelocationIterator> {
         None
     }
@@ -430,12 +436,14 @@ where
         0
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn entry(&'file self) -> u64 {
         self.entry
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> FileFlags {
         FileFlags::None
     }
@@ -452,7 +460,8 @@ pub struct WasmSegmentIterator<'data, 'file, R = &'data [u8]> {
 impl<'data, 'file, R> Iterator for WasmSegmentIterator<'data, 'file, R> {
     type Item = WasmSegment<'data, 'file, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         None
     }
@@ -469,22 +478,26 @@ pub struct WasmSegment<'data, 'file, R = &'data [u8]> {
 impl<'data, 'file, R> read::private::Sealed for WasmSegment<'data, 'file, R> {}
 
 impl<'data, 'file, R> ObjectSegment<'data> for WasmSegment<'data, 'file, R> {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         unreachable!()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         unreachable!()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
         unreachable!()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> (u64, u64) {
         unreachable!()
     }
@@ -497,17 +510,20 @@ impl<'data, 'file, R> ObjectSegment<'data> for WasmSegment<'data, 'file, R> {
         unreachable!()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<Option<&[u8]>> {
         unreachable!()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<Option<&str>> {
         unreachable!()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SegmentFlags {
         unreachable!()
     }
@@ -546,36 +562,42 @@ impl<'data, 'file, R> read::private::Sealed for WasmSection<'data, 'file, R> {}
 impl<'data, 'file, R> ObjectSection<'data> for WasmSection<'data, 'file, R> {
     type RelocationIterator = WasmRelocationIterator<'data, 'file, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SectionIndex {
         // Note that we treat all custom sections as index 0.
         // This is ok because they are never looked up by index.
         SectionIndex(section_code_to_id(self.section.code))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         0
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         let range = self.section.range();
         (range.end - range.start) as u64
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
         1
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> Option<(u64, u64)> {
         let range = self.section.range();
         Some((range.start as _, range.end as _))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]> {
         let mut reader = self.section.get_binary_reader();
         // TODO: raise a feature request upstream to be able
@@ -587,22 +609,26 @@ impl<'data, 'file, R> ObjectSection<'data> for WasmSection<'data, 'file, R> {
         unimplemented!()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_file_range(&self) -> Result<CompressedFileRange> {
         Ok(CompressedFileRange::none(self.file_range()))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_data(&self) -> Result<CompressedData<'data>> {
         self.data().map(CompressedData::none)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&[u8]> {
         self.name().map(str::as_bytes)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&str> {
         Ok(match self.section.code {
             wp::SectionCode::Custom { name, .. } => name,
@@ -621,17 +647,20 @@ impl<'data, 'file, R> ObjectSection<'data> for WasmSection<'data, 'file, R> {
         })
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name_bytes(&self) -> Result<Option<&[u8]>> {
         Ok(None)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name(&self) -> Result<Option<&str>> {
         Ok(None)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SectionKind {
         match self.section.code {
             wp::SectionCode::Custom { kind, .. } => match kind {
@@ -655,12 +684,14 @@ impl<'data, 'file, R> ObjectSection<'data> for WasmSection<'data, 'file, R> {
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relocations(&self) -> WasmRelocationIterator<'data, 'file, R> {
         WasmRelocationIterator(PhantomData)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SectionFlags {
         SectionFlags::None
     }
@@ -677,7 +708,8 @@ pub struct WasmComdatIterator<'data, 'file, R = &'data [u8]> {
 impl<'data, 'file, R> Iterator for WasmComdatIterator<'data, 'file, R> {
     type Item = WasmComdat<'data, 'file, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         None
     }
@@ -696,27 +728,32 @@ impl<'data, 'file, R> read::private::Sealed for WasmComdat<'data, 'file, R> {}
 impl<'data, 'file, R> ObjectComdat<'data> for WasmComdat<'data, 'file, R> {
     type SectionIterator = WasmComdatSectionIterator<'data, 'file, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ComdatKind {
         unreachable!();
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol(&self) -> SymbolIndex {
         unreachable!();
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&[u8]> {
         unreachable!();
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&str> {
         unreachable!();
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&self) -> Self::SectionIterator {
         unreachable!();
     }
@@ -810,77 +847,92 @@ struct WasmSymbolInternal<'data> {
 impl<'data, 'file> read::private::Sealed for WasmSymbol<'data, 'file> {}
 
 impl<'data, 'file> ObjectSymbol<'data> for WasmSymbol<'data, 'file> {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SymbolIndex {
         self.index
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> read::Result<&'data [u8]> {
         Ok(self.symbol.name.as_bytes())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> read::Result<&'data str> {
         Ok(self.symbol.name)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         self.symbol.address
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         self.symbol.size
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SymbolKind {
         self.symbol.kind
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section(&self) -> SymbolSection {
         self.symbol.section
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_undefined(&self) -> bool {
         self.symbol.section == SymbolSection::Undefined
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_definition(&self) -> bool {
         self.symbol.kind == SymbolKind::Text && self.symbol.section != SymbolSection::Undefined
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_common(&self) -> bool {
         self.symbol.section == SymbolSection::Common
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_weak(&self) -> bool {
         false
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn scope(&self) -> SymbolScope {
         self.symbol.scope
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_global(&self) -> bool {
         self.symbol.scope != SymbolScope::Compilation
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_local(&self) -> bool {
         self.symbol.scope == SymbolScope::Compilation
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SymbolFlags<SectionIndex> {
         SymbolFlags::None
     }
@@ -896,7 +948,8 @@ pub struct WasmRelocationIterator<'data, 'file, R = &'data [u8]>(
 impl<'data, 'file, R> Iterator for WasmRelocationIterator<'data, 'file, R> {
     type Item = (u64, Relocation);
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         None
     }

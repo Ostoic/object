@@ -24,13 +24,15 @@ impl<'data> fmt::Debug for Bytes<'data> {
 
 impl<'data> Bytes<'data> {
     /// Return the length of the byte slice.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
     /// Return true if the byte slice is empty.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
@@ -40,7 +42,8 @@ impl<'data> Bytes<'data> {
     /// Modifies the byte slice to start after the bytes.
     ///
     /// Returns an error if there are too few bytes.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn skip(&mut self, offset: usize) -> Result<(), ()> {
         match self.0.get(offset..) {
             Some(tail) => {
@@ -59,7 +62,8 @@ impl<'data> Bytes<'data> {
     /// Modifies the byte slice to start after the bytes.
     ///
     /// Returns an error if there are too few bytes.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn read_bytes(&mut self, count: usize) -> Result<Bytes<'data>, ()> {
         match (self.0.get(..count), self.0.get(count..)) {
             (Some(head), Some(tail)) => {
@@ -76,7 +80,8 @@ impl<'data> Bytes<'data> {
     /// Return a reference to the given number of bytes at the given offset of the byte slice.
     ///
     /// Returns an error if the offset is invalid or there are too few bytes.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn read_bytes_at(mut self, offset: usize, count: usize) -> Result<Bytes<'data>, ()> {
         self.skip(offset)?;
         self.read_bytes(count)
@@ -87,7 +92,8 @@ impl<'data> Bytes<'data> {
     /// Modifies the byte slice to start after the bytes.
     ///
     /// Returns an error if there are too few bytes or the slice is incorrectly aligned.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn read<T: Pod>(&mut self) -> Result<&'data T, ()> {
         match from_bytes(self.0) {
             Ok((value, tail)) => {
@@ -104,7 +110,8 @@ impl<'data> Bytes<'data> {
     /// Return a reference to a `Pod` struct at the given offset of the byte slice.
     ///
     /// Returns an error if there are too few bytes or the offset is incorrectly aligned.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn read_at<T: Pod>(mut self, offset: usize) -> Result<&'data T, ()> {
         self.skip(offset)?;
         self.read()
@@ -115,7 +122,8 @@ impl<'data> Bytes<'data> {
     /// Modifies the byte slice to start after the bytes.
     ///
     /// Returns an error if there are too few bytes or the offset is incorrectly aligned.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn read_slice<T: Pod>(&mut self, count: usize) -> Result<&'data [T], ()> {
         match slice_from_bytes(self.0, count) {
             Ok((value, tail)) => {
@@ -132,7 +140,8 @@ impl<'data> Bytes<'data> {
     /// Return a reference to a slice of `Pod` structs at the given offset of the byte slice.
     ///
     /// Returns an error if there are too few bytes or the offset is incorrectly aligned.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn read_slice_at<T: Pod>(mut self, offset: usize, count: usize) -> Result<&'data [T], ()> {
         self.skip(offset)?;
         self.read_slice(count)
@@ -142,7 +151,8 @@ impl<'data> Bytes<'data> {
     ///
     /// Does not assume any encoding.
     /// Reads past the null byte, but doesn't return it.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn read_string(&mut self) -> Result<&'data [u8], ()> {
         match memchr::memchr(b'\0', self.0) {
             Some(null) => {
@@ -161,7 +171,8 @@ impl<'data> Bytes<'data> {
     /// Read a null terminated string at an offset.
     ///
     /// Does not assume any encoding. Does not return the null byte.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn read_string_at(mut self, offset: usize) -> Result<&'data [u8], ()> {
         self.skip(offset)?;
         self.read_string()
@@ -211,7 +222,8 @@ impl<'data> fmt::Debug for ByteString<'data> {
 }
 
 #[allow(dead_code)]
-#[inline]
+#[cfg_attr(not(feature = "aggressive-inline"), inline)]
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(crate) fn align(offset: usize, size: usize) -> usize {
     (offset + (size - 1)) & !(size - 1)
 }

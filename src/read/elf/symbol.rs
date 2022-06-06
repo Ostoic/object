@@ -90,49 +90,57 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
     }
 
     /// Return the section index of this symbol table.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section(&self) -> SectionIndex {
         self.section
     }
 
     /// Return the section index of the shndx table.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn shndx_section(&self) -> SectionIndex {
         self.shndx_section
     }
 
     /// Return the section index of the linked string table.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn string_section(&self) -> SectionIndex {
         self.string_section
     }
 
     /// Return the string table used for the symbol names.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn strings(&self) -> StringTable<'data, R> {
         self.strings
     }
 
     /// Return the symbol table.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbols(&self) -> &'data [Elf::Sym] {
         self.symbols
     }
 
     /// Iterate over the symbols.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn iter(&self) -> slice::Iter<'data, Elf::Sym> {
         self.symbols.iter()
     }
 
     /// Return true if the symbol table is empty.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_empty(&self) -> bool {
         self.symbols.is_empty()
     }
 
     /// The number of symbols.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn len(&self) -> usize {
         self.symbols.len()
     }
@@ -145,7 +153,8 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
     }
 
     /// Return the extended section index for the given symbol if present.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn shndx(&self, index: usize) -> Option<u32> {
         self.shndx.get(index).copied()
     }
@@ -324,7 +333,8 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> read::private::Sealed
 impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
     for ElfSymbol<'data, 'file, Elf, R>
 {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SymbolIndex {
         self.index
     }
@@ -340,12 +350,14 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
             .read_error("Non UTF-8 ELF symbol name")
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         self.symbol.st_value(self.endian).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         self.symbol.st_size(self.endian).into()
     }
@@ -384,22 +396,26 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_undefined(&self) -> bool {
         self.symbol.st_shndx(self.endian) == elf::SHN_UNDEF
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_definition(&self) -> bool {
         self.symbol.is_definition(self.endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_common(&self) -> bool {
         self.symbol.st_shndx(self.endian) == elf::SHN_COMMON
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_weak(&self) -> bool {
         self.symbol.st_bind() == elf::STB_WEAK
     }
@@ -422,17 +438,20 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_global(&self) -> bool {
         self.symbol.st_bind() != elf::STB_LOCAL
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_local(&self) -> bool {
         self.symbol.st_bind() == elf::STB_LOCAL
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SymbolFlags<SectionIndex> {
         SymbolFlags::Elf {
             st_info: self.symbol.st_info(),
@@ -469,7 +488,8 @@ pub trait Sym: Debug + Pod {
     }
 
     /// Return true if the symbol is undefined.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_undefined(&self, endian: Self::Endian) -> bool {
         self.st_shndx(endian) == elf::SHN_UNDEF
     }
@@ -486,47 +506,56 @@ impl<Endian: endian::Endian> Sym for elf::Sym32<Endian> {
     type Word = u32;
     type Endian = Endian;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_name(&self, endian: Self::Endian) -> u32 {
         self.st_name.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_info(&self) -> u8 {
         self.st_info
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_bind(&self) -> u8 {
         self.st_bind()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_type(&self) -> u8 {
         self.st_type()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_other(&self) -> u8 {
         self.st_other
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_visibility(&self) -> u8 {
         self.st_visibility()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_shndx(&self, endian: Self::Endian) -> u16 {
         self.st_shndx.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_value(&self, endian: Self::Endian) -> Self::Word {
         self.st_value.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_size(&self, endian: Self::Endian) -> Self::Word {
         self.st_size.get(endian)
     }
@@ -536,47 +565,56 @@ impl<Endian: endian::Endian> Sym for elf::Sym64<Endian> {
     type Word = u64;
     type Endian = Endian;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_name(&self, endian: Self::Endian) -> u32 {
         self.st_name.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_info(&self) -> u8 {
         self.st_info
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_bind(&self) -> u8 {
         self.st_bind()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_type(&self) -> u8 {
         self.st_type()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_other(&self) -> u8 {
         self.st_other
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_visibility(&self) -> u8 {
         self.st_visibility()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_shndx(&self, endian: Self::Endian) -> u16 {
         self.st_shndx.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_value(&self, endian: Self::Endian) -> Self::Word {
         self.st_value.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_size(&self, endian: Self::Endian) -> Self::Word {
         self.st_size.get(endian)
     }

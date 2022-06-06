@@ -41,7 +41,8 @@ pub use util::*;
 pub struct Error(String);
 
 impl fmt::Display for Error {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_str(&self.0)
     }
@@ -94,25 +95,29 @@ impl<'a> Object<'a> {
     }
 
     /// Return the file format.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn format(&self) -> BinaryFormat {
         self.format
     }
 
     /// Return the architecture.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn architecture(&self) -> Architecture {
         self.architecture
     }
 
     /// Return the current mangling setting.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn mangling(&self) -> Mangling {
         self.mangling
     }
 
     /// Specify the mangling setting.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_mangling(&mut self, mangling: Mangling) {
         self.mangling = mangling;
     }
@@ -134,13 +139,15 @@ impl<'a> Object<'a> {
     }
 
     /// Get the section with the given `SectionId`.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section(&self, section: SectionId) -> &Section<'a> {
         &self.sections[section.0]
     }
 
     /// Mutably get the section with the given `SectionId`.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section_mut(&mut self, section: SectionId) -> &mut Section<'a> {
         &mut self.sections[section.0]
     }
@@ -282,13 +289,15 @@ impl<'a> Object<'a> {
     }
 
     /// Get the COMDAT section group with the given `ComdatId`.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn comdat(&self, comdat: ComdatId) -> &Comdat {
         &self.comdats[comdat.0]
     }
 
     /// Mutably get the COMDAT section group with the given `ComdatId`.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn comdat_mut(&mut self, comdat: ComdatId) -> &mut Comdat {
         &mut self.comdats[comdat.0]
     }
@@ -306,13 +315,15 @@ impl<'a> Object<'a> {
     }
 
     /// Get the symbol with the given `SymbolId`.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol(&self, symbol: SymbolId) -> &Symbol {
         &self.symbols[symbol.0]
     }
 
     /// Mutably get the symbol with the given `SymbolId`.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol_mut(&mut self, symbol: SymbolId) -> &mut Symbol {
         &mut self.symbols[symbol.0]
     }
@@ -354,13 +365,15 @@ impl<'a> Object<'a> {
     }
 
     /// Return true if the file format supports `StandardSection::UninitializedTls`.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn has_uninitialized_tls(&self) -> bool {
         self.format != BinaryFormat::Coff
     }
 
     /// Return true if the file format supports `StandardSection::Common`.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn has_common(&self) -> bool {
         self.format == BinaryFormat::MachO
     }
@@ -669,19 +682,22 @@ pub struct Section<'a> {
 
 impl<'a> Section<'a> {
     /// Try to convert the name to a utf8 string.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(&self) -> Option<&str> {
         str::from_utf8(&self.name).ok()
     }
 
     /// Try to convert the segment to a utf8 string.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn segment(&self) -> Option<&str> {
         str::from_utf8(&self.segment).ok()
     }
 
     /// Return true if this section contains zerofill data.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_bss(&self) -> bool {
         self.kind.is_bss()
     }
@@ -777,7 +793,8 @@ impl SymbolSection {
     /// Returns the section id for the section where the symbol is defined.
     ///
     /// May return `None` if the symbol is not defined in a section.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn id(self) -> Option<SectionId> {
         if let SymbolSection::Section(id) = self {
             Some(id)
@@ -818,13 +835,15 @@ pub struct Symbol {
 
 impl Symbol {
     /// Try to convert the name to a utf8 string.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(&self) -> Option<&str> {
         str::from_utf8(&self.name).ok()
     }
 
     /// Return true if the symbol is undefined.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_undefined(&self) -> bool {
         self.section == SymbolSection::Undefined
     }
@@ -832,13 +851,15 @@ impl Symbol {
     /// Return true if the symbol is common data.
     ///
     /// Note: does not check for `SymbolSection::Section` with `SectionKind::Common`.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_common(&self) -> bool {
         self.section == SymbolSection::Common
     }
 
     /// Return true if the symbol scope is local.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_local(&self) -> bool {
         self.scope == SymbolScope::Compilation
     }

@@ -155,13 +155,15 @@ where
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_little_endian(&self) -> bool {
         // Only little endian is supported.
         true
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_64(&self) -> bool {
         self.nt_headers.is_type_64()
     }
@@ -396,7 +398,8 @@ where
 {
     type Item = PeComdat<'data, 'file, Pe, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         None
     }
@@ -435,27 +438,32 @@ where
 {
     type SectionIterator = PeComdatSectionIterator<'data, 'file, Pe, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ComdatKind {
         unreachable!();
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol(&self) -> SymbolIndex {
         unreachable!();
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&[u8]> {
         unreachable!();
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&str> {
         unreachable!();
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&self) -> Self::SectionIterator {
         unreachable!();
     }
@@ -508,7 +516,8 @@ impl pe::ImageDosHeader {
     }
 
     /// Return the file offset of the nt_headers.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn nt_headers_offset(&self) -> u32 {
         self.e_lfanew.get(LE)
     }
@@ -601,7 +610,8 @@ pub trait ImageNtHeaders: Debug + Pod {
     ///
     /// `data` must be for the entire file.
     /// `offset` must be after the optional file header.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections<'data, R: ReadRef<'data>>(
         &self,
         data: R,
@@ -613,7 +623,8 @@ pub trait ImageNtHeaders: Debug + Pod {
     /// Read the COFF symbol table and string table.
     ///
     /// `data` must be the entire file data.
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols<'data, R: ReadRef<'data>>(&self, data: R) -> read::Result<SymbolTable<'data, R>> {
         SymbolTable::parse(self.file_header(), data)
     }
@@ -661,179 +672,214 @@ impl ImageNtHeaders for pe::ImageNtHeaders32 {
     type ImageOptionalHeader = pe::ImageOptionalHeader32;
     type ImageThunkData = pe::ImageThunkData32;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_type_64(&self) -> bool {
         false
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_valid_optional_magic(&self) -> bool {
         self.optional_header.magic.get(LE) == pe::IMAGE_NT_OPTIONAL_HDR32_MAGIC
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn signature(&self) -> u32 {
         self.signature.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_header(&self) -> &pe::ImageFileHeader {
         &self.file_header
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn optional_header(&self) -> &Self::ImageOptionalHeader {
         &self.optional_header
     }
 }
 
 impl ImageOptionalHeader for pe::ImageOptionalHeader32 {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn magic(&self) -> u16 {
         self.magic.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_linker_version(&self) -> u8 {
         self.major_linker_version
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_linker_version(&self) -> u8 {
         self.minor_linker_version
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_code(&self) -> u32 {
         self.size_of_code.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_initialized_data(&self) -> u32 {
         self.size_of_initialized_data.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_uninitialized_data(&self) -> u32 {
         self.size_of_uninitialized_data.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address_of_entry_point(&self) -> u32 {
         self.address_of_entry_point.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn base_of_code(&self) -> u32 {
         self.base_of_code.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn base_of_data(&self) -> Option<u32> {
         Some(self.base_of_data.get(LE))
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn image_base(&self) -> u64 {
         self.image_base.get(LE).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_alignment(&self) -> u32 {
         self.section_alignment.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_alignment(&self) -> u32 {
         self.file_alignment.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_operating_system_version(&self) -> u16 {
         self.major_operating_system_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_operating_system_version(&self) -> u16 {
         self.minor_operating_system_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_image_version(&self) -> u16 {
         self.major_image_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_image_version(&self) -> u16 {
         self.minor_image_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_subsystem_version(&self) -> u16 {
         self.major_subsystem_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_subsystem_version(&self) -> u16 {
         self.minor_subsystem_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn win32_version_value(&self) -> u32 {
         self.win32_version_value.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_image(&self) -> u32 {
         self.size_of_image.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_headers(&self) -> u32 {
         self.size_of_headers.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn check_sum(&self) -> u32 {
         self.check_sum.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn subsystem(&self) -> u16 {
         self.subsystem.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dll_characteristics(&self) -> u16 {
         self.dll_characteristics.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_stack_reserve(&self) -> u64 {
         self.size_of_stack_reserve.get(LE).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_stack_commit(&self) -> u64 {
         self.size_of_stack_commit.get(LE).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_heap_reserve(&self) -> u64 {
         self.size_of_heap_reserve.get(LE).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_heap_commit(&self) -> u64 {
         self.size_of_heap_commit.get(LE).into()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn loader_flags(&self) -> u32 {
         self.loader_flags.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn number_of_rva_and_sizes(&self) -> u32 {
         self.number_of_rva_and_sizes.get(LE)
     }
@@ -843,179 +889,214 @@ impl ImageNtHeaders for pe::ImageNtHeaders64 {
     type ImageOptionalHeader = pe::ImageOptionalHeader64;
     type ImageThunkData = pe::ImageThunkData64;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_type_64(&self) -> bool {
         true
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_valid_optional_magic(&self) -> bool {
         self.optional_header.magic.get(LE) == pe::IMAGE_NT_OPTIONAL_HDR64_MAGIC
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn signature(&self) -> u32 {
         self.signature.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_header(&self) -> &pe::ImageFileHeader {
         &self.file_header
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn optional_header(&self) -> &Self::ImageOptionalHeader {
         &self.optional_header
     }
 }
 
 impl ImageOptionalHeader for pe::ImageOptionalHeader64 {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn magic(&self) -> u16 {
         self.magic.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_linker_version(&self) -> u8 {
         self.major_linker_version
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_linker_version(&self) -> u8 {
         self.minor_linker_version
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_code(&self) -> u32 {
         self.size_of_code.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_initialized_data(&self) -> u32 {
         self.size_of_initialized_data.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_uninitialized_data(&self) -> u32 {
         self.size_of_uninitialized_data.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address_of_entry_point(&self) -> u32 {
         self.address_of_entry_point.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn base_of_code(&self) -> u32 {
         self.base_of_code.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn base_of_data(&self) -> Option<u32> {
         None
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn image_base(&self) -> u64 {
         self.image_base.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_alignment(&self) -> u32 {
         self.section_alignment.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_alignment(&self) -> u32 {
         self.file_alignment.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_operating_system_version(&self) -> u16 {
         self.major_operating_system_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_operating_system_version(&self) -> u16 {
         self.minor_operating_system_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_image_version(&self) -> u16 {
         self.major_image_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_image_version(&self) -> u16 {
         self.minor_image_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_subsystem_version(&self) -> u16 {
         self.major_subsystem_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_subsystem_version(&self) -> u16 {
         self.minor_subsystem_version.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn win32_version_value(&self) -> u32 {
         self.win32_version_value.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_image(&self) -> u32 {
         self.size_of_image.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_headers(&self) -> u32 {
         self.size_of_headers.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn check_sum(&self) -> u32 {
         self.check_sum.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn subsystem(&self) -> u16 {
         self.subsystem.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dll_characteristics(&self) -> u16 {
         self.dll_characteristics.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_stack_reserve(&self) -> u64 {
         self.size_of_stack_reserve.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_stack_commit(&self) -> u64 {
         self.size_of_stack_commit.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_heap_reserve(&self) -> u64 {
         self.size_of_heap_reserve.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_heap_commit(&self) -> u64 {
         self.size_of_heap_commit.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn loader_flags(&self) -> u32 {
         self.loader_flags.get(LE)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn number_of_rva_and_sizes(&self) -> u32 {
         self.number_of_rva_and_sizes.get(LE)
     }

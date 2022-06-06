@@ -90,12 +90,14 @@ impl<Endian: endian::Endian> Dyn for elf::Dyn32<Endian> {
     type Word = u32;
     type Endian = Endian;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn d_tag(&self, endian: Self::Endian) -> Self::Word {
         self.d_tag.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn d_val(&self, endian: Self::Endian) -> Self::Word {
         self.d_val.get(endian)
     }
@@ -105,12 +107,14 @@ impl<Endian: endian::Endian> Dyn for elf::Dyn64<Endian> {
     type Word = u64;
     type Endian = Endian;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn d_tag(&self, endian: Self::Endian) -> Self::Word {
         self.d_tag.get(endian)
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn d_val(&self, endian: Self::Endian) -> Self::Word {
         self.d_val.get(endian)
     }

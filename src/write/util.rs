@@ -55,25 +55,29 @@ impl<'a> dyn WritableBuffer + 'a {
 }
 
 impl WritableBuffer for Vec<u8> {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn len(&self) -> usize {
         self.len()
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn reserve(&mut self, size: usize) -> Result<(), ()> {
         debug_assert!(self.is_empty());
         self.reserve(size);
         Ok(())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn resize(&mut self, new_len: usize) {
         debug_assert!(new_len >= self.len());
         self.resize(new_len, 0);
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_bytes(&mut self, val: &[u8]) {
         debug_assert!(self.len() + val.len() <= self.capacity());
         self.extend_from_slice(val)
@@ -119,17 +123,20 @@ impl<W> StreamingBuffer<W> {
 
 #[cfg(feature = "std")]
 impl<W: io::Write> WritableBuffer for StreamingBuffer<W> {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn len(&self) -> usize {
         self.len
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn reserve(&mut self, _size: usize) -> Result<(), ()> {
         Ok(())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn resize(&mut self, new_len: usize) {
         debug_assert!(self.len <= new_len);
         while self.len < new_len {
@@ -138,7 +145,8 @@ impl<W: io::Write> WritableBuffer for StreamingBuffer<W> {
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_bytes(&mut self, val: &[u8]) {
         if self.result.is_ok() {
             self.result = self.writer.write_all(val);
@@ -155,7 +163,8 @@ pub(crate) trait BytesMut {
 }
 
 impl<'a> BytesMut for &'a mut [u8] {
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_at<T: Pod>(self, offset: usize, val: &T) -> Result<(), ()> {
         let src = bytes_of(val);
         let dest = self.get_mut(offset..).ok_or(())?;

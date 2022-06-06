@@ -85,7 +85,8 @@ impl<'data, 'file, R: ReadRef<'data>> read::private::Sealed for CoffComdat<'data
 impl<'data, 'file, R: ReadRef<'data>> ObjectComdat<'data> for CoffComdat<'data, 'file, R> {
     type SectionIterator = CoffComdatSectionIterator<'data, 'file, R>;
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ComdatKind {
         match self.selection {
             pe::IMAGE_COMDAT_SELECT_NODUPLICATES => ComdatKind::NoDuplicates,
@@ -98,18 +99,21 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectComdat<'data> for CoffComdat<'data, 
         }
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol(&self) -> SymbolIndex {
         self.symbol_index
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&[u8]> {
         // Find the name of first symbol referring to the section.
         self.symbol.name(self.file.common.symbols.strings())
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&str> {
         let bytes = self.name_bytes()?;
         str::from_utf8(bytes)
@@ -117,7 +121,8 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectComdat<'data> for CoffComdat<'data, 
             .read_error("Non UTF-8 COFF COMDAT name")
     }
 
-    #[inline]
+    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&self) -> Self::SectionIterator {
         CoffComdatSectionIterator {
             file: self.file,
