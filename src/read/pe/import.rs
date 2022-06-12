@@ -25,6 +25,7 @@ impl<'data> ImportTable<'data> {
     /// `section_data` should be from the section containing `import_address`, and
     /// `section_address` should be the address of that section. Pointers within the
     /// descriptors and thunks may point to anywhere within the section data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(section_data: &'data [u8], section_address: u32, import_address: u32) -> Self {
         ImportTable {
             section_data: Bytes(section_data),
@@ -34,6 +35,7 @@ impl<'data> ImportTable<'data> {
     }
 
     /// Return an iterator for the import descriptors.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn descriptors(&self) -> Result<ImportDescriptorIterator<'data>> {
         let offset = self.import_address.wrapping_sub(self.section_address);
         let mut data = self.section_data;
@@ -45,6 +47,7 @@ impl<'data> ImportTable<'data> {
     /// Return a library name given its address.
     ///
     /// This address may be from [`pe::ImageImportDescriptor::name`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(&self, address: u32) -> Result<&'data [u8]> {
         self.section_data
             .read_string_at(address.wrapping_sub(self.section_address) as usize)
@@ -55,6 +58,7 @@ impl<'data> ImportTable<'data> {
     ///
     /// This address may be from [`pe::ImageImportDescriptor::original_first_thunk`]
     /// or [`pe::ImageImportDescriptor::first_thunk`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn thunks(&self, address: u32) -> Result<ImportThunkList<'data>> {
         let offset = address.wrapping_sub(self.section_address);
         let mut data = self.section_data;
@@ -64,6 +68,7 @@ impl<'data> ImportTable<'data> {
     }
 
     /// Parse a thunk.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn import<Pe: ImageNtHeaders>(&self, thunk: Pe::ImageThunkData) -> Result<Import<'data>> {
         if thunk.is_ordinal() {
             Ok(Import::Ordinal(thunk.ordinal()))
@@ -78,6 +83,7 @@ impl<'data> ImportTable<'data> {
     /// This address may be from [`pe::ImageThunkData32`] or [`pe::ImageThunkData64`].
     ///
     /// The hint is an index into the export name pointer table in the target library.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn hint_name(&self, address: u32) -> Result<(u16, &'data [u8])> {
         let offset = address.wrapping_sub(self.section_address);
         let mut data = self.section_data;
@@ -105,6 +111,7 @@ impl<'data> ImportDescriptorIterator<'data> {
     /// Return the next descriptor.
     ///
     /// Returns `Ok(None)` when a null descriptor is found.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn next(&mut self) -> Result<Option<&'data pe::ImageImportDescriptor>> {
         let import_desc = self
             .data
@@ -129,6 +136,7 @@ pub struct ImportThunkList<'data> {
 
 impl<'data> ImportThunkList<'data> {
     /// Get the thunk at the given index.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get<Pe: ImageNtHeaders>(&self, index: usize) -> Result<Pe::ImageThunkData> {
         let thunk = self
             .data
@@ -140,6 +148,7 @@ impl<'data> ImportThunkList<'data> {
     /// Return the first thunk in the list, and update `self` to point after it.
     ///
     /// Returns `Ok(None)` when a null thunk is found.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn next<Pe: ImageNtHeaders>(&mut self) -> Result<Option<Pe::ImageThunkData>> {
         let thunk = self
             .data
@@ -185,14 +194,17 @@ pub trait ImageThunkData: Debug + Pod {
 }
 
 impl ImageThunkData for pe::ImageThunkData64 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn raw(self) -> u64 {
         self.0.get(LE)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_ordinal(self) -> bool {
         self.0.get(LE) & pe::IMAGE_ORDINAL_FLAG64 != 0
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn ordinal(self) -> u16 {
         self.0.get(LE) as u16
     }
@@ -203,18 +215,22 @@ impl ImageThunkData for pe::ImageThunkData64 {
 }
 
 impl ImageThunkData for pe::ImageThunkData32 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn raw(self) -> u64 {
         self.0.get(LE).into()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_ordinal(self) -> bool {
         self.0.get(LE) & pe::IMAGE_ORDINAL_FLAG32 != 0
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn ordinal(self) -> u16 {
         self.0.get(LE) as u16
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(self) -> u32 {
         self.0.get(LE) & 0x7fff_ffff
     }

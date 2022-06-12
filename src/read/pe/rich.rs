@@ -40,6 +40,7 @@ pub struct RichHeaderEntry {
 
 impl<'data> RichHeaderInfo<'data> {
     /// Try to locate a rich header and its entries in the current PE file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse<R: ReadRef<'data>>(data: R, nt_header_offset: u64) -> Option<Self> {
         // Locate the rich header, if any.
         // It ends with the "Rich" string and an XOR key, before the NT header.
@@ -68,6 +69,7 @@ impl<'data> RichHeaderInfo<'data> {
     }
 
     /// Returns an iterator over the unmasked entries.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn unmasked_entries(&self) -> impl Iterator<Item = RichHeaderEntry> + 'data {
         let xor_key = self.xor_key;
         self.masked_entries
@@ -82,6 +84,7 @@ impl<'data> RichHeaderInfo<'data> {
 /// Find the offset of the first occurence of needle in the data.
 ///
 /// The offset must have the given alignment.
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 fn memmem(data: &[u8], needle: &[u8], align: usize) -> Option<usize> {
     let mut offset = 0;
     loop {

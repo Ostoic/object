@@ -120,6 +120,7 @@ pub struct Writer<'a> {
 
 impl<'a> Writer<'a> {
     /// Create a new `Writer` for the given endianness and ELF class.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(endian: Endianness, is_64: bool, buffer: &'a mut dyn WritableBuffer) -> Self {
         let elf_align = if is_64 { 8 } else { 4 };
         Writer {
@@ -205,12 +206,14 @@ impl<'a> Writer<'a> {
     }
 
     /// Return the current file length that has been reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserved_len(&self) -> usize {
         self.len
     }
 
     /// Return the current file length that has been written.
     #[allow(clippy::len_without_is_empty)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn len(&self) -> usize {
         self.buffer.len()
     }
@@ -218,6 +221,7 @@ impl<'a> Writer<'a> {
     /// Reserve a file range with the given size and starting alignment.
     ///
     /// Returns the aligned offset of the start of the range.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve(&mut self, len: usize, align_start: usize) -> usize {
         if len == 0 {
             return self.len;
@@ -229,6 +233,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write alignment padding bytes.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_align(&mut self, align_start: usize) {
         util::write_align(self.buffer, align_start);
     }
@@ -236,22 +241,26 @@ impl<'a> Writer<'a> {
     /// Write data.
     ///
     /// This is typically used to write section data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write(&mut self, data: &[u8]) {
         self.buffer.write_bytes(data);
     }
 
     /// Reserve the file range up to the given file offset.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_until(&mut self, offset: usize) {
         debug_assert!(self.len <= offset);
         self.len = offset;
     }
 
     /// Write padding up to the given file offset.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pad_until(&mut self, offset: usize) {
         debug_assert!(self.buffer.len() <= offset);
         self.buffer.resize(offset);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_header_size(&self) -> usize {
         if self.is_64 {
             mem::size_of::<elf::FileHeader64<Endianness>>()
@@ -263,6 +272,7 @@ impl<'a> Writer<'a> {
     /// Reserve the range for the file header.
     ///
     /// This must be at the start of the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_file_header(&mut self) {
         debug_assert_eq!(self.len, 0);
         self.reserve(self.file_header_size(), 1);
@@ -273,6 +283,7 @@ impl<'a> Writer<'a> {
     /// This must be at the start of the file.
     ///
     /// Fields that can be derived from known information are automatically set by this function.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_file_header(&mut self, header: &FileHeader) -> Result<()> {
         debug_assert_eq!(self.buffer.len(), 0);
 
@@ -373,6 +384,7 @@ impl<'a> Writer<'a> {
         Ok(())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn program_header_size(&self) -> usize {
         if self.is_64 {
             mem::size_of::<elf::ProgramHeader64<Endianness>>()
@@ -382,6 +394,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Reserve the range for the program headers.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_program_headers(&mut self, num: u32) {
         debug_assert_eq!(self.segment_offset, 0);
         if num == 0 {
@@ -393,6 +406,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write alignment padding bytes prior to the program headers.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_align_program_headers(&mut self) {
         if self.segment_offset == 0 {
             return;
@@ -402,6 +416,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write a program header.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_program_header(&mut self, header: &ProgramHeader) {
         let endian = self.endian;
         if self.is_64 {
@@ -437,6 +452,7 @@ impl<'a> Writer<'a> {
     /// but this can be used to force an empty section table.
     ///
     /// This must be called before [`Self::reserve_section_headers`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_null_section_index(&mut self) -> SectionIndex {
         debug_assert_eq!(self.section_num, 0);
         if self.section_num == 0 {
@@ -450,6 +466,7 @@ impl<'a> Writer<'a> {
     /// Automatically also reserves the null section header if required.
     ///
     /// This must be called before [`Self::reserve_section_headers`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_section_index(&mut self) -> SectionIndex {
         debug_assert_eq!(self.section_offset, 0);
         if self.section_num == 0 {
@@ -460,6 +477,7 @@ impl<'a> Writer<'a> {
         SectionIndex(index)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_header_size(&self) -> usize {
         if self.is_64 {
             mem::size_of::<elf::SectionHeader64<Endianness>>()
@@ -473,6 +491,7 @@ impl<'a> Writer<'a> {
     /// This function does nothing if no sections were reserved.
     /// This must be called after [`Self::reserve_section_index`]
     /// and other functions that reserve section indices.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_section_headers(&mut self) {
         debug_assert_eq!(self.section_offset, 0);
         if self.section_num == 0 {
@@ -488,6 +507,7 @@ impl<'a> Writer<'a> {
     ///
     /// This must be the first section header that is written.
     /// This function does nothing if no sections were reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_null_section_header(&mut self) {
         if self.section_num == 0 {
             return;
@@ -518,6 +538,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write a section header.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_section_header(&mut self, section: &SectionHeader) {
         let sh_name = if let Some(name) = section.name {
             self.shstrtab.get_offset(name) as u32
@@ -561,6 +582,7 @@ impl<'a> Writer<'a> {
     /// This will be stored in the `.shstrtab` section.
     ///
     /// This must be called before [`Self::reserve_shstrtab`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_section_name(&mut self, name: &'a [u8]) -> StringId {
         debug_assert_eq!(self.shstrtab_offset, 0);
         self.shstrtab.add(name)
@@ -573,6 +595,7 @@ impl<'a> Writer<'a> {
     /// This function does nothing if no sections were reserved.
     /// This must be called after [`Self::add_section_name`].
     /// and other functions that reserve section names and indices.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_shstrtab(&mut self) {
         debug_assert_eq!(self.shstrtab_offset, 0);
         if self.section_num == 0 {
@@ -587,6 +610,7 @@ impl<'a> Writer<'a> {
     /// Write the section header string table.
     ///
     /// This function does nothing if the section was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_shstrtab(&mut self) {
         if self.shstrtab_offset == 0 {
             return;
@@ -599,6 +623,7 @@ impl<'a> Writer<'a> {
     ///
     /// This must be called before [`Self::reserve_shstrtab`]
     /// and [`Self::reserve_section_headers`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_shstrtab_section_index(&mut self) -> SectionIndex {
         debug_assert_eq!(self.shstrtab_index, SectionIndex(0));
         self.shstrtab_str_id = Some(self.add_section_name(&b".shstrtab"[..]));
@@ -609,6 +634,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the section header string table.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_shstrtab_section_header(&mut self) {
         if self.shstrtab_index == SectionIndex(0) {
             return;
@@ -632,6 +658,7 @@ impl<'a> Writer<'a> {
     /// This will be stored in the `.strtab` section.
     ///
     /// This must be called before [`Self::reserve_strtab`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_string(&mut self, name: &'a [u8]) -> StringId {
         debug_assert_eq!(self.strtab_offset, 0);
         self.need_strtab = true;
@@ -639,6 +666,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Return true if `.strtab` is needed.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn strtab_needed(&self) -> bool {
         self.need_strtab
     }
@@ -649,6 +677,7 @@ impl<'a> Writer<'a> {
     ///
     /// This function does nothing if no strings or symbols were defined.
     /// This must be called after [`Self::add_string`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_strtab(&mut self) {
         debug_assert_eq!(self.strtab_offset, 0);
         if !self.need_strtab {
@@ -663,6 +692,7 @@ impl<'a> Writer<'a> {
     /// Write the string table.
     ///
     /// This function does nothing if the section was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_strtab(&mut self) {
         if self.strtab_offset == 0 {
             return;
@@ -674,6 +704,7 @@ impl<'a> Writer<'a> {
     /// Reserve the section index for the string table.
     ///
     /// This must be called before [`Self::reserve_section_headers`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_strtab_section_index(&mut self) -> SectionIndex {
         debug_assert_eq!(self.strtab_index, SectionIndex(0));
         self.strtab_str_id = Some(self.add_section_name(&b".strtab"[..]));
@@ -684,6 +715,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the string table.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_strtab_section_header(&mut self) {
         if self.strtab_index == SectionIndex(0) {
             return;
@@ -710,6 +742,7 @@ impl<'a> Writer<'a> {
     /// but this can be used to force an empty symbol table.
     ///
     /// This must be called before [`Self::reserve_symtab`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_null_symbol_index(&mut self) -> SymbolIndex {
         debug_assert_eq!(self.symtab_offset, 0);
         debug_assert_eq!(self.symtab_num, 0);
@@ -731,6 +764,7 @@ impl<'a> Writer<'a> {
     ///
     /// This must be called before [`Self::reserve_symtab`] and
     /// [`Self::reserve_symtab_shndx`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_symbol_index(&mut self, section_index: Option<SectionIndex>) -> SymbolIndex {
         debug_assert_eq!(self.symtab_offset, 0);
         debug_assert_eq!(self.symtab_shndx_offset, 0);
@@ -752,10 +786,12 @@ impl<'a> Writer<'a> {
     /// Return the number of reserved symbol table entries.
     ///
     /// Includes the null symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol_count(&self) -> u32 {
         self.symtab_num
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_size(&self) -> usize {
         if self.is_64 {
             mem::size_of::<elf::Sym64<Endianness>>()
@@ -769,6 +805,7 @@ impl<'a> Writer<'a> {
     /// This range is used for a section named `.symtab`.
     /// This function does nothing if no symbols were reserved.
     /// This must be called after [`Self::reserve_symbol_index`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_symtab(&mut self) {
         debug_assert_eq!(self.symtab_offset, 0);
         if self.symtab_num == 0 {
@@ -784,6 +821,7 @@ impl<'a> Writer<'a> {
     ///
     /// This must be the first symbol that is written.
     /// This function does nothing if no symbols were reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_null_symbol(&mut self) {
         if self.symtab_num == 0 {
             return;
@@ -802,6 +840,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write a symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_symbol(&mut self, sym: &Sym) {
         let st_name = if let Some(name) = sym.name {
             self.strtab.get_offset(name) as u32
@@ -851,6 +890,7 @@ impl<'a> Writer<'a> {
     /// Reserve the section index for the symbol table.
     ///
     /// This must be called before [`Self::reserve_section_headers`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_symtab_section_index(&mut self) -> SectionIndex {
         debug_assert_eq!(self.symtab_index, SectionIndex(0));
         self.symtab_str_id = Some(self.add_section_name(&b".symtab"[..]));
@@ -859,6 +899,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Return the section index of the symbol table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symtab_index(&mut self) -> SectionIndex {
         self.symtab_index
     }
@@ -866,6 +907,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the symbol table.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_symtab_section_header(&mut self, num_local: u32) {
         if self.symtab_index == SectionIndex(0) {
             return;
@@ -885,6 +927,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Return true if `.symtab_shndx` is needed.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symtab_shndx_needed(&self) -> bool {
         self.need_symtab_shndx
     }
@@ -895,6 +938,7 @@ impl<'a> Writer<'a> {
     /// This also reserves a section index.
     ///
     /// This function does nothing if extended section indices are not needed.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     /// This must be called after [`Self::reserve_symbol_index`].
     pub fn reserve_symtab_shndx(&mut self) {
         debug_assert_eq!(self.symtab_shndx_offset, 0);
@@ -908,6 +952,7 @@ impl<'a> Writer<'a> {
     /// Write the extended section indices for the symbol table.
     ///
     /// This function does nothing if the section was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_symtab_shndx(&mut self) {
         if self.symtab_shndx_offset == 0 {
             return;
@@ -923,6 +968,7 @@ impl<'a> Writer<'a> {
     /// unless you have other means of knowing if this section is needed.
     ///
     /// This must be called before [`Self::reserve_section_headers`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_symtab_shndx_section_index(&mut self) -> SectionIndex {
         debug_assert!(self.symtab_shndx_str_id.is_none());
         self.symtab_shndx_str_id = Some(self.add_section_name(&b".symtab_shndx"[..]));
@@ -932,6 +978,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the extended section indices for the symbol table.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_symtab_shndx_section_header(&mut self) {
         if self.symtab_shndx_str_id.is_none() {
             return;
@@ -960,6 +1007,7 @@ impl<'a> Writer<'a> {
     /// This will be stored in the `.dynstr` section.
     ///
     /// This must be called before [`Self::reserve_dynstr`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_dynamic_string(&mut self, name: &'a [u8]) -> StringId {
         debug_assert_eq!(self.dynstr_offset, 0);
         self.need_dynstr = true;
@@ -969,11 +1017,13 @@ impl<'a> Writer<'a> {
     /// Get a string that was previously added to the dynamic string table.
     ///
     /// Panics if the string was not added.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get_dynamic_string(&self, name: &'a [u8]) -> StringId {
         self.dynstr.get_id(name)
     }
 
     /// Return true if `.dynstr` is needed.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn dynstr_needed(&self) -> bool {
         self.need_dynstr
     }
@@ -984,6 +1034,7 @@ impl<'a> Writer<'a> {
     ///
     /// This function does nothing if no dynamic strings or symbols were defined.
     /// This must be called after [`Self::add_dynamic_string`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_dynstr(&mut self) {
         debug_assert_eq!(self.dynstr_offset, 0);
         if !self.need_dynstr {
@@ -998,6 +1049,7 @@ impl<'a> Writer<'a> {
     /// Write the dynamic string table.
     ///
     /// This function does nothing if the section was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_dynstr(&mut self) {
         if self.dynstr_offset == 0 {
             return;
@@ -1009,6 +1061,7 @@ impl<'a> Writer<'a> {
     /// Reserve the section index for the dynamic string table.
     ///
     /// This must be called before [`Self::reserve_section_headers`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_dynstr_section_index(&mut self) -> SectionIndex {
         debug_assert_eq!(self.dynstr_index, SectionIndex(0));
         self.dynstr_str_id = Some(self.add_section_name(&b".dynstr"[..]));
@@ -1017,6 +1070,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Return the section index of the dynamic string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn dynstr_index(&mut self) -> SectionIndex {
         self.dynstr_index
     }
@@ -1024,6 +1078,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the dynamic string table.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_dynstr_section_header(&mut self, sh_addr: u64) {
         if self.dynstr_index == SectionIndex(0) {
             return;
@@ -1050,6 +1105,7 @@ impl<'a> Writer<'a> {
     /// but this can be used to force an empty dynamic symbol table.
     ///
     /// This must be called before [`Self::reserve_dynsym`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_null_dynamic_symbol_index(&mut self) -> SymbolIndex {
         debug_assert_eq!(self.dynsym_offset, 0);
         debug_assert_eq!(self.dynsym_num, 0);
@@ -1068,6 +1124,7 @@ impl<'a> Writer<'a> {
     /// starting at 1.
     ///
     /// This must be called before [`Self::reserve_dynsym`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_dynamic_symbol_index(&mut self) -> SymbolIndex {
         debug_assert_eq!(self.dynsym_offset, 0);
         if self.dynsym_num == 0 {
@@ -1083,6 +1140,7 @@ impl<'a> Writer<'a> {
     /// Return the number of reserved dynamic symbols.
     ///
     /// Includes the null symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn dynamic_symbol_count(&mut self) -> u32 {
         self.dynsym_num
     }
@@ -1093,6 +1151,7 @@ impl<'a> Writer<'a> {
     ///
     /// This function does nothing if no dynamic symbols were reserved.
     /// This must be called after [`Self::reserve_dynamic_symbol_index`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_dynsym(&mut self) {
         debug_assert_eq!(self.dynsym_offset, 0);
         if self.dynsym_num == 0 {
@@ -1108,6 +1167,7 @@ impl<'a> Writer<'a> {
     ///
     /// This must be the first dynamic symbol that is written.
     /// This function does nothing if no dynamic symbols were reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_null_dynamic_symbol(&mut self) {
         if self.dynsym_num == 0 {
             return;
@@ -1122,6 +1182,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write a dynamic symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_dynamic_symbol(&mut self, sym: &Sym) {
         let st_name = if let Some(name) = sym.name {
             self.dynstr.get_offset(name) as u32
@@ -1168,6 +1229,7 @@ impl<'a> Writer<'a> {
     /// Reserve the section index for the dynamic symbol table.
     ///
     /// This must be called before [`Self::reserve_section_headers`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_dynsym_section_index(&mut self) -> SectionIndex {
         debug_assert_eq!(self.dynsym_index, SectionIndex(0));
         self.dynsym_str_id = Some(self.add_section_name(&b".dynsym"[..]));
@@ -1176,6 +1238,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Return the section index of the dynamic symbol table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn dynsym_index(&mut self) -> SectionIndex {
         self.dynsym_index
     }
@@ -1183,6 +1246,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the dynamic symbol table.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_dynsym_section_header(&mut self, sh_addr: u64, num_local: u32) {
         if self.dynsym_index == SectionIndex(0) {
             return;
@@ -1201,6 +1265,7 @@ impl<'a> Writer<'a> {
         });
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dyn_size(&self) -> usize {
         if self.is_64 {
             mem::size_of::<elf::Dyn64<Endianness>>()
@@ -1212,6 +1277,7 @@ impl<'a> Writer<'a> {
     /// Reserve the range for the `.dynamic` section.
     ///
     /// This function does nothing if `dynamic_num` is zero.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_dynamic(&mut self, dynamic_num: usize) {
         debug_assert_eq!(self.dynamic_offset, 0);
         if dynamic_num == 0 {
@@ -1224,6 +1290,7 @@ impl<'a> Writer<'a> {
     /// Write alignment padding bytes prior to the `.dynamic` section.
     ///
     /// This function does nothing if the section was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_align_dynamic(&mut self) {
         if self.dynamic_offset == 0 {
             return;
@@ -1233,11 +1300,13 @@ impl<'a> Writer<'a> {
     }
 
     /// Write a dynamic string entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_dynamic_string(&mut self, tag: u32, id: StringId) {
         self.write_dynamic(tag, self.dynstr.get_offset(id) as u64);
     }
 
     /// Write a dynamic value entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_dynamic(&mut self, d_tag: u32, d_val: u64) {
         debug_assert!(self.dynamic_offset <= self.buffer.len());
         let endian = self.endian;
@@ -1260,6 +1329,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Reserve the section index for the dynamic table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_dynamic_section_index(&mut self) -> SectionIndex {
         debug_assert!(self.dynamic_str_id.is_none());
         self.dynamic_str_id = Some(self.add_section_name(&b".dynamic"[..]));
@@ -1269,6 +1339,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the dynamic table.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_dynamic_section_header(&mut self, sh_addr: u64) {
         if self.dynamic_str_id.is_none() {
             return;
@@ -1287,6 +1358,7 @@ impl<'a> Writer<'a> {
         });
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn rel_size(&self, is_rela: bool) -> usize {
         if self.is_64 {
             if is_rela {
@@ -1307,6 +1379,7 @@ impl<'a> Writer<'a> {
     ///
     /// `symbol_count` is the number of symbols in the hash,
     /// not the total number of symbols.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_hash(&mut self, bucket_count: u32, chain_count: u32) {
         self.hash_size = mem::size_of::<elf::HashHeader<Endianness>>()
             + bucket_count as usize * 4
@@ -1318,6 +1391,7 @@ impl<'a> Writer<'a> {
     ///
     /// `chain_count` is the number of symbols in the hash.
     /// The argument to `hash` will be in the range `0..chain_count`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_hash<F>(&mut self, bucket_count: u32, chain_count: u32, hash: F)
     where
         F: Fn(u32) -> Option<u32>,
@@ -1343,6 +1417,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Reserve the section index for the SysV hash table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_hash_section_index(&mut self) -> SectionIndex {
         debug_assert!(self.hash_str_id.is_none());
         self.hash_str_id = Some(self.add_section_name(&b".hash"[..]));
@@ -1352,6 +1427,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the SysV hash table.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_hash_section_header(&mut self, sh_addr: u64) {
         if self.hash_str_id.is_none() {
             return;
@@ -1374,6 +1450,7 @@ impl<'a> Writer<'a> {
     ///
     /// `symbol_count` is the number of symbols in the hash,
     /// not the total number of symbols.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_gnu_hash(&mut self, bloom_count: u32, bucket_count: u32, symbol_count: u32) {
         self.gnu_hash_size = mem::size_of::<elf::GnuHashHeader<Endianness>>()
             + bloom_count as usize * self.elf_align
@@ -1388,6 +1465,7 @@ impl<'a> Writer<'a> {
     /// The argument to `hash` will be in the range `0..symbol_count`.
     ///
     /// This requires that symbols are already sorted by bucket.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_gnu_hash<F>(
         &mut self,
         symbol_base: u32,
@@ -1464,6 +1542,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Reserve the section index for the GNU hash table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_gnu_hash_section_index(&mut self) -> SectionIndex {
         debug_assert!(self.gnu_hash_str_id.is_none());
         self.gnu_hash_str_id = Some(self.add_section_name(&b".gnu.hash"[..]));
@@ -1473,6 +1552,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the GNU hash table.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_gnu_hash_section_header(&mut self, sh_addr: u64) {
         if self.gnu_hash_str_id.is_none() {
             return;
@@ -1494,6 +1574,7 @@ impl<'a> Writer<'a> {
     /// Reserve the range for the `.gnu.version` section.
     ///
     /// This function does nothing if no dynamic symbols were reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_gnu_versym(&mut self) {
         debug_assert_eq!(self.gnu_versym_offset, 0);
         if self.dynsym_num == 0 {
@@ -1506,6 +1587,7 @@ impl<'a> Writer<'a> {
     ///
     /// This must be the first symbol version that is written.
     /// This function does nothing if no dynamic symbols were reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_null_gnu_versym(&mut self) {
         if self.dynsym_num == 0 {
             return;
@@ -1516,11 +1598,13 @@ impl<'a> Writer<'a> {
     }
 
     /// Write a symbol version entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_gnu_versym(&mut self, versym: u16) {
         self.buffer.write(&U16::new(self.endian, versym));
     }
 
     /// Reserve the section index for the `.gnu.version` section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_gnu_versym_section_index(&mut self) -> SectionIndex {
         debug_assert!(self.gnu_versym_str_id.is_none());
         self.gnu_versym_str_id = Some(self.add_section_name(&b".gnu.version"[..]));
@@ -1530,6 +1614,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the `.gnu.version` section.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_gnu_versym_section_header(&mut self, sh_addr: u64) {
         if self.gnu_versym_str_id.is_none() {
             return;
@@ -1549,6 +1634,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Reserve the range for the `.gnu.version_d` section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_gnu_verdef(&mut self, verdef_count: usize, verdaux_count: usize) {
         debug_assert_eq!(self.gnu_verdef_offset, 0);
         if verdef_count == 0 {
@@ -1562,6 +1648,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write alignment padding bytes prior to a `.gnu.version_d` section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_align_gnu_verdef(&mut self) {
         if self.gnu_verdef_offset == 0 {
             return;
@@ -1571,6 +1658,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write a version definition entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_gnu_verdef(&mut self, verdef: &Verdef) {
         debug_assert_ne!(self.gnu_verdef_remaining, 0);
         self.gnu_verdef_remaining -= 1;
@@ -1601,6 +1689,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write a version definition auxiliary entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_gnu_verdaux(&mut self, name: StringId) {
         debug_assert_ne!(self.gnu_verdaux_remaining, 0);
         self.gnu_verdaux_remaining -= 1;
@@ -1616,6 +1705,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Reserve the section index for the `.gnu.version_d` section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_gnu_verdef_section_index(&mut self) -> SectionIndex {
         debug_assert!(self.gnu_verdef_str_id.is_none());
         self.gnu_verdef_str_id = Some(self.add_section_name(&b".gnu.version_d"[..]));
@@ -1625,6 +1715,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the `.gnu.version_d` section.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_gnu_verdef_section_header(&mut self, sh_addr: u64) {
         if self.gnu_verdef_str_id.is_none() {
             return;
@@ -1644,6 +1735,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Reserve the range for the `.gnu.version_r` section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_gnu_verneed(&mut self, verneed_count: usize, vernaux_count: usize) {
         debug_assert_eq!(self.gnu_verneed_offset, 0);
         if verneed_count == 0 {
@@ -1657,6 +1749,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write alignment padding bytes prior to a `.gnu.version_r` section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_align_gnu_verneed(&mut self) {
         if self.gnu_verneed_offset == 0 {
             return;
@@ -1666,6 +1759,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write a version need entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_gnu_verneed(&mut self, verneed: &Verneed) {
         debug_assert_ne!(self.gnu_verneed_remaining, 0);
         self.gnu_verneed_remaining -= 1;
@@ -1693,6 +1787,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write a version need auxiliary entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_gnu_vernaux(&mut self, vernaux: &Vernaux) {
         debug_assert_ne!(self.gnu_vernaux_remaining, 0);
         self.gnu_vernaux_remaining -= 1;
@@ -1711,6 +1806,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Reserve the section index for the `.gnu.version_r` section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_gnu_verneed_section_index(&mut self) -> SectionIndex {
         debug_assert!(self.gnu_verneed_str_id.is_none());
         self.gnu_verneed_str_id = Some(self.add_section_name(&b".gnu.version_r"[..]));
@@ -1720,6 +1816,7 @@ impl<'a> Writer<'a> {
     /// Write the section header for the `.gnu.version_r` section.
     ///
     /// This function does nothing if the section index was not reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_gnu_verneed_section_header(&mut self, sh_addr: u64) {
         if self.gnu_verneed_str_id.is_none() {
             return;
@@ -1741,16 +1838,19 @@ impl<'a> Writer<'a> {
     /// Reserve a file range for the given number of relocations.
     ///
     /// Returns the offset of the range.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_relocations(&mut self, count: usize, is_rela: bool) -> usize {
         self.reserve(count * self.rel_size(is_rela), self.elf_align)
     }
 
     /// Write alignment padding bytes prior to a relocation section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_align_relocation(&mut self) {
         util::write_align(self.buffer, self.elf_align);
     }
 
     /// Write a relocation.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_relocation(&mut self, is_rela: bool, rel: &Rel) {
         let endian = self.endian;
         if self.is_64 {
@@ -1795,6 +1895,7 @@ impl<'a> Writer<'a> {
     /// or 0 if none.
     ///
     /// `offset` is the file offset of the relocations.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_relocation_section_header(
         &mut self,
         name: StringId,
@@ -1823,22 +1924,26 @@ impl<'a> Writer<'a> {
     /// `count` is the number of sections in the COMDAT group.
     ///
     /// Returns the offset of the range.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_comdat(&mut self, count: usize) -> usize {
         self.reserve((count + 1) * 4, 4)
     }
 
     /// Write `GRP_COMDAT` at the start of the COMDAT section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_comdat_header(&mut self) {
         util::write_align(self.buffer, 4);
         self.buffer.write(&U32::new(self.endian, elf::GRP_COMDAT));
     }
 
     /// Write an entry in a COMDAT section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_comdat_entry(&mut self, entry: SectionIndex) {
         self.buffer.write(&U32::new(self.endian, entry.0));
     }
 
     /// Write the section header for a COMDAT section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_comdat_section_header(
         &mut self,
         name: StringId,

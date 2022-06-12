@@ -42,6 +42,7 @@ where
     R: ReadRef<'data>,
 {
     /// Parse the raw PE file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(data: R) -> Result<Self> {
         let dos_header = pe::ImageDosHeader::parse(data)?;
         let mut offset = dos_header.nt_headers_offset().into();
@@ -66,36 +67,43 @@ where
     }
 
     /// Returns this binary data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data(&self) -> R {
         self.data
     }
 
     /// Return the DOS header of this file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn dos_header(&self) -> &'data pe::ImageDosHeader {
         self.dos_header
     }
 
     /// Return the NT Headers of this file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn nt_headers(&self) -> &'data Pe {
         self.nt_headers
     }
 
     /// Returns information about the rich header of this file (if any).
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn rich_header_info(&self) -> Option<RichHeaderInfo> {
         RichHeaderInfo::parse(self.data, self.dos_header.nt_headers_offset().into())
     }
 
     /// Returns the section table of this binary.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section_table(&self) -> SectionTable<'data> {
         self.common.sections
     }
 
     /// Returns the data directories of this file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data_directories(&self) -> DataDirectories<'data> {
         self.data_directories
     }
 
     /// Returns the data directory at the given index.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data_directory(&self, id: usize) -> Option<&'data pe::ImageDataDirectory> {
         self.data_directories.get(id)
     }
@@ -103,6 +111,7 @@ where
     /// Returns the export table of this file.
     ///
     /// The export table is located using the data directory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn export_table(&self) -> Result<Option<ExportTable<'data>>> {
         self.data_directories
             .export_table(self.data, &self.common.sections)
@@ -111,11 +120,13 @@ where
     /// Returns the import table of this file.
     ///
     /// The import table is located using the data directory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn import_table(&self) -> Result<Option<ImportTable<'data>>> {
         self.data_directories
             .import_table(self.data, &self.common.sections)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn section_alignment(&self) -> u64 {
         u64::from(self.nt_headers.optional_header().section_alignment())
     }
@@ -145,6 +156,7 @@ where
     type SymbolTable = CoffSymbolTable<'data, 'file, R>;
     type DynamicRelocationIterator = NoDynamicRelocationIterator;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn architecture(&self) -> Architecture {
         match self.nt_headers.file_header().machine.get(LE) {
             pe::IMAGE_FILE_MACHINE_ARMNT => Architecture::Arm,
@@ -168,6 +180,7 @@ where
         self.nt_headers.is_type_64()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ObjectKind {
         let characteristics = self.nt_headers.file_header().characteristics.get(LE);
         if characteristics & pe::IMAGE_FILE_DLL != 0 {

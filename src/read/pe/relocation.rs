@@ -13,11 +13,13 @@ pub struct RelocationBlockIterator<'data> {
 
 impl<'data> RelocationBlockIterator<'data> {
     /// Construct a new iterator from the data of the `.reloc` section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(data: &'data [u8]) -> Self {
         RelocationBlockIterator { data: Bytes(data) }
     }
 
     /// Read the next relocation page.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn next(&mut self) -> Result<Option<RelocationIterator<'data>>> {
         if self.data.is_empty() {
             return Ok(None);
@@ -56,11 +58,13 @@ pub struct RelocationIterator<'data> {
 
 impl<'data> RelocationIterator<'data> {
     /// Return the virtual address of the page that this block of relocations applies to.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn virtual_address(&self) -> u32 {
         self.virtual_address
     }
 
     /// Return the size in bytes of this block of relocations.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn size(&self) -> u32 {
         self.size
     }
@@ -69,6 +73,7 @@ impl<'data> RelocationIterator<'data> {
 impl<'data> Iterator for RelocationIterator<'data> {
     type Item = Relocation;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Relocation> {
         loop {
             let reloc = self.relocs.next()?.get(LE);

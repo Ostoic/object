@@ -21,6 +21,7 @@ pub enum ExportTarget<'data> {
 
 impl<'data> ExportTarget<'data> {
     /// Returns true if the target is an address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_address(&self) -> bool {
         match self {
             ExportTarget::Address(_) => true,
@@ -29,6 +30,7 @@ impl<'data> ExportTarget<'data> {
     }
 
     /// Returns true if the export is forwarded to another DLL.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_forward(&self) -> bool {
         !self.is_address()
     }
@@ -51,6 +53,7 @@ pub struct Export<'data> {
 }
 
 impl<'a> Debug for Export<'a> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::result::Result<(), core::fmt::Error> {
         f.debug_struct("Export")
             .field("ordinal", &self.ordinal)
@@ -61,6 +64,7 @@ impl<'a> Debug for Export<'a> {
 }
 
 impl<'a> Debug for ExportTarget<'a> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::result::Result<(), core::fmt::Error> {
         match self {
             ExportTarget::Address(address) => write!(f, "Address({:#x})", address),
@@ -94,6 +98,7 @@ pub struct ExportTable<'data> {
 
 impl<'data> ExportTable<'data> {
     /// Parse the export table given its section data and address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(data: &'data [u8], virtual_address: u32) -> Result<Self> {
         let directory = Self::parse_directory(data)?;
         let data = Bytes(data);
@@ -144,12 +149,14 @@ impl<'data> ExportTable<'data> {
     }
 
     /// Parse the export directory given its section data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse_directory(data: &'data [u8]) -> Result<&'data pe::ImageExportDirectory> {
         data.read_at::<pe::ImageExportDirectory>(0)
             .read_error("Invalid PE export dir size")
     }
 
     /// Returns the header of the export table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn directory(&self) -> &'data pe::ImageExportDirectory {
         self.directory
     }
@@ -157,6 +164,7 @@ impl<'data> ExportTable<'data> {
     /// Returns the base value of ordinals.
     ///
     /// Adding this to an address index will give an ordinal.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn ordinal_base(&self) -> u32 {
         self.directory.base.get(LE)
     }
@@ -165,6 +173,7 @@ impl<'data> ExportTable<'data> {
     ///
     /// An address table entry may be a local address, or the address of a forwarded export entry.
     /// See [`Self::is_forward`] and [`Self::target_from_address`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn addresses(&self) -> &'data [U32Bytes<LE>] {
         self.addresses
     }
@@ -180,6 +189,7 @@ impl<'data> ExportTable<'data> {
     ///
     /// An ordinal table entry is a 0-based index into the address table.
     /// See [`Self::address_by_index`] and [`Self::target_by_index`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name_ordinals(&self) -> &'data [U16Bytes<LE>] {
         self.name_ordinals
     }
@@ -190,6 +200,7 @@ impl<'data> ExportTable<'data> {
     ///
     /// An ordinal table entry is a 0-based index into the address table.
     /// See [`Self::address_by_index`] and [`Self::target_by_index`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name_iter(&self) -> impl Iterator<Item = (u32, u16)> + 'data {
         self.names
             .iter()
@@ -203,6 +214,7 @@ impl<'data> ExportTable<'data> {
     /// See [`Self::is_forward`] and [`Self::target_from_address`].
     ///
     /// `index` is a 0-based index into the export address table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn address_by_index(&self, index: u32) -> Result<u32> {
         Ok(self
             .addresses
@@ -215,6 +227,7 @@ impl<'data> ExportTable<'data> {
     ///
     /// This may be a local address, or the address of a forwarded export entry.
     /// See [`Self::is_forward`] and [`Self::target_from_address`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn address_by_ordinal(&self, ordinal: u32) -> Result<u32> {
         self.address_by_index(ordinal.wrapping_sub(self.ordinal_base()))
     }
@@ -222,16 +235,19 @@ impl<'data> ExportTable<'data> {
     /// Returns the target of the export at the given address index.
     ///
     /// `index` is a 0-based index into the export address table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn target_by_index(&self, index: u32) -> Result<ExportTarget<'data>> {
         self.target_from_address(self.address_by_index(index)?)
     }
 
     /// Returns the target of the export at the given ordinal.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn target_by_ordinal(&self, ordinal: u32) -> Result<ExportTarget<'data>> {
         self.target_from_address(self.address_by_ordinal(ordinal)?)
     }
 
     /// Convert an export address table entry into a target.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn target_from_address(&self, address: u32) -> Result<ExportTarget<'data>> {
         Ok(if let Some(forward) = self.forward_string(address)? {
             let i = forward
@@ -255,6 +271,7 @@ impl<'data> ExportTable<'data> {
         })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn forward_offset(&self, address: u32) -> Option<usize> {
         let offset = address.wrapping_sub(self.virtual_address) as usize;
         if offset < self.data.len() {
@@ -265,11 +282,13 @@ impl<'data> ExportTable<'data> {
     }
 
     /// Return true if the export address table entry is a forward.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_forward(&self, address: u32) -> bool {
         self.forward_offset(address).is_some()
     }
 
     /// Return the forward string if the export address table entry is a forward.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn forward_string(&self, address: u32) -> Result<Option<&'data [u8]>> {
         if let Some(offset) = self.forward_offset(address) {
             self.data
@@ -282,6 +301,7 @@ impl<'data> ExportTable<'data> {
     }
 
     /// Convert an export name pointer table entry into a name.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name_from_pointer(&self, name_pointer: u32) -> Result<&'data [u8]> {
         let offset = name_pointer.wrapping_sub(self.virtual_address);
         self.data
@@ -290,6 +310,7 @@ impl<'data> ExportTable<'data> {
     }
 
     /// Returns the parsed exports in this table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn exports(&self) -> Result<Vec<Export<'data>>> {
         // First, let's list all exports.
         let mut exports = Vec::new();
@@ -320,6 +341,7 @@ impl<'data> ExportTable<'data> {
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 fn parse_ordinal(digits: &[u8]) -> Option<u32> {
     if digits.is_empty() {
         return None;

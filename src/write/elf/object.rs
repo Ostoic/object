@@ -31,6 +31,7 @@ struct SymbolOffsets {
 }
 
 impl<'a> Object<'a> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn elf_section_info(
         &self,
         section: StandardSection,
@@ -60,6 +61,7 @@ impl<'a> Object<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn elf_subsection_name(&self, section: &[u8], value: &[u8]) -> Vec<u8> {
         let mut name = section.to_vec();
         name.push(b'.');
@@ -67,6 +69,7 @@ impl<'a> Object<'a> {
         name
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn elf_has_relocation_addend(&self) -> Result<bool> {
         Ok(match self.architecture {
             Architecture::Aarch64 => true,
@@ -96,6 +99,7 @@ impl<'a> Object<'a> {
         })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn elf_fixup_relocation(&mut self, mut relocation: &mut Relocation) -> Result<i64> {
         // Return true if we should use a section symbol to avoid preemption.
         fn want_section_symbol(relocation: &Relocation, symbol: &Symbol) -> bool {
@@ -151,6 +155,7 @@ impl<'a> Object<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn elf_write(&self, buffer: &mut dyn WritableBuffer) -> Result<()> {
         // Create reloc section header names so we can reference them.
         let is_rela = self.elf_has_relocation_addend()?;

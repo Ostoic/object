@@ -1968,6 +1968,7 @@ pub struct ImageImportDescriptor {
 impl ImageImportDescriptor {
     /// Tell whether this import descriptor is the null descriptor
     /// (used to mark the end of the iterator array in a PE)
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_null(&self) -> bool {
         self.original_first_thunk.get(LE) == 0
             && self.time_date_stamp.get(LE) == 0

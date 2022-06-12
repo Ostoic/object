@@ -77,6 +77,7 @@ pub struct Object<'a> {
 
 impl<'a> Object<'a> {
     /// Create an empty object file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(format: BinaryFormat, architecture: Architecture, endian: Endianness) -> Object<'a> {
         Object {
             format,
@@ -126,6 +127,7 @@ impl<'a> Object<'a> {
     ///
     /// This will vary based on the file format.
     #[allow(unused_variables)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn segment_name(&self, segment: StandardSegment) -> &'static [u8] {
         match self.format {
             #[cfg(feature = "coff")]
@@ -155,6 +157,7 @@ impl<'a> Object<'a> {
     /// Set the data for an existing section.
     ///
     /// Must not be called for sections that already have data, or that contain uninitialized data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_section_data<T>(&mut self, section: SectionId, data: T, align: u64)
     where
         T: Into<Cow<'a, [u8]>>,
@@ -163,11 +166,13 @@ impl<'a> Object<'a> {
     }
 
     /// Append data to an existing section. Returns the section offset of the data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn append_section_data(&mut self, section: SectionId, data: &[u8], align: u64) -> u64 {
         self.sections[section.0].append_data(data, align)
     }
 
     /// Append zero-initialized data to an existing section. Returns the section offset of the data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn append_section_bss(&mut self, section: SectionId, size: u64, align: u64) -> u64 {
         self.sections[section.0].append_bss(size, align)
     }
@@ -175,6 +180,7 @@ impl<'a> Object<'a> {
     /// Return the `SectionId` of a standard section.
     ///
     /// If the section doesn't already exist then it is created.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section_id(&mut self, section: StandardSection) -> SectionId {
         self.standard_sections
             .get(&section)
@@ -188,6 +194,7 @@ impl<'a> Object<'a> {
     /// Add a new section and return its `SectionId`.
     ///
     /// This also creates a section symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_section(&mut self, segment: Vec<u8>, name: Vec<u8>, kind: SectionKind) -> SectionId {
         let id = SectionId(self.sections.len());
         self.sections.push(Section {
@@ -216,6 +223,7 @@ impl<'a> Object<'a> {
         id
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_info(
         &self,
         section: StandardSection,
@@ -232,6 +240,7 @@ impl<'a> Object<'a> {
     }
 
     /// Add a subsection. Returns the `SectionId` and section offset of the data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_subsection(
         &mut self,
         section: StandardSection,
@@ -250,6 +259,7 @@ impl<'a> Object<'a> {
         (section_id, offset)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn has_subsections_via_symbols(&self) -> bool {
         match self.format {
             BinaryFormat::Coff | BinaryFormat::Elf => false,
@@ -258,6 +268,7 @@ impl<'a> Object<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn set_subsections_via_symbols(&mut self) {
         match self.format {
             #[cfg(feature = "macho")]
@@ -266,6 +277,7 @@ impl<'a> Object<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn subsection_info(
         &self,
         section: StandardSection,
@@ -277,6 +289,7 @@ impl<'a> Object<'a> {
     }
 
     #[allow(unused_variables)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn subsection_name(&self, section: &[u8], value: &[u8]) -> Vec<u8> {
         debug_assert!(!self.has_subsections_via_symbols());
         match self.format {
@@ -303,6 +316,7 @@ impl<'a> Object<'a> {
     }
 
     /// Add a new COMDAT section group and return its `ComdatId`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_comdat(&mut self, comdat: Comdat) -> ComdatId {
         let comdat_id = ComdatId(self.comdats.len());
         self.comdats.push(comdat);
@@ -310,6 +324,7 @@ impl<'a> Object<'a> {
     }
 
     /// Get the `SymbolId` of the symbol with the given name.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol_id(&self, name: &[u8]) -> Option<SymbolId> {
         self.symbol_map.get(name).cloned()
     }
@@ -329,6 +344,7 @@ impl<'a> Object<'a> {
     }
 
     /// Add a new symbol and return its `SymbolId`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_symbol(&mut self, mut symbol: Symbol) -> SymbolId {
         // Defined symbols must have a scope.
         debug_assert!(symbol.is_undefined() || symbol.scope != SymbolScope::Unknown);
@@ -358,6 +374,7 @@ impl<'a> Object<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn add_raw_symbol(&mut self, symbol: Symbol) -> SymbolId {
         let symbol_id = SymbolId(self.symbols.len());
         self.symbols.push(symbol);
@@ -381,6 +398,7 @@ impl<'a> Object<'a> {
     /// Add a new common symbol and return its `SymbolId`.
     ///
     /// For Mach-O, this appends the symbol to the `__common` section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_common_symbol(&mut self, mut symbol: Symbol, size: u64, align: u64) -> SymbolId {
         if self.has_common() {
             let symbol_id = self.add_symbol(symbol);
@@ -395,6 +413,7 @@ impl<'a> Object<'a> {
     }
 
     /// Add a new file symbol and return its `SymbolId`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_file_symbol(&mut self, name: Vec<u8>) -> SymbolId {
         self.add_raw_symbol(Symbol {
             name,
@@ -409,6 +428,7 @@ impl<'a> Object<'a> {
     }
 
     /// Get the symbol for a section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section_symbol(&mut self, section_id: SectionId) -> SymbolId {
         let section = &mut self.sections[section_id.0];
         if let Some(symbol) = section.symbol {
@@ -440,6 +460,7 @@ impl<'a> Object<'a> {
     /// symbol will indirectly point to the added data via the `__thread_vars` entry.
     ///
     /// Returns the section offset of the data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_symbol_data(
         &mut self,
         symbol_id: SymbolId,
@@ -458,6 +479,7 @@ impl<'a> Object<'a> {
     /// symbol will indirectly point to the added data via the `__thread_vars` entry.
     ///
     /// Returns the section offset of the data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_symbol_bss(
         &mut self,
         symbol_id: SymbolId,
@@ -475,6 +497,7 @@ impl<'a> Object<'a> {
     /// For Mach-O, this also creates a `__thread_vars` entry for TLS symbols, and the
     /// symbol will indirectly point to the data via the `__thread_vars` entry.
     #[allow(unused_mut)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_symbol_data(
         &mut self,
         mut symbol_id: SymbolId,
@@ -498,6 +521,7 @@ impl<'a> Object<'a> {
     /// Convert a symbol to a section symbol and offset.
     ///
     /// Returns `None` if the symbol does not have a section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol_section_and_offset(&mut self, symbol_id: SymbolId) -> Option<(SymbolId, u64)> {
         let symbol = self.symbol(symbol_id);
         if symbol.kind == SymbolKind::Section {
@@ -513,6 +537,7 @@ impl<'a> Object<'a> {
     ///
     /// Relocations must only be added after the referenced symbols have been added
     /// and defined (if applicable).
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_relocation(&mut self, section: SectionId, mut relocation: Relocation) -> Result<()> {
         let addend = match self.format {
             #[cfg(feature = "coff")]
@@ -530,6 +555,7 @@ impl<'a> Object<'a> {
         Ok(())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_relocation_addend(
         &mut self,
         section: SectionId,
@@ -559,6 +585,7 @@ impl<'a> Object<'a> {
     }
 
     /// Write the object to a `Vec`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write(&self) -> Result<Vec<u8>> {
         let mut buffer = Vec::new();
         self.emit(&mut buffer)?;
@@ -572,6 +599,7 @@ impl<'a> Object<'a> {
     /// It is advisable to use a buffered writer like [`BufWriter`](std::io::BufWriter)
     /// instead of an unbuffered writer like [`File`](std::fs::File).
     #[cfg(feature = "std")]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_stream<W: io::Write>(&self, w: W) -> result::Result<(), Box<dyn error::Error>> {
         let mut stream = StreamingBuffer::new(w);
         self.emit(&mut stream)?;
@@ -581,6 +609,7 @@ impl<'a> Object<'a> {
     }
 
     /// Write the object to a `WritableBuffer`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn emit(&self, buffer: &mut dyn WritableBuffer) -> Result<()> {
         match self.format {
             #[cfg(feature = "coff")]
@@ -626,6 +655,7 @@ pub enum StandardSection {
 
 impl StandardSection {
     /// Return the section kind of a standard section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn kind(self) -> SectionKind {
         match self {
             StandardSection::Text => SectionKind::Text,
@@ -643,6 +673,7 @@ impl StandardSection {
     }
 
     // TODO: remembering to update this is error-prone, can we do better?
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn all() -> &'static [StandardSection] {
         &[
             StandardSection::Text,
@@ -705,6 +736,7 @@ impl<'a> Section<'a> {
     /// Set the data for a section.
     ///
     /// Must not be called for sections that already have data, or that contain uninitialized data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_data<T>(&mut self, data: T, align: u64)
     where
         T: Into<Cow<'a, [u8]>>,
@@ -720,6 +752,7 @@ impl<'a> Section<'a> {
     /// Append data to a section.
     ///
     /// Must not be called for sections that contain uninitialized data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn append_data(&mut self, append_data: &[u8], align: u64) -> u64 {
         debug_assert!(!self.is_bss());
         debug_assert_eq!(align & (align - 1), 0);
@@ -741,6 +774,7 @@ impl<'a> Section<'a> {
     /// Append unitialized data to a section.
     ///
     /// Must not be called for sections that contain initialized data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn append_bss(&mut self, size: u64, align: u64) -> u64 {
         debug_assert!(self.is_bss());
         debug_assert_eq!(align & (align - 1), 0);
@@ -759,6 +793,7 @@ impl<'a> Section<'a> {
     /// Returns the section as-built so far.
     ///
     /// This requires that the section is not a bss section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data(&self) -> &[u8] {
         debug_assert!(!self.is_bss());
         &self.data
@@ -767,6 +802,7 @@ impl<'a> Section<'a> {
     /// Returns the section as-built so far.
     ///
     /// This requires that the section is not a bss section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data_mut(&mut self) -> &mut [u8] {
         debug_assert!(!self.is_bss());
         self.data.to_mut()
@@ -928,6 +964,7 @@ pub enum Mangling {
 
 impl Mangling {
     /// Return the default symboling mangling for the given format and architecture.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn default(format: BinaryFormat, architecture: Architecture) -> Self {
         match (format, architecture) {
             (BinaryFormat::Coff, Architecture::I386) => Mangling::CoffI386,
@@ -939,6 +976,7 @@ impl Mangling {
     }
 
     /// Return the prefix to use for global symbols.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn global_prefix(self) -> Option<u8> {
         match self {
             Mangling::None | Mangling::Elf | Mangling::Coff => None,

@@ -37,6 +37,7 @@ where
 {
     type Item = PeSegment<'data, 'file, Pe, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|section| PeSegment {
             file: self.file,
@@ -168,6 +169,7 @@ where
 {
     type Item = PeSection<'data, 'file, Pe, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|(index, section)| PeSection {
             file: self.file,
@@ -247,10 +249,12 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]> {
         self.section.pe_data(self.file.data)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> Result<Option<&'data [u8]>> {
         Ok(read::util::data_range(
             self.data()?,
@@ -305,10 +309,12 @@ where
         self.section.kind()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relocations(&self) -> PeRelocationIterator<'data, 'file, R> {
         PeRelocationIterator(PhantomData)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SectionFlags {
         SectionFlags::Coff {
             characteristics: self.section.characteristics.get(LE),
@@ -321,6 +327,7 @@ impl<'data> SectionTable<'data> {
     /// to the end of the section containing it.
     ///
     /// Returns `None` if no section contains the address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pe_file_range_at(&self, va: u32) -> Option<(u32, u32)> {
         self.iter().find_map(|section| section.pe_file_range_at(va))
     }
@@ -331,6 +338,7 @@ impl<'data> SectionTable<'data> {
     /// Ignores sections with invalid data.
     ///
     /// Returns `None` if no section contains the address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pe_data_at<R: ReadRef<'data>>(&self, data: R, va: u32) -> Option<&'data [u8]> {
         self.iter().find_map(|section| section.pe_data_at(data, va))
     }
@@ -340,6 +348,7 @@ impl<'data> SectionTable<'data> {
     /// Also returns the virtual address of that section.
     ///
     /// Ignores sections with invalid data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pe_data_containing<R: ReadRef<'data>>(
         &self,
         data: R,
@@ -350,6 +359,7 @@ impl<'data> SectionTable<'data> {
     }
 
     /// Return the section that contains a given virtual address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section_containing(&self, va: u32) -> Option<&'data ImageSectionHeader> {
         self.iter().find(|section| section.contains_rva(va))
     }
@@ -359,6 +369,7 @@ impl pe::ImageSectionHeader {
     /// Return the offset and size of the section in a PE file.
     ///
     /// The size of the range will be the minimum of the file size and virtual size.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pe_file_range(&self) -> (u32, u32) {
         // Pointer and size will be zero for uninitialized data; we don't need to validate this.
         let offset = self.pointer_to_raw_data.get(LE);
@@ -370,6 +381,7 @@ impl pe::ImageSectionHeader {
     /// to the end of the section.
     ///
     /// Returns `None` if the section does not contain the address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pe_file_range_at(&self, va: u32) -> Option<(u32, u32)> {
         let section_va = self.virtual_address.get(LE);
         let offset = va.checked_sub(section_va)?;
@@ -383,6 +395,7 @@ impl pe::ImageSectionHeader {
     }
 
     /// Return the virtual address and size of the section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pe_address_range(&self) -> (u32, u32) {
         (self.virtual_address.get(LE), self.virtual_size.get(LE))
     }
@@ -390,6 +403,7 @@ impl pe::ImageSectionHeader {
     /// Return the section data in a PE file.
     ///
     /// The length of the data will be the minimum of the file size and virtual size.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pe_data<'data, R: ReadRef<'data>>(&self, data: R) -> Result<&'data [u8]> {
         let (offset, size) = self.pe_file_range();
         data.read_bytes_at(offset.into(), size.into())
@@ -402,12 +416,14 @@ impl pe::ImageSectionHeader {
     /// Ignores sections with invalid data.
     ///
     /// Returns `None` if the section does not contain the address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pe_data_at<'data, R: ReadRef<'data>>(&self, data: R, va: u32) -> Option<&'data [u8]> {
         let (offset, size) = self.pe_file_range_at(va)?;
         data.read_bytes_at(offset.into(), size.into()).ok()
     }
 
     /// Tests whether a given RVA is part of this section
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn contains_rva(&self, va: u32) -> bool {
         let section_va = self.virtual_address.get(LE);
         match va.checked_sub(section_va) {
@@ -424,6 +440,7 @@ impl pe::ImageSectionHeader {
     /// Also returns the virtual address of that section.
     ///
     /// Ignores sections with invalid data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pe_data_containing<'data, R: ReadRef<'data>>(
         &self,
         data: R,
@@ -454,6 +471,7 @@ pub struct PeRelocationIterator<'data, 'file, R = &'data [u8]>(
 impl<'data, 'file, R> Iterator for PeRelocationIterator<'data, 'file, R> {
     type Item = (u64, Relocation);
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         None
     }

@@ -12,11 +12,13 @@ pub struct ResourceDirectory<'data> {
 
 impl<'data> ResourceDirectory<'data> {
     /// Construct from the data of the `.rsrc` section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(data: &'data [u8]) -> Self {
         ResourceDirectory { data }
     }
 
     /// Parses the root resource directory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn root(&self) -> Result<ResourceDirectoryTable<'data>> {
         ResourceDirectoryTable::parse(&self.data, 0)
     }
@@ -33,6 +35,7 @@ pub struct ResourceDirectoryTable<'data> {
 }
 
 impl<'data> ResourceDirectoryTable<'data> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn parse(data: &'data [u8], offset: u32) -> Result<Self> {
         let mut offset = u64::from(offset);
         let header = data
@@ -49,6 +52,7 @@ impl<'data> ResourceDirectoryTable<'data> {
 
 impl pe::ImageResourceDirectoryEntry {
     /// Returns true if the entry has a name, rather than an ID.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn has_name(&self) -> bool {
         self.name_or_id.get(LE) & pe::IMAGE_RESOURCE_NAME_IS_STRING != 0
     }
@@ -56,6 +60,7 @@ impl pe::ImageResourceDirectoryEntry {
     /// Returns the section offset of the name.
     ///
     /// Valid if `has_name()` returns true.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> ResourceName {
         let offset = self.name_or_id.get(LE) & !pe::IMAGE_RESOURCE_NAME_IS_STRING;
         ResourceName { offset }
@@ -64,11 +69,13 @@ impl pe::ImageResourceDirectoryEntry {
     /// Returns the ID.
     ///
     /// Valid if `has_string_name()` returns false.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn id(&self) -> u16 {
         (self.name_or_id.get(LE) & 0x0000_FFFF) as u16
     }
 
     /// Returns the entry name
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name_or_id(&self) -> ResourceNameOrId {
         if self.has_name() {
             ResourceNameOrId::Name(self.name())
@@ -78,16 +85,19 @@ impl pe::ImageResourceDirectoryEntry {
     }
 
     /// Returns true if the entry is a subtable.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_table(&self) -> bool {
         self.offset_to_data_or_directory.get(LE) & pe::IMAGE_RESOURCE_DATA_IS_DIRECTORY != 0
     }
 
     /// Returns the section offset of the associated table or data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data_offset(&self) -> u32 {
         self.offset_to_data_or_directory.get(LE) & !pe::IMAGE_RESOURCE_DATA_IS_DIRECTORY
     }
 
     /// Returns the data associated to this directory entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data<'data>(
         &self,
         section: ResourceDirectory<'data>,
@@ -118,6 +128,7 @@ impl<'data> ResourceDirectoryEntryData<'data> {
     /// Converts to an option of table.
     ///
     /// Helper for iterator filtering.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn table(self) -> Option<ResourceDirectoryTable<'data>> {
         match self {
             Self::Table(dir) => Some(dir),
@@ -128,6 +139,7 @@ impl<'data> ResourceDirectoryEntryData<'data> {
     /// Converts to an option of data entry.
     ///
     /// Helper for iterator filtering.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data(self) -> Option<&'data pe::ImageResourceDataEntry> {
         match self {
             Self::Data(rsc) => Some(rsc),
@@ -145,12 +157,14 @@ pub struct ResourceName {
 
 impl ResourceName {
     /// Converts to a `String`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn to_string_lossy(&self, directory: ResourceDirectory) -> Result<String> {
         let d = self.data(directory)?;
         Ok(String::from_utf16_lossy(d))
     }
 
     /// Returns the string unicode buffer.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data<'data>(&self, directory: ResourceDirectory<'data>) -> Result<&'data [u16]> {
         let mut offset = u64::from(self.offset);
         let len = directory
@@ -179,6 +193,7 @@ impl ResourceNameOrId {
     /// Converts to an option of name.
     ///
     /// Helper for iterator filtering.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(self) -> Option<ResourceName> {
         match self {
             Self::Name(name) => Some(name),
@@ -189,6 +204,7 @@ impl ResourceNameOrId {
     /// Converts to an option of ID.
     ///
     /// Helper for iterator filtering.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn id(self) -> Option<u16> {
         match self {
             Self::Id(id) => Some(id),

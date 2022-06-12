@@ -48,6 +48,7 @@ pub struct Writer<'a> {
 
 impl<'a> Writer<'a> {
     /// Create a new `Writer`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(
         is_64: bool,
         section_alignment: u32,
@@ -87,6 +88,7 @@ impl<'a> Writer<'a> {
     /// Return the current virtual address size that has been reserved.
     ///
     /// This is only valid after section headers have been reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn virtual_len(&self) -> u32 {
         self.virtual_len
     }
@@ -96,6 +98,7 @@ impl<'a> Writer<'a> {
     /// The reserved length will be increased to match the section alignment.
     ///
     /// Returns the aligned offset of the start of the range.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_virtual(&mut self, len: u32) -> u32 {
         let offset = self.virtual_len;
         self.virtual_len += len;
@@ -106,18 +109,21 @@ impl<'a> Writer<'a> {
     /// Reserve up to the given virtual address.
     ///
     /// The reserved length will be increased to match the section alignment.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_virtual_until(&mut self, address: u32) {
         debug_assert!(self.virtual_len <= address);
         self.virtual_len = util::align_u32(address, self.section_alignment);
     }
 
     /// Return the current file length that has been reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserved_len(&self) -> u32 {
         self.len
     }
 
     /// Return the current file length that has been written.
     #[allow(clippy::len_without_is_empty)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn len(&self) -> usize {
         self.buffer.len()
     }
@@ -125,6 +131,7 @@ impl<'a> Writer<'a> {
     /// Reserve a file range with the given size and starting alignment.
     ///
     /// Returns the aligned offset of the start of the range.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve(&mut self, len: u32, align_start: u32) -> u32 {
         if len == 0 {
             return self.len;
@@ -143,32 +150,38 @@ impl<'a> Writer<'a> {
     }
 
     /// Write data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write(&mut self, data: &[u8]) {
         self.buffer.write_bytes(data);
     }
 
     /// Reserve alignment padding bytes.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_align(&mut self, align_start: u32) {
         self.len = util::align_u32(self.len, align_start);
     }
 
     /// Write alignment padding bytes.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_align(&mut self, align_start: u32) {
         util::write_align(self.buffer, align_start as usize);
     }
 
     /// Write padding up to the next multiple of file alignment.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_file_align(&mut self) {
         self.write_align(self.file_alignment);
     }
 
     /// Reserve the file range up to the given file offset.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_until(&mut self, offset: u32) {
         debug_assert!(self.len <= offset);
         self.len = offset;
     }
 
     /// Write padding up to the given file offset.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn pad_until(&mut self, offset: u32) {
         debug_assert!(self.buffer.len() <= offset as usize);
         self.buffer.resize(offset as usize);
@@ -179,6 +192,7 @@ impl<'a> Writer<'a> {
     /// This must be at the start of the file.
     ///
     /// When writing, you may use `write_custom_dos_header` or `write_empty_dos_header`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_dos_header(&mut self) {
         debug_assert_eq!(self.len, 0);
         self.reserve(mem::size_of::<pe::ImageDosHeader>() as u32, 1);
@@ -187,6 +201,7 @@ impl<'a> Writer<'a> {
     /// Write a custom DOS header.
     ///
     /// This must be at the start of the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_custom_dos_header(&mut self, dos_header: &pe::ImageDosHeader) -> Result<()> {
         debug_assert_eq!(self.buffer.len(), 0);
 
@@ -204,6 +219,7 @@ impl<'a> Writer<'a> {
     /// This must be at the start of the file.
     ///
     /// Uses default values for all fields.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_empty_dos_header(&mut self) -> Result<()> {
         self.write_custom_dos_header(&pe::ImageDosHeader {
             e_magic: U16::new(LE, pe::IMAGE_DOS_SIGNATURE),
@@ -231,6 +247,7 @@ impl<'a> Writer<'a> {
     /// Reserve a fixed DOS header and stub.
     ///
     /// Use `reserve_dos_header` and `reserve` if you need a custom stub.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_dos_header_and_stub(&mut self) {
         self.reserve_dos_header();
         self.reserve(64, 1);
@@ -239,6 +256,7 @@ impl<'a> Writer<'a> {
     /// Write a fixed DOS header and stub.
     ///
     /// Use `write_custom_dos_header` and `write` if you need a custom stub.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_dos_header_and_stub(&mut self) -> Result<()> {
         self.write_custom_dos_header(&pe::ImageDosHeader {
             e_magic: U16::new(LE, pe::IMAGE_DOS_SIGNATURE),
@@ -277,6 +295,7 @@ impl<'a> Writer<'a> {
         Ok(())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn nt_headers_size(&self) -> u32 {
         if self.is_64 {
             mem::size_of::<pe::ImageNtHeaders64>() as u32
@@ -285,6 +304,7 @@ impl<'a> Writer<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn optional_header_size(&self) -> u32 {
         let size = if self.is_64 {
             mem::size_of::<pe::ImageOptionalHeader64>() as u32
@@ -295,11 +315,13 @@ impl<'a> Writer<'a> {
     }
 
     /// Return the offset of the NT headers, if reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn nt_headers_offset(&self) -> u32 {
         self.nt_headers_offset
     }
 
     /// Reserve the range for the NT headers.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_nt_headers(&mut self, data_directory_num: usize) {
         debug_assert_eq!(self.nt_headers_offset, 0);
         self.nt_headers_offset = self.reserve(self.nt_headers_size(), 8);
@@ -311,6 +333,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Set the virtual address and size of a data directory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_data_directory(&mut self, index: usize, virtual_address: u32, size: u32) {
         self.data_directories[index] = DataDirectory {
             virtual_address,
@@ -319,6 +342,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write the NT headers.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_nt_headers(&mut self, nt_headers: NtHeaders) {
         self.pad_until(self.nt_headers_offset);
         self.buffer.write(&U32::new(LE, pe::IMAGE_NT_SIGNATURE));
@@ -426,6 +450,7 @@ impl<'a> Writer<'a> {
     /// The number of reserved section headers must be the same as the number of sections that
     /// are later reserved.
     // TODO: change this to a maximum number of sections?
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_section_headers(&mut self, section_header_num: u16) {
         debug_assert_eq!(self.section_header_num, 0);
         self.section_header_num = section_header_num;
@@ -442,6 +467,7 @@ impl<'a> Writer<'a> {
     /// Write the section headers.
     ///
     /// This uses information that was recorded when the sections were reserved.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_section_headers(&mut self) {
         debug_assert_eq!(self.section_header_num as usize, self.sections.len());
         for section in &self.sections {
@@ -465,6 +491,7 @@ impl<'a> Writer<'a> {
     ///
     /// Returns the file range and virtual address range that are reserved
     /// for the section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_section(
         &mut self,
         name: [u8; 8],
@@ -516,6 +543,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Write the data for a section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_section(&mut self, offset: u32, data: &[u8]) {
         if data.is_empty() {
             return;
@@ -528,6 +556,7 @@ impl<'a> Writer<'a> {
     /// Reserve a `.text` section.
     ///
     /// Contains executable code.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_text_section(&mut self, size: u32) -> SectionRange {
         self.reserve_section(
             *b".text\0\0\0",
@@ -542,6 +571,7 @@ impl<'a> Writer<'a> {
     /// Contains initialized data.
     ///
     /// May also contain uninitialized data if `virtual_size` is greater than `data_size`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_data_section(&mut self, virtual_size: u32, data_size: u32) -> SectionRange {
         self.reserve_section(
             *b".data\0\0\0",
@@ -554,6 +584,7 @@ impl<'a> Writer<'a> {
     /// Reserve a `.rdata` section.
     ///
     /// Contains read-only initialized data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_rdata_section(&mut self, size: u32) -> SectionRange {
         self.reserve_section(
             *b".rdata\0\0",
@@ -566,6 +597,7 @@ impl<'a> Writer<'a> {
     /// Reserve a `.bss` section.
     ///
     /// Contains uninitialized data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_bss_section(&mut self, size: u32) -> SectionRange {
         self.reserve_section(
             *b".bss\0\0\0\0",
@@ -581,6 +613,7 @@ impl<'a> Writer<'a> {
     /// section.
     ///
     /// This also sets the `pe::IMAGE_DIRECTORY_ENTRY_IMPORT` data directory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_idata_section(&mut self, size: u32) -> SectionRange {
         let range = self.reserve_section(
             *b".idata\0\0",
@@ -602,6 +635,7 @@ impl<'a> Writer<'a> {
     /// Contains export tables.
     ///
     /// This also sets the `pe::IMAGE_DIRECTORY_ENTRY_EXPORT` data directory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_edata_section(&mut self, size: u32) -> SectionRange {
         let range = self.reserve_section(
             *b".edata\0\0",
@@ -623,6 +657,7 @@ impl<'a> Writer<'a> {
     /// Contains exception information.
     ///
     /// This also sets the `pe::IMAGE_DIRECTORY_ENTRY_EXCEPTION` data directory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_pdata_section(&mut self, size: u32) -> SectionRange {
         let range = self.reserve_section(
             *b".pdata\0\0",
@@ -642,6 +677,7 @@ impl<'a> Writer<'a> {
     /// Reserve a `.xdata` section.
     ///
     /// Contains exception information.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_xdata_section(&mut self, size: u32) -> SectionRange {
         self.reserve_section(
             *b".xdata\0\0",
@@ -656,6 +692,7 @@ impl<'a> Writer<'a> {
     /// Contains the resource directory.
     ///
     /// This also sets the `pe::IMAGE_DIRECTORY_ENTRY_RESOURCE` data directory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_rsrc_section(&mut self, size: u32) -> SectionRange {
         let range = self.reserve_section(
             *b".rsrc\0\0\0",
@@ -675,6 +712,7 @@ impl<'a> Writer<'a> {
     /// Add a base relocation.
     ///
     /// `typ` must be one of the `IMAGE_REL_BASED_*` constants.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_reloc(&mut self, mut virtual_address: u32, typ: u16) {
         let reloc = U16::new(LE, typ << 12 | (virtual_address & 0xfff) as u16);
         virtual_address &= !0xfff;
@@ -699,6 +737,7 @@ impl<'a> Writer<'a> {
     }
 
     /// Return true if a base relocation has been added.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn has_relocs(&mut self) -> bool {
         !self.relocs.is_empty()
     }
@@ -708,6 +747,7 @@ impl<'a> Writer<'a> {
     /// This contains the base relocations that were added with `add_reloc`.
     ///
     /// This also sets the `pe::IMAGE_DIRECTORY_ENTRY_BASERELOC` data directory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_reloc_section(&mut self) -> SectionRange {
         if let Some(block) = self.reloc_blocks.last_mut() {
             // Blocks must have an even number of relocations.
@@ -738,6 +778,7 @@ impl<'a> Writer<'a> {
     /// Write a `.reloc` section.
     ///
     /// This contains the base relocations that were added with `add_reloc`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_reloc_section(&mut self) {
         if self.reloc_offset == 0 {
             return;
@@ -763,6 +804,7 @@ impl<'a> Writer<'a> {
     ///
     /// This also sets the `pe::IMAGE_DIRECTORY_ENTRY_SECURITY` data directory.
     // TODO: reserve individual certificates
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_certificate_table(&mut self, size: u32) {
         let size = util::align_u32(size, 8);
         let offset = self.reserve(size, 8);
@@ -776,6 +818,7 @@ impl<'a> Writer<'a> {
 
     /// Write the certificate table.
     // TODO: write individual certificates
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_certificate_table(&mut self, data: &[u8]) {
         let dir = self.data_directories[pe::IMAGE_DIRECTORY_ENTRY_SECURITY];
         self.pad_until(dir.virtual_address);

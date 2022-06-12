@@ -36,6 +36,7 @@ pub enum CoffExportStyle {
 }
 
 impl<'a> Object<'a> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn coff_section_info(
         &self,
         section: StandardSection,
@@ -66,6 +67,7 @@ impl<'a> Object<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn coff_subsection_name(&self, section: &[u8], value: &[u8]) -> Vec<u8> {
         let mut name = section.to_vec();
         name.push(b'$');
@@ -73,6 +75,7 @@ impl<'a> Object<'a> {
         name
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn coff_fixup_relocation(&mut self, mut relocation: &mut Relocation) -> i64 {
         if relocation.kind == RelocationKind::GotRelative {
             // Use a stub symbol for the relocation instead.
@@ -113,6 +116,7 @@ impl<'a> Object<'a> {
         constant
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn coff_add_stub_symbol(&mut self, symbol_id: SymbolId) -> SymbolId {
         if let Some(stub_id) = self.stub_symbols.get(&symbol_id) {
             return *stub_id;
@@ -154,6 +158,7 @@ impl<'a> Object<'a> {
     /// to export all symbols with `SymbolScope::Dynamic`.
     ///
     /// This must be called after all symbols have been defined.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add_coff_exports(&mut self, style: CoffExportStyle) {
         assert_eq!(self.format, BinaryFormat::Coff);
 
@@ -178,6 +183,7 @@ impl<'a> Object<'a> {
         self.append_section_data(drectve, &directives, 1);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn coff_write(&self, buffer: &mut dyn WritableBuffer) -> Result<()> {
         // Calculate offsets of everything, and build strtab.
         let mut offset = 0;
@@ -707,6 +713,7 @@ impl<'a> Object<'a> {
 }
 
 // JamCRC
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 fn checksum(data: &[u8]) -> u32 {
     let mut hasher = crc32fast::Hasher::new_with_initial(0xffff_ffff);
     hasher.update(data);
