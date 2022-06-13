@@ -4,7 +4,7 @@ use core::{mem, str};
 
 use core::convert::TryInto;
 
-use crate::read::coff::{CoffCommon, CoffSymbol, CoffSymbolIterator, CoffSymbolTable, SymbolTable};
+use crate::{read::coff::{CoffCommon, CoffSymbol, CoffSymbolIterator, CoffSymbolTable, SymbolTable}, DebugPod};
 use crate::read::{
     self, Architecture, ComdatKind, Error, Export, FileFlags, Import, NoDynamicRelocationIterator,
     Object, ObjectComdat, ObjectKind, ReadError, ReadRef, Result, SectionIndex, SymbolIndex,
@@ -22,7 +22,8 @@ pub type PeFile32<'data, R = &'data [u8]> = PeFile<'data, pe::ImageNtHeaders32, 
 pub type PeFile64<'data, R = &'data [u8]> = PeFile<'data, pe::ImageNtHeaders64, R>;
 
 /// A PE object file.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeFile<'data, Pe, R = &'data [u8]>
 where
@@ -393,7 +394,8 @@ pub type PeComdatIterator64<'data, 'file, R = &'data [u8]> =
     PeComdatIterator<'data, 'file, pe::ImageNtHeaders64, R>;
 
 /// An iterator over the COMDAT section groups of a `PeFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeComdatIterator<'data, 'file, Pe, R = &'data [u8]>
 where
@@ -426,7 +428,8 @@ pub type PeComdat64<'data, 'file, R = &'data [u8]> =
     PeComdat<'data, 'file, pe::ImageNtHeaders64, R>;
 
 /// A COMDAT section group of a `PeFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeComdat<'data, 'file, Pe, R = &'data [u8]>
 where
@@ -490,7 +493,8 @@ pub type PeComdatSectionIterator64<'data, 'file, R = &'data [u8]> =
     PeComdatSectionIterator<'data, 'file, pe::ImageNtHeaders64, R>;
 
 /// An iterator over the sections in a COMDAT section group of a `PeFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeComdatSectionIterator<'data, 'file, Pe, R = &'data [u8]>
 where
@@ -557,7 +561,7 @@ pub fn optional_header_magic<'data, R: ReadRef<'data>>(data: R) -> Result<u16> {
 
 /// A trait for generic access to `ImageNtHeaders32` and `ImageNtHeaders64`.
 #[allow(missing_docs)]
-pub trait ImageNtHeaders: Debug + Pod {
+pub trait ImageNtHeaders: DebugPod {
     type ImageOptionalHeader: ImageOptionalHeader;
     type ImageThunkData: ImageThunkData;
 
@@ -645,7 +649,7 @@ pub trait ImageNtHeaders: Debug + Pod {
 
 /// A trait for generic access to `ImageOptionalHeader32` and `ImageOptionalHeader64`.
 #[allow(missing_docs)]
-pub trait ImageOptionalHeader: Debug + Pod {
+pub trait ImageOptionalHeader: DebugPod {
     // Standard fields.
     fn magic(&self) -> u16;
     fn major_linker_version(&self) -> u8;

@@ -52,6 +52,7 @@
 //! }
 //! ```
 
+#![feature(trait_alias)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![no_std]

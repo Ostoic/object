@@ -4,7 +4,8 @@ use crate::read::{ReadError, ReadRef, Result};
 use crate::{pe, LittleEndian as LE, U16};
 
 /// The `.rsrc` section of a PE file.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ResourceDirectory<'data> {
     data: &'data [u8],
@@ -25,7 +26,8 @@ impl<'data> ResourceDirectory<'data> {
 }
 
 /// A table of resource entries.
-#[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ResourceDirectoryTable<'data> {
     /// The table header.
@@ -116,7 +118,8 @@ impl pe::ImageResourceDirectoryEntry {
 }
 
 /// Data associated with a resource directory entry.
-#[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone)]
 pub enum ResourceDirectoryEntryData<'data> {
     /// A subtable entry.
     Table(ResourceDirectoryTable<'data>),
@@ -149,7 +152,8 @@ impl<'data> ResourceDirectoryEntryData<'data> {
 }
 
 /// A resource name.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ResourceName {
     offset: u32,
@@ -181,7 +185,8 @@ impl ResourceName {
 /// A resource name or ID.
 ///
 /// Can be either a string or a numeric ID.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 pub enum ResourceNameOrId {
     /// A resource name.
     Name(ResourceName),

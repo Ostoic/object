@@ -17,13 +17,15 @@ use crate::read::ReadRef;
 /// them to be returned. Entries in the cache are never removed.
 /// Entries are keyed on the offset and size of the read.
 /// Currently overlapping reads are considered separate reads.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ReadCache<R: Read + Seek> {
     cache: RefCell<ReadCacheInternal<R>>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct ReadCacheInternal<R: Read + Seek> {
     read: R,
@@ -137,7 +139,8 @@ impl<'a, R: Read + Seek> ReadRef<'a> for &'a ReadCache<R> {
 /// implements `Read + Seek`.
 ///
 /// Shares an underlying `ReadCache` with a lifetime of `'a`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ReadCacheRange<'a, R: Read + Seek> {
     r: &'a ReadCache<R>,

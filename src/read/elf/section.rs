@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 use core::{iter, mem, slice, str};
 
-use crate::elf;
+use crate::{elf, DebugPod};
 use crate::endian::{self, Endianness, U32Bytes};
 use crate::pod::Pod;
 use crate::read::{
@@ -17,7 +17,8 @@ use super::{
 /// The table of section headers in an ELF file.
 ///
 /// Also includes the string table used for the section names.
-#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Default, Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionTable<'data, Elf: FileHeader, R = &'data [u8]>
 where
@@ -334,7 +335,8 @@ pub type ElfSectionIterator64<'data, 'file, Endian = Endianness, R = &'data [u8]
     ElfSectionIterator<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// An iterator over the sections of an `ElfFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSectionIterator<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -369,7 +371,8 @@ pub type ElfSection64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
     ElfSection<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// A section of an `ElfFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSection<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -621,7 +624,7 @@ where
 
 /// A trait for generic access to `SectionHeader32` and `SectionHeader64`.
 #[allow(missing_docs)]
-pub trait SectionHeader: Debug + Pod {
+pub trait SectionHeader: DebugPod {
     type Elf: FileHeader<SectionHeader = Self, Endian = Self::Endian, Word = Self::Word>;
     type Word: Into<u64>;
     type Endian: endian::Endian;

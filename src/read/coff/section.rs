@@ -12,7 +12,8 @@ use crate::read::{
 use super::{CoffFile, CoffRelocationIterator};
 
 /// The table of section headers in a COFF or PE file.
-#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Default, Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionTable<'data> {
     sections: &'data [pe::ImageSectionHeader],
@@ -109,7 +110,8 @@ impl<'data> SectionTable<'data> {
 }
 
 /// An iterator over the loadable sections of a `CoffFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffSegmentIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,
@@ -128,7 +130,8 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffSegmentIterator<'data, 'f
 }
 
 /// A loadable section of a `CoffFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffSegment<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,
@@ -211,7 +214,8 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSegment<'data> for CoffSegment<'data
 }
 
 /// An iterator over the sections of a `CoffFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffSectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,
@@ -231,7 +235,8 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffSectionIterator<'data, 'f
 }
 
 /// A section of a `CoffFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffSection<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,

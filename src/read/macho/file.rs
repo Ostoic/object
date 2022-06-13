@@ -2,11 +2,11 @@ use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::{mem, str};
 
-use crate::read::{
+use crate::{read::{
     self, Architecture, ComdatKind, Error, Export, FileFlags, Import, NoDynamicRelocationIterator,
     Object, ObjectComdat, ObjectKind, ObjectMap, ObjectSection, ReadError, ReadRef, Result,
     SectionIndex, SymbolIndex,
-};
+}, DebugPod};
 use crate::{endian, macho, BigEndian, ByteString, Endian, Endianness, Pod};
 
 use super::{
@@ -25,7 +25,8 @@ pub type MachOFile64<'data, Endian = Endianness, R = &'data [u8]> =
 /// A partially parsed Mach-O file.
 ///
 /// Most of the functionality of this type is provided by the `Object` trait implementation.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOFile<'data, Mach, R = &'data [u8]>
 where
@@ -443,7 +444,8 @@ pub type MachOComdatIterator64<'data, 'file, Endian = Endianness, R = &'data [u8
     MachOComdatIterator<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// An iterator over the COMDAT section groups of a `MachOFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOComdatIterator<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -477,7 +479,8 @@ pub type MachOComdat64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
     MachOComdat<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// A COMDAT section group of a `MachOFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOComdat<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -541,7 +544,8 @@ pub type MachOComdatSectionIterator64<'data, 'file, Endian = Endianness, R = &'d
     MachOComdatSectionIterator<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// An iterator over the sections in a COMDAT section group of a `MachOFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOComdatSectionIterator<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -567,7 +571,7 @@ where
 
 /// A trait for generic access to `MachHeader32` and `MachHeader64`.
 #[allow(missing_docs)]
-pub trait MachHeader: Debug + Pod {
+pub trait MachHeader: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
     type Segment: Segment<Endian = Self::Endian, Section = Self::Section>;

@@ -16,7 +16,8 @@ use crate::read::{
 /// A table of symbol entries in a COFF or PE file.
 ///
 /// Also includes the string table used for the symbol names.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolTable<'data, R = &'data [u8]>
 where
@@ -170,7 +171,8 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
 /// An iterator for symbol entries in a COFF or PE file.
 ///
 /// Yields the index and symbol structure for each symbol.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolIterator<'data, 'table, R = &'data [u8]>
 where
@@ -260,7 +262,8 @@ impl pe::ImageSymbol {
 }
 
 /// A symbol table of a `CoffFile`.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffSymbolTable<'data, 'file, R = &'data [u8]>
 where
@@ -326,7 +329,8 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffSymbolIterator<'data, 'fi
 }
 
 /// A symbol of a `CoffFile`.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffSymbol<'data, 'file, R = &'data [u8]>
 where

@@ -13,7 +13,8 @@ use super::{
 };
 
 /// The common parts of `PeFile` and `CoffFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 pub(crate) struct CoffCommon<'data, R: ReadRef<'data>> {
     pub(crate) sections: SectionTable<'data>,
     // TODO: ImageSymbolExBytes
@@ -22,7 +23,8 @@ pub(crate) struct CoffCommon<'data, R: ReadRef<'data>> {
 }
 
 /// A COFF object file.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffFile<'data, R: ReadRef<'data> = &'data [u8]> {
     pub(super) header: &'data pe::ImageFileHeader,

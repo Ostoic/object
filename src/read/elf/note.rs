@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 use core::mem;
 
-use crate::elf;
+use crate::{elf, DebugPod};
 use crate::endian;
 use crate::pod::Pod;
 use crate::read::util;
@@ -10,7 +10,8 @@ use crate::read::{self, Bytes, Error, ReadError};
 use super::FileHeader;
 
 /// An iterator over the notes in an ELF section or segment.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct NoteIterator<'data, Elf>
 where
@@ -83,7 +84,8 @@ where
 }
 
 /// A parsed `NoteHeader`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Note<'data, Elf>
 where
@@ -140,7 +142,7 @@ impl<'data, Elf: FileHeader> Note<'data, Elf> {
 
 /// A trait for generic access to `NoteHeader32` and `NoteHeader64`.
 #[allow(missing_docs)]
-pub trait NoteHeader: Debug + Pod {
+pub trait NoteHeader: DebugPod {
     type Endian: endian::Endian;
 
     fn n_namesz(&self, endian: Self::Endian) -> u32;

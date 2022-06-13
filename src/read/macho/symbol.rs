@@ -2,7 +2,7 @@ use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::{fmt, slice, str};
 
-use crate::endian::{self, Endianness};
+use crate::{endian::{self, Endianness}, DebugPod};
 use crate::macho;
 use crate::pod::Pod;
 use crate::read::util::StringTable;
@@ -17,7 +17,8 @@ use super::{MachHeader, MachOFile};
 /// A table of symbol entries in a Mach-O file.
 ///
 /// Also includes the string table used for the symbol names.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolTable<'data, Mach: MachHeader, R = &'data [u8]>
 where
@@ -157,7 +158,8 @@ pub type MachOSymbolTable64<'data, 'file, Endian = Endianness, R = &'data [u8]> 
     MachOSymbolTable<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// A symbol table of a `MachOFile`.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSymbolTable<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -250,7 +252,8 @@ pub type MachOSymbol64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
     MachOSymbol<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// A symbol of a `MachOFile`.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSymbol<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -415,7 +418,7 @@ where
 
 /// A trait for generic access to `Nlist32` and `Nlist64`.
 #[allow(missing_docs)]
-pub trait Nlist: Debug + Pod {
+pub trait Nlist: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 

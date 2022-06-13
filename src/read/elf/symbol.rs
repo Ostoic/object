@@ -4,7 +4,7 @@ use core::fmt::Debug;
 use core::slice;
 use core::str;
 
-use crate::elf;
+use crate::{elf, DebugPod};
 use crate::endian::{self, Endianness};
 use crate::pod::Pod;
 use crate::read::util::StringTable;
@@ -18,7 +18,8 @@ use super::{FileHeader, SectionHeader, SectionTable};
 /// A table of symbol entries in an ELF file.
 ///
 /// Also includes the string table used for the symbol names.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolTable<'data, Elf: FileHeader, R = &'data [u8]>
 where
@@ -215,7 +216,8 @@ pub type ElfSymbolTable64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
     ElfSymbolTable<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// A symbol table of an `ElfFile`.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSymbolTable<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -311,7 +313,8 @@ pub type ElfSymbol64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
     ElfSymbol<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// A symbol of an `ElfFile`.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSymbol<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -462,7 +465,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
 
 /// A trait for generic access to `Sym32` and `Sym64`.
 #[allow(missing_docs)]
-pub trait Sym: Debug + Pod {
+pub trait Sym: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 

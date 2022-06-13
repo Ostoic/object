@@ -3,10 +3,10 @@ use core::convert::TryInto;
 use core::fmt::Debug;
 use core::mem;
 
-use crate::read::{
+use crate::{read::{
     self, util, Architecture, ByteString, Bytes, Error, Export, FileFlags, Import, Object,
     ObjectKind, ReadError, ReadRef, SectionIndex, StringTable, SymbolIndex,
-};
+}, DebugPod};
 use crate::{elf, endian, Endian, Endianness, Pod, U32};
 
 use super::{
@@ -26,7 +26,8 @@ pub type ElfFile64<'data, Endian = Endianness, R = &'data [u8]> =
 /// A partially parsed ELF file.
 ///
 /// Most of the functionality of this type is provided by the `Object` trait implementation.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfFile<'data, Elf, R = &'data [u8]>
 where
@@ -429,7 +430,7 @@ where
 
 /// A trait for generic access to `FileHeader32` and `FileHeader64`.
 #[allow(missing_docs)]
-pub trait FileHeader: Debug + Pod {
+pub trait FileHeader: DebugPod {
     // Ideally this would be a `u64: From<Word>`, but can't express that.
     type Word: Into<u64>;
     type Sword: Into<i64>;

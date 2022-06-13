@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 use core::{result, slice, str};
 
-use crate::endian::{self, Endianness};
+use crate::{endian::{self, Endianness}, DebugPod};
 use crate::macho;
 use crate::pod::Pod;
 use crate::read::{self, ObjectSegment, ReadError, ReadRef, Result, SegmentFlags};
@@ -16,7 +16,8 @@ pub type MachOSegmentIterator64<'data, 'file, Endian = Endianness, R = &'data [u
     MachOSegmentIterator<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// An iterator over the segments of a `MachOFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSegmentIterator<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -51,7 +52,8 @@ pub type MachOSegment64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
     MachOSegment<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// A segment of a `MachOFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSegment<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -156,7 +158,8 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 pub(super) struct MachOSegmentInternal<'data, Mach: MachHeader, R: ReadRef<'data>> {
     pub data: R,
     pub segment: &'data Mach::Segment,
@@ -164,7 +167,7 @@ pub(super) struct MachOSegmentInternal<'data, Mach: MachHeader, R: ReadRef<'data
 
 /// A trait for generic access to `SegmentCommand32` and `SegmentCommand64`.
 #[allow(missing_docs)]
-pub trait Segment: Debug + Pod {
+pub trait Segment: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
     type Section: Section<Endian = Self::Endian>;

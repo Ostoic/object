@@ -1,14 +1,14 @@
 use core::convert::TryInto;
 use core::fmt::Debug;
 
-use crate::elf;
+use crate::{elf, DebugPod};
 use crate::endian;
 use crate::pod::Pod;
 use crate::read::{ReadError, Result, StringTable};
 
 /// A trait for generic access to `Dyn32` and `Dyn64`.
 #[allow(missing_docs)]
-pub trait Dyn: Debug + Pod {
+pub trait Dyn: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 

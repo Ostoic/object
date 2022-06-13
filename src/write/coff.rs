@@ -27,7 +27,8 @@ struct SymbolOffsets {
 
 /// Internal format to use for the `.drectve` section containing linker
 /// directives for symbol exports.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum CoffExportStyle {
     /// MSVC format supported by link.exe and LLD.
     Msvc,

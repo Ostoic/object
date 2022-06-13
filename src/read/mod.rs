@@ -139,7 +139,8 @@ pub type NativeFile<'data, R = &'data [u8]> = pe::PeFile64<'data, R>;
 pub type NativeFile<'data, R = &'data [u8]> = wasm::WasmFile<'data, R>;
 
 /// A file format kind.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum FileKind {
     /// A Unix archive.
@@ -245,7 +246,8 @@ impl FileKind {
 }
 
 /// An object kind.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum ObjectKind {
     /// The object kind is unknown.
@@ -261,17 +263,20 @@ pub enum ObjectKind {
 }
 
 /// The index used to identify a section of a file.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionIndex(pub usize);
 
 /// The index used to identify a symbol of a file.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolIndex(pub usize);
 
 /// The section where a symbol is defined.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum SymbolSection {
     /// The section is unknown.
@@ -310,7 +315,8 @@ pub trait SymbolMapEntry {
 }
 
 /// A map from addresses to symbols.
-#[derive(Debug, Default, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Default, Clone)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolMap<T: SymbolMapEntry> {
     symbols: Vec<T>,
@@ -346,7 +352,8 @@ impl<T: SymbolMapEntry> SymbolMap<T> {
 }
 
 /// A `SymbolMap` entry for symbol names.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolMapName<'data> {
     address: u64,
@@ -385,7 +392,8 @@ impl<'data> SymbolMapEntry for SymbolMapName<'data> {
 /// A map from addresses to symbol names and object files.
 ///
 /// This is derived from STAB entries in Mach-O files.
-#[derive(Debug, Default, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Default, Clone)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ObjectMap<'data> {
     symbols: SymbolMap<ObjectMapEntry<'data>>,
@@ -416,7 +424,8 @@ impl<'data> ObjectMap<'data> {
 }
 
 /// A `ObjectMap` entry.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Default, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ObjectMapEntry<'data> {
     address: u64,
@@ -473,7 +482,8 @@ impl<'data> SymbolMapEntry for ObjectMapEntry<'data> {
 }
 
 /// An imported symbol.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Import<'data> {
     library: ByteString<'data>,
@@ -498,7 +508,8 @@ impl<'data> Import<'data> {
 }
 
 /// An exported symbol.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Export<'data> {
     // TODO: and ordinal?
@@ -523,7 +534,8 @@ impl<'data> Export<'data> {
 }
 
 /// PDB Information
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CodeView<'data> {
     guid: [u8; 16],
@@ -555,7 +567,8 @@ impl<'data> CodeView<'data> {
 }
 
 /// The target referenced by a relocation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum RelocationTarget {
     /// The target is a symbol.
@@ -567,7 +580,8 @@ pub enum RelocationTarget {
 }
 
 /// A relocation entry.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Relocation {
     kind: RelocationKind,
@@ -633,7 +647,8 @@ impl Relocation {
 }
 
 /// A data compression format.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum CompressionFormat {
     /// The data is uncompressed.
@@ -647,7 +662,8 @@ pub enum CompressionFormat {
 }
 
 /// A range in a file that may be compressed.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CompressedFileRange {
     /// The data compression format.
@@ -696,7 +712,8 @@ impl CompressedFileRange {
 }
 
 /// Data that may be compressed.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CompressedData<'data> {
     /// The data compression format.

@@ -5,7 +5,8 @@ use crate::pe;
 use crate::read::{Bytes, Error, ReadError, Result};
 
 /// An iterator over the relocation blocks in the `.reloc` section of a PE file.
-#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Default, Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RelocationBlockIterator<'data> {
     data: Bytes<'data>,
@@ -48,7 +49,8 @@ impl<'data> RelocationBlockIterator<'data> {
 }
 
 /// An iterator of the relocations in a block in the `.reloc` section of a PE file.
-#[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RelocationIterator<'data> {
     virtual_address: u32,
@@ -88,7 +90,8 @@ impl<'data> Iterator for RelocationIterator<'data> {
 }
 
 /// A relocation in the `.reloc` section of a PE file.
-#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Default, Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Relocation {
     /// The virtual address of the relocation.

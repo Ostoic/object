@@ -6,7 +6,8 @@ use crate::{elf, endian};
 use super::FileHeader;
 
 /// A version index.
-#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Default, Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct VersionIndex(pub u16);
 
@@ -35,7 +36,8 @@ impl VersionIndex {
 /// A version definition or requirement.
 ///
 /// This is derived from entries in the `SHT_GNU_verdef` and `SHT_GNU_verneed` sections.
-#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Default, Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Version<'data> {
     name: &'data [u8],
@@ -61,7 +63,8 @@ impl<'data> Version<'data> {
 /// It allows looking up the version information for a given symbol index.
 ///
 /// This is derived from entries in the `SHT_GNU_versym`, `SHT_GNU_verdef` and `SHT_GNU_verneed` sections.
-#[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct VersionTable<'data, Elf: FileHeader> {
     symbols: &'data [elf::Versym<Elf::Endian>],
@@ -214,7 +217,8 @@ impl<'data, Elf: FileHeader> VersionTable<'data, Elf> {
 }
 
 /// An iterator over the entries in an ELF `SHT_GNU_verdef` section.
-#[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct VerdefIterator<'data, Elf: FileHeader> {
     endian: Elf::Endian,
@@ -262,7 +266,8 @@ impl<'data, Elf: FileHeader> VerdefIterator<'data, Elf> {
 }
 
 /// An iterator over the auxiliary records for an entry in an ELF `SHT_GNU_verdef` section.
-#[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct VerdauxIterator<'data, Elf: FileHeader> {
     endian: Elf::Endian,
@@ -299,7 +304,8 @@ impl<'data, Elf: FileHeader> VerdauxIterator<'data, Elf> {
 }
 
 /// An iterator over the entries in an ELF `SHT_GNU_verneed` section.
-#[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct VerneedIterator<'data, Elf: FileHeader> {
     endian: Elf::Endian,
@@ -352,7 +358,8 @@ impl<'data, Elf: FileHeader> VerneedIterator<'data, Elf> {
 }
 
 /// An iterator over the auxiliary records for an entry in an ELF `SHT_GNU_verneed` section.
-#[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct VernauxIterator<'data, Elf: FileHeader> {
     endian: Elf::Endian,

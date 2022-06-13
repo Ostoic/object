@@ -17,7 +17,8 @@ pub const THIN_MAGIC: [u8; 8] = *b"!<thin>\n";
 pub const TERMINATOR: [u8; 2] = *b"`\n";
 
 /// The header at the start of an archive member.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Header {

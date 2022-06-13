@@ -243,7 +243,8 @@ pub(crate) fn data_range(
 /// A table of zero-terminated strings.
 ///
 /// This is used for most file formats.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct StringTable<'data, R = &'data [u8]>
 where

@@ -6,7 +6,8 @@ use crate::archive;
 use crate::read::{self, Error, ReadError, ReadRef};
 
 /// The kind of archive format.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum ArchiveKind {
     /// There are no special files that indicate the archive format.
@@ -26,7 +27,8 @@ pub enum ArchiveKind {
 }
 
 /// A partially parsed archive file.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ArchiveFile<'data, R: ReadRef<'data> = &'data [u8]> {
     data: R,
@@ -161,7 +163,8 @@ impl<'data, R: ReadRef<'data>> ArchiveFile<'data, R> {
 }
 
 /// An iterator over the members of an archive.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ArchiveMemberIterator<'data, R: ReadRef<'data> = &'data [u8]> {
     data: R,
@@ -186,7 +189,8 @@ impl<'data, R: ReadRef<'data>> Iterator for ArchiveMemberIterator<'data, R> {
 }
 
 /// A partially parsed archive member.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ArchiveMember<'data> {
     header: &'data archive::Header,

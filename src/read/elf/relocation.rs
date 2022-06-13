@@ -3,7 +3,7 @@ use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::slice;
 
-use crate::elf;
+use crate::{elf, DebugPod};
 use crate::endian::{self, Endianness};
 use crate::pod::Pod;
 use crate::read::{
@@ -14,7 +14,8 @@ use crate::read::{
 use super::{ElfFile, FileHeader, SectionHeader, SectionTable};
 
 /// A mapping from section index to associated relocation sections.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RelocationSections {
     relocations: Vec<usize>,
@@ -402,7 +403,7 @@ fn parse_relocation<Elf: FileHeader>(
 
 /// A trait for generic access to `Rel32` and `Rel64`.
 #[allow(missing_docs)]
-pub trait Rel: Debug + Pod + Clone {
+pub trait Rel: DebugPod + Clone {
     type Word: Into<u64>;
     type Sword: Into<i64>;
     type Endian: endian::Endian;
@@ -475,7 +476,7 @@ impl<Endian: endian::Endian> Rel for elf::Rel64<Endian> {
 
 /// A trait for generic access to `Rela32` and `Rela64`.
 #[allow(missing_docs)]
-pub trait Rela: Debug + Pod + Clone {
+pub trait Rela: DebugPod + Clone {
     type Word: Into<u64>;
     type Sword: Into<i64>;
     type Endian: endian::Endian;

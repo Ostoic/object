@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 use core::{mem, slice, str};
 
-use crate::elf;
+use crate::{elf, DebugPod};
 use crate::endian::{self, Endianness};
 use crate::pod::Pod;
 use crate::read::{self, Bytes, ObjectSegment, ReadError, ReadRef, SegmentFlags};
@@ -16,7 +16,8 @@ pub type ElfSegmentIterator64<'data, 'file, Endian = Endianness, R = &'data [u8]
     ElfSegmentIterator<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// An iterator over the segments of an `ElfFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSegmentIterator<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -55,7 +56,8 @@ pub type ElfSegment64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
     ElfSegment<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// A segment of an `ElfFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSegment<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -148,7 +150,7 @@ where
 
 /// A trait for generic access to `ProgramHeader32` and `ProgramHeader64`.
 #[allow(missing_docs)]
-pub trait ProgramHeader: Debug + Pod {
+pub trait ProgramHeader: DebugPod {
     type Elf: FileHeader<ProgramHeader = Self, Endian = Self::Endian, Word = Self::Word>;
     type Word: Into<u64>;
     type Endian: endian::Endian;

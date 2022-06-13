@@ -7,7 +7,8 @@ use crate::{U32, U64};
 use super::{FileHeader, Sym, SymbolTable, Version, VersionTable};
 
 /// A SysV symbol hash table in an ELF file.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct HashTable<'data, Elf: FileHeader> {
     buckets: &'data [U32<Elf::Endian>],
@@ -71,7 +72,8 @@ impl<'data, Elf: FileHeader> HashTable<'data, Elf> {
 }
 
 /// A GNU symbol hash table in an ELF file.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct GnuHashTable<'data, Elf: FileHeader> {
     symbol_base: u32,

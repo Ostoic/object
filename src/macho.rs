@@ -293,7 +293,8 @@ pub const VM_PROT_EXECUTE: u32 = 0x04;
 /// are guaranteed to be present. For all other fields, check the header size before
 /// accessing the field. The header size is stored in mapping_offset; the mappings start
 /// right after the theader.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DyldCacheHeader<E: Endian> {
@@ -352,7 +353,8 @@ pub struct DyldCacheHeader<E: Endian> {
 }
 
 /// Corresponds to struct dyld_cache_mapping_info from dyld_cache_format.h.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DyldCacheMappingInfo<E: Endian> {
@@ -369,7 +371,8 @@ pub struct DyldCacheMappingInfo<E: Endian> {
 }
 
 /// Corresponds to struct dyld_cache_image_info from dyld_cache_format.h.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DyldCacheImageInfo<E: Endian> {
@@ -387,7 +390,8 @@ pub struct DyldCacheImageInfo<E: Endian> {
 
 /// Corresponds to a struct whose source code has not been published as of Nov 2021.
 /// Added in the dyld cache version which shipped with macOS 12 / iOS 15.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DyldSubCacheInfo<E: Endian> {
@@ -418,7 +422,8 @@ pub const FAT_MAGIC: u32 = 0xcafe_babe;
 /// NXSwapLong(FAT_MAGIC)
 pub const FAT_CIGAM: u32 = 0xbeba_feca;
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct FatHeader {
@@ -428,7 +433,8 @@ pub struct FatHeader {
     pub nfat_arch: U32<BigEndian>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct FatArch32 {
@@ -455,7 +461,8 @@ pub const FAT_MAGIC_64: u32 = 0xcafe_babf;
 /// NXSwapLong(FAT_MAGIC_64)
 pub const FAT_CIGAM_64: u32 = 0xbfba_feca;
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct FatArch64 {
@@ -478,7 +485,8 @@ pub struct FatArch64 {
 /// The 32-bit mach header.
 ///
 /// Appears at the very beginning of the object file for 32-bit architectures.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachHeader32<E: Endian> {
@@ -507,7 +515,8 @@ pub const MH_CIGAM: u32 = 0xcefa_edfe;
 /// The 64-bit mach header.
 ///
 /// Appears at the very beginning of object files for 64-bit architectures.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachHeader64<E: Endian> {
@@ -662,7 +671,8 @@ pub const MH_DYLIB_IN_CACHE: u32 = 0x8000_0000;
 /// follow these rules so the file can be memory mapped.  Otherwise the pointers
 /// to these tables will not work well or at all on some machines.  With all
 /// padding zeroed like objects will compare byte for byte.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct LoadCommand<E: Endian> {
@@ -803,7 +813,8 @@ pub const LC_FILESET_ENTRY: u32 = 0x35 | LC_REQ_DYLD;
 /// of the string is reflected in the `cmdsize` field of the load command.
 /// Once again any padded bytes to bring the `cmdsize` field to a multiple
 /// of 4 bytes must be zero.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct LcStr<E: Endian> {
@@ -823,7 +834,8 @@ pub struct LcStr<E: Endian> {
 /// by the maxprot and initprot fields.  If the segment has sections then the
 /// `Section32` structures directly follow the segment command and their size is
 /// reflected in `cmdsize`.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SegmentCommand32<E: Endian> {
@@ -857,7 +869,8 @@ pub struct SegmentCommand32<E: Endian> {
 /// mapped into a 64-bit task's address space.  If the 64-bit segment has
 /// sections then `Section64` structures directly follow the 64-bit segment
 /// command and their size is reflected in `cmdsize`.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SegmentCommand64<E: Endian> {
@@ -925,7 +938,8 @@ pub const SG_READ_ONLY: u32 = 0x10;
  * header file <reloc.h>.
  */
 /// 32-bit section.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Section32<E: Endian> {
@@ -954,7 +968,8 @@ pub struct Section32<E: Endian> {
 }
 
 /// 64-bit section.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Section64<E: Endian> {
@@ -1169,7 +1184,8 @@ pub const SEG_IMPORT: &str = "__IMPORT";
  * minor version number.  The address of where the headers are loaded is in
  * header_addr. (THIS IS OBSOLETE and no longer supported).
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Fvmlib<E: Endian> {
@@ -1188,7 +1204,8 @@ pub struct Fvmlib<E: Endian> {
  * `FvmlibCommand` (cmd == LC_LOADFVMLIB) for each library it uses.
  * (THIS IS OBSOLETE and no longer supported).
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct FvmlibCommand<E: Endian> {
@@ -1209,7 +1226,8 @@ pub struct FvmlibCommand<E: Endian> {
  * built and copied into user so it can be use to determined if the library used
  * at runtime is exactly the same as used to built the program.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Dylib<E: Endian> {
@@ -1230,7 +1248,8 @@ pub struct Dylib<E: Endian> {
  * `DylibCommand` (cmd == LC_LOAD_DYLIB, LC_LOAD_WEAK_DYLIB, or
  * LC_REEXPORT_DYLIB) for each library it uses.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DylibCommand<E: Endian> {
@@ -1252,7 +1271,8 @@ pub struct DylibCommand<E: Endian> {
  * The name of the umbrella framework for subframeworks is recorded in the
  * following structure.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SubFrameworkCommand<E: Endian> {
@@ -1273,7 +1293,8 @@ pub struct SubFrameworkCommand<E: Endian> {
  * usually a framework name.  It can also be a name used for bundles clients
  * where the bundle is built with "-client_name client_name".
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SubClientCommand<E: Endian> {
@@ -1298,7 +1319,8 @@ pub struct SubClientCommand<E: Endian> {
  * Zero or more sub_umbrella frameworks may be use by an umbrella framework.
  * The name of a sub_umbrella framework is recorded in the following structure.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SubUmbrellaCommand<E: Endian> {
@@ -1325,7 +1347,8 @@ pub struct SubUmbrellaCommand<E: Endian> {
  * The name of a sub_library framework is recorded in the following structure.
  * For example /usr/lib/libobjc_profile.A.dylib would be recorded as "libobjc".
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SubLibraryCommand<E: Endian> {
@@ -1346,7 +1369,8 @@ pub struct SubLibraryCommand<E: Endian> {
  * of the first byte.  So the bit for the Nth module is:
  * (linked_modules[N/8] >> N%8) & 1
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PreboundDylibCommand<E: Endian> {
@@ -1370,7 +1394,8 @@ pub struct PreboundDylibCommand<E: Endian> {
  * This struct is also used for the LC_DYLD_ENVIRONMENT load command and
  * contains string for dyld to treat like environment variable.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DylinkerCommand<E: Endian> {
@@ -1403,7 +1428,8 @@ pub struct DylinkerCommand<E: Endian> {
  * created (based on the shell's limit for the stack size).  Command arguments
  * and environment variables are copied onto that stack.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ThreadCommand<E: Endian> {
@@ -1425,7 +1451,8 @@ pub struct ThreadCommand<E: Endian> {
  * and then calls it.  This gets called before any module initialization
  * routines (used for C++ static constructors) in the library.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RoutinesCommand32<E: Endian> {
@@ -1449,7 +1476,8 @@ pub struct RoutinesCommand32<E: Endian> {
 /*
  * The 64-bit routines command.  Same use as above.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RoutinesCommand64<E: Endian> {
@@ -1475,7 +1503,8 @@ pub struct RoutinesCommand64<E: Endian> {
  * "stab" style symbol table information as described in the header files
  * <nlist.h> and <stab.h>.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymtabCommand<E: Endian> {
@@ -1533,7 +1562,8 @@ pub struct SymtabCommand<E: Endian> {
  * For executable and object modules the relocation entries continue to hang
  * off the section structures.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DysymtabCommand<E: Endian> {
@@ -1682,7 +1712,8 @@ pub const INDIRECT_SYMBOL_LOCAL: u32 = 0x8000_0000;
 pub const INDIRECT_SYMBOL_ABS: u32 = 0x4000_0000;
 
 /* a table of contents entry */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DylibTableOfContents<E: Endian> {
@@ -1693,7 +1724,8 @@ pub struct DylibTableOfContents<E: Endian> {
 }
 
 /* a module table entry */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DylibModule32<E: Endian> {
@@ -1730,7 +1762,8 @@ pub struct DylibModule32<E: Endian> {
 }
 
 /* a 64-bit module table entry */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DylibModule64<E: Endian> {
@@ -1774,7 +1807,8 @@ pub struct DylibModule64<E: Endian> {
  * reference that is being made.  The constants for the flags are defined in
  * <mach-o/nlist.h> as they are also used for symbol table entries.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DylibReference<E: Endian> {
@@ -1789,7 +1823,8 @@ pub struct DylibReference<E: Endian> {
  * The TwolevelHintsCommand contains the offset and number of hints in the
  * two-level namespace lookup hints table.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct TwolevelHintsCommand<E: Endian> {
@@ -1819,7 +1854,8 @@ pub struct TwolevelHintsCommand<E: Endian> {
  * library's table of contents.  This is used as the starting point of the
  * binary search or a directed linear search.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct TwolevelHint<E: Endian> {
@@ -1841,7 +1877,8 @@ pub struct TwolevelHint<E: Endian> {
  * is re-done and the cksum field is non-zero it is left unchanged from the
  * input file.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PrebindCksumCommand<E: Endian> {
@@ -1857,7 +1894,8 @@ pub struct PrebindCksumCommand<E: Endian> {
  * The uuid load command contains a single 128-bit unique random number that
  * identifies an object produced by the static link editor.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct UuidCommand<E: Endian> {
@@ -1873,7 +1911,8 @@ pub struct UuidCommand<E: Endian> {
  * The RpathCommand contains a path which at runtime should be added to
  * the current run path used to find @rpath prefixed dylibs.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RpathCommand<E: Endian> {
@@ -1889,7 +1928,8 @@ pub struct RpathCommand<E: Endian> {
  * The LinkeditDataCommand contains the offsets and sizes of a blob
  * of data in the __LINKEDIT segment.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct LinkeditDataCommand<E: Endian> {
@@ -1905,7 +1945,8 @@ pub struct LinkeditDataCommand<E: Endian> {
     pub datasize: U32<E>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct FilesetEntryCommand<E: Endian> {
@@ -1927,7 +1968,8 @@ pub struct FilesetEntryCommand<E: Endian> {
  * The EncryptionInfoCommand32 contains the file offset and size of an
  * of an encrypted segment.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct EncryptionInfoCommand32<E: Endian> {
@@ -1947,7 +1989,8 @@ pub struct EncryptionInfoCommand32<E: Endian> {
  * The EncryptionInfoCommand64 contains the file offset and size of an
  * of an encrypted segment (for use in x86_64 targets).
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct EncryptionInfoCommand64<E: Endian> {
@@ -1969,7 +2012,8 @@ pub struct EncryptionInfoCommand64<E: Endian> {
  * The VersionMinCommand contains the min OS version on which this
  * binary was built to run.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct VersionMinCommand<E: Endian> {
@@ -1988,7 +2032,8 @@ pub struct VersionMinCommand<E: Endian> {
  * binary was built to run for its platform.  The list of known platforms and
  * tool values following it.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct BuildVersionCommand<E: Endian> {
@@ -2006,7 +2051,8 @@ pub struct BuildVersionCommand<E: Endian> {
     pub ntools: U32<E>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct BuildToolVersion<E: Endian> {
@@ -2041,7 +2087,8 @@ pub const TOOL_LD: u32 = 3;
  * is encoded using byte streams, so no endian swapping is needed
  * to interpret it.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DyldInfoCommand<E: Endian> {
@@ -2227,7 +2274,8 @@ pub const EXPORT_SYMBOL_FLAGS_STUB_AND_RESOLVER: u32 = 0x10;
 /*
  * The LinkerOptionCommand contains linker options embedded in object files.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct LinkerOptionCommand<E: Endian> {
@@ -2249,7 +2297,8 @@ pub struct LinkerOptionCommand<E: Endian> {
  * roots also being a multiple of a long.  Also the padding must again be
  * zeroed. (THIS IS OBSOLETE and no longer supported).
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymsegCommand<E: Endian> {
@@ -2269,7 +2318,8 @@ pub struct SymsegCommand<E: Endian> {
  * the command is padded out with zero bytes to a multiple of 4 bytes/
  * (THIS IS OBSOLETE and no longer supported).
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct IdentCommand<E: Endian> {
@@ -2285,7 +2335,8 @@ pub struct IdentCommand<E: Endian> {
  * internal use.  The kernel ignores this command when loading a program into
  * memory).
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct FvmfileCommand<E: Endian> {
@@ -2305,7 +2356,8 @@ pub struct FvmfileCommand<E: Endian> {
  * of main().  If -stack_size was used at link time, the stacksize
  * field will contain the stack size need for the main thread.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct EntryPointCommand<E: Endian> {
@@ -2323,7 +2375,8 @@ pub struct EntryPointCommand<E: Endian> {
  * The SourceVersionCommand is an optional load command containing
  * the version of the sources used to build the binary.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SourceVersionCommand<E: Endian> {
@@ -2340,7 +2393,8 @@ pub struct SourceVersionCommand<E: Endian> {
  * to point to an array of DataInCodeEntry entries. Each entry
  * describes a range of data in a code section.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DataInCodeEntry<E: Endian> {
@@ -2362,7 +2416,8 @@ pub const DICE_KIND_ABS_JUMP_TABLE32: u32 = 0x0005;
  * of TlvDescriptor structures.
  */
 /* TODO:
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct TlvDescriptor<E: Endian>
@@ -2377,7 +2432,8 @@ pub struct TlvDescriptor<E: Endian>
  * LC_NOTE commands describe a region of arbitrary data included in a Mach-O
  * file.  Its initial use is to record extra data in MH_CORE files.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct NoteCommand<E: Endian> {
@@ -2395,7 +2451,8 @@ pub struct NoteCommand<E: Endian> {
 
 // Definitions from "/usr/include/mach-o/nlist.h".
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Nlist32<E: Endian> {
@@ -2414,7 +2471,8 @@ pub struct Nlist32<E: Endian> {
 /*
  * This is the symbol table entry structure for 64-bit architectures.
  */
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Nlist64<E: Endian> {
@@ -2758,7 +2816,8 @@ pub const N_PC: u8 = 0x30;
 ///
 /// This type provides functions for determining whether the relocation
 /// is scattered, and for accessing the fields of each variant.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Relocation<E: Endian> {
@@ -2826,7 +2885,8 @@ impl<E: Endian> Relocation<E> {
  * Also the last 4 bits have had the r_type tag added to them.
  */
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RelocationInfo {
     /// offset in the section to what is being relocated
@@ -2936,7 +2996,8 @@ pub const R_ABS: u8 = 0;
 /// Bit set in `Relocation::r_word0` for scattered relocations.
 pub const R_SCATTERED: u32 = 0x8000_0000;
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ScatteredRelocationInfo {
     /// offset in the section to what is being relocated

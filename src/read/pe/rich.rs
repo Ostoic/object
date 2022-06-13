@@ -7,7 +7,8 @@ use crate::read::Bytes;
 use crate::{pe, LittleEndian as LE, ReadRef, U32};
 
 /// Parsed information about a Rich Header.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RichHeaderInfo<'data> {
     /// The offset at which the rich header starts.
@@ -28,7 +29,8 @@ pub struct RichHeaderInfo<'data> {
 /// A PE rich header entry after it has been unmasked.
 ///
 /// See [`pe::MaskedRichHeaderEntry`].
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[repr(C)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RichHeaderEntry {

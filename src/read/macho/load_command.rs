@@ -7,7 +7,8 @@ use crate::read::macho::{MachHeader, SymbolTable};
 use crate::read::{Bytes, ReadError, ReadRef, Result, StringTable};
 
 /// An iterator over the load commands of a `MachHeader`.
-#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Default, Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct LoadCommandIterator<'data, E: Endian> {
     endian: E,
@@ -49,7 +50,8 @@ impl<'data, E: Endian> LoadCommandIterator<'data, E> {
 }
 
 /// The data for a `LoadCommand`.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct LoadCommandData<'data, E: Endian> {
     cmd: u32,
@@ -244,7 +246,8 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
 }
 
 /// A `LoadCommand` that has been interpreted according to its `cmd` field.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[non_exhaustive]
 pub enum LoadCommandVariant<'data, E: Endian> {
     /// `LC_SEGMENT`

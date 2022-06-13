@@ -9,7 +9,8 @@ use crate::read::{
 use super::CoffFile;
 
 /// An iterator over the COMDAT section groups of a `CoffFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffComdatIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,
@@ -32,7 +33,8 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffComdatIterator<'data, 'fi
 }
 
 /// A COMDAT section group of a `CoffFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffComdat<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     file: &'file CoffFile<'data, R>,
@@ -133,7 +135,8 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectComdat<'data> for CoffComdat<'data, 
 }
 
 /// An iterator over the sections in a COMDAT section group of a `CoffFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffComdatSectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     file: &'file CoffFile<'data, R>,

@@ -1,8 +1,13 @@
 //! Types for compile-time and run-time endianness.
 
 use crate::pod::Pod;
-use core::fmt::{self, Debug};
+use core::fmt;
 use core::marker::PhantomData;
+
+#[cfg(feature = "nosym")]
+pub trait DebugClone = Clone;
+#[cfg(not(feature = "nosym"))]
+pub trait DebugClone = core::fmt::Debug + Clone;
 
 /// A trait for using an endianness specification.
 ///
@@ -10,7 +15,7 @@ use core::marker::PhantomData;
 /// the native endianness of the target machine.
 ///
 /// This trait does not require that the endianness is known at compile time.
-pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
+pub trait Endian: Default + DebugClone + Copy + PartialEq + Eq + 'static {
     /// Construct a specification for the endianness of some values.
     ///
     /// Returns `None` if the type does not support specifying the given endianness.
@@ -299,7 +304,8 @@ pub trait Endian: Debug + Default + Clone + Copy + PartialEq + Eq + 'static {
 }
 
 /// An endianness that is selectable at run-time.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Endianness {
     /// Little endian byte order.
     Little,
@@ -342,7 +348,8 @@ impl Endian for Endianness {
 }
 
 /// Compile-time little endian byte order.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct LittleEndian;
 
@@ -373,7 +380,8 @@ impl Endian for LittleEndian {
 }
 
 /// Compile-time big endian byte order.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct BigEndian;
 

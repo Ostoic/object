@@ -169,13 +169,15 @@ macro_rules! next_inner {
 /// An object file.
 ///
 /// Most functionality is provided by the `Object` trait implementation.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct File<'data, R: ReadRef<'data> = &'data [u8]> {
     inner: FileInternal<'data, R>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 enum FileInternal<'data, R: ReadRef<'data>> {
     #[cfg(feature = "coff")]
     Coff(coff::CoffFile<'data, R>),
@@ -445,7 +447,8 @@ where
 }
 
 /// An iterator over the segments of a `File`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SegmentIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
@@ -454,7 +457,8 @@ where
     inner: SegmentIteratorInternal<'data, 'file, R>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 enum SegmentIteratorInternal<'data, 'file, R: ReadRef<'data>>
 where
     'data: 'file,
@@ -495,7 +499,8 @@ where
     inner: SegmentInternal<'data, 'file, R>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 enum SegmentInternal<'data, 'file, R: ReadRef<'data>>
 where
     'data: 'file,
@@ -578,7 +583,8 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSegment<'data> for Segment<'data, 'f
 }
 
 /// An iterator of the sections of a `File`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
@@ -588,7 +594,8 @@ where
 }
 
 // we wrap our enums in a struct so that they are kept private.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 enum SectionIteratorInternal<'data, 'file, R: ReadRef<'data>>
 where
     'data: 'file,
@@ -752,7 +759,8 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for Section<'data, 'f
 }
 
 /// An iterator of the COMDAT section groups of a `File`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ComdatIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
@@ -761,7 +769,8 @@ where
     inner: ComdatIteratorInternal<'data, 'file, R>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 enum ComdatIteratorInternal<'data, 'file, R: ReadRef<'data>>
 where
     'data: 'file,
@@ -868,7 +877,8 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectComdat<'data> for Comdat<'data, 'fil
 }
 
 /// An iterator over COMDAT section entries.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ComdatSectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
@@ -877,7 +887,8 @@ where
     inner: ComdatSectionIteratorInternal<'data, 'file, R>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 enum ComdatSectionIteratorInternal<'data, 'file, R: ReadRef<'data>>
 where
     'data: 'file,
@@ -909,7 +920,8 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for ComdatSectionIterator<'data, 
 }
 
 /// A symbol table.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolTable<'data, 'file, R = &'data [u8]>
 where
@@ -919,7 +931,8 @@ where
     inner: SymbolTableInternal<'data, 'file, R>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 enum SymbolTableInternal<'data, 'file, R>
 where
     'data: 'file,
@@ -990,7 +1003,8 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbolTable<'data> for SymbolTable<'
 }
 
 /// An iterator over symbol table entries.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolIterator<'data, 'file, R = &'data [u8]>
 where
@@ -1000,7 +1014,8 @@ where
     inner: SymbolIteratorInternal<'data, 'file, R>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 enum SymbolIteratorInternal<'data, 'file, R>
 where
     'data: 'file,
@@ -1188,7 +1203,8 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for Symbol<'data, 'fil
 }
 
 /// An iterator over dynamic relocation entries.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DynamicRelocationIterator<'data, 'file, R = &'data [u8]>
 where
@@ -1198,7 +1214,8 @@ where
     inner: DynamicRelocationIteratorInternal<'data, 'file, R>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 enum DynamicRelocationIteratorInternal<'data, 'file, R>
 where
     'data: 'file,
@@ -1228,7 +1245,8 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for DynamicRelocationIterator<'da
 }
 
 /// An iterator over section relocation entries.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionRelocationIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
@@ -1237,7 +1255,8 @@ where
     inner: SectionRelocationIteratorInternal<'data, 'file, R>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 enum SectionRelocationIteratorInternal<'data, 'file, R: ReadRef<'data>>
 where
     'data: 'file,

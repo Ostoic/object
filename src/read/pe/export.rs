@@ -85,7 +85,8 @@ impl<'a> Debug for ExportTarget<'a> {
 }
 
 /// A partially parsed PE export table.
-#[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone)]
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ExportTable<'data> {
     data: Bytes<'data>,

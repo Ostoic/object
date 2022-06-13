@@ -33,6 +33,7 @@ features = ["derive"]
 
 [features]
 aggressive-inline = []
+nosym = []
 
 #=======================================
 # Read/write features.

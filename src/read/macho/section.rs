@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 use core::{fmt, result, slice, str};
 
-use crate::endian::{self, Endianness};
+use crate::{endian::{self, Endianness}, DebugPod};
 use crate::macho;
 use crate::pod::Pod;
 use crate::read::{
@@ -64,7 +64,8 @@ pub type MachOSection64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
     MachOSection<'data, 'file, macho::MachHeader64<Endian>, R>;
 
 /// A section of a `MachOFile`.
-#[derive(Debug)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSection<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -215,7 +216,8 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Clone, Copy)]
 pub(super) struct MachOSectionInternal<'data, Mach: MachHeader> {
     pub index: SectionIndex,
     pub segment_index: usize,
@@ -260,7 +262,7 @@ impl<'data, Mach: MachHeader> MachOSectionInternal<'data, Mach> {
 
 /// A trait for generic access to `Section32` and `Section64`.
 #[allow(missing_docs)]
-pub trait Section: Debug + Pod {
+pub trait Section: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 

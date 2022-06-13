@@ -20,6 +20,11 @@ type Result<T> = result::Result<T, ()>;
 /// - have no padding
 pub unsafe trait Pod: Copy + 'static {}
 
+#[cfg(feature = "nosym")]
+pub trait DebugPod = Pod;
+#[cfg(not(feature = "nosym"))]
+pub trait DebugPod = core::fmt::Debug + Pod;
+
 /// Cast a byte slice to a `Pod` type.
 ///
 /// Returns the type and the tail of the slice.
