@@ -296,14 +296,19 @@ impl<'a> Object<'a> {
                 )));
             }
         };
-        let e_flags = if let FileFlags::Elf { e_flags } = self.flags {
-            e_flags
+        let (os_abi, abi_version, e_flags) = if let FileFlags::Elf {
+            os_abi,
+            abi_version,
+            e_flags,
+        } = self.flags
+        {
+            (os_abi, abi_version, e_flags)
         } else {
-            0
+            (elf::ELFOSABI_NONE, 0, 0)
         };
         writer.write_file_header(&FileHeader {
-            os_abi: elf::ELFOSABI_NONE,
-            abi_version: 0,
+            os_abi,
+            abi_version,
             e_type,
             e_machine,
             e_entry: 0,

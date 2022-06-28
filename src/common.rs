@@ -364,6 +364,10 @@ pub enum FileFlags {
     None,
     /// ELF file flags.
     Elf {
+        /// `os_abi` field in the ELF file header.
+        os_abi: u8,
+        /// `abi_version` field in the ELF file header.
+        abi_version: u8,
         /// `e_flags` field in the ELF file header.
         e_flags: u32,
     },
