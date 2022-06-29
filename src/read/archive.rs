@@ -38,6 +38,7 @@ pub struct ArchiveFile<'data, R: ReadRef<'data> = &'data [u8]> {
     names: &'data [u8],
 }
 
+#[cfg(not(feature = "nosym"))]
 impl<'data, R: ReadRef<'data>> ArchiveFile<'data, R> {
     #[cfg_attr(feature = "aggressive-inline", inline(always))]
     /// Parse the archive header and special members.

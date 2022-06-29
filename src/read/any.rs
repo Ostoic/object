@@ -658,6 +658,7 @@ where
     Wasm(wasm::WasmSection<'data, 'file, R>),
 }
 
+#[cfg(not(feature = "nosym"))]
 impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for Section<'data, 'file, R> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // It's painful to do much better than this
@@ -833,6 +834,7 @@ where
     Wasm(wasm::WasmComdat<'data, 'file, R>),
 }
 
+#[cfg(not(feature = "nosym"))]
 impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for Comdat<'data, 'file, R> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut s = f.debug_struct("Comdat");
@@ -1123,6 +1125,7 @@ where
     Wasm((wasm::WasmSymbol<'data, 'file>, PhantomData<R>)),
 }
 
+#[cfg(not(feature = "nosym"))]
 impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for Symbol<'data, 'file, R> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Symbol")
