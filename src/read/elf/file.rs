@@ -389,15 +389,15 @@ where
         let data = section
             .section
             .data(self.endian, self.data)
-            .read_error("Invalid ELF .gnu_debuglink section offset or size")
+            .read_error(crate::nosym!("Invalid ELF .gnu_debuglink section offset or size"))
             .map(Bytes)?;
         let filename = data
             .read_string_at(0)
-            .read_error("Missing ELF .gnu_debuglink filename")?;
+            .read_error(crate::nosym!("Missing ELF .gnu_debuglink filename"))?;
         let crc_offset = util::align(filename.len() + 1, 4);
         let crc = data
             .read_at::<U32<_>>(crc_offset)
-            .read_error("Missing ELF .gnu_debuglink crc")?
+            .read_error(crate::nosym!("Missing ELF .gnu_debuglink crc"))?
             .get(self.endian);
         Ok(Some((filename, crc)))
     }
@@ -410,11 +410,11 @@ where
         let mut data = section
             .section
             .data(self.endian, self.data)
-            .read_error("Invalid ELF .gnu_debugaltlink section offset or size")
+            .read_error(crate::nosym!("Invalid ELF .gnu_debugaltlink section offset or size"))
             .map(Bytes)?;
         let filename = data
             .read_string()
-            .read_error("Missing ELF .gnu_debugaltlink filename")?;
+            .read_error(crate::nosym!("Missing ELF .gnu_debugaltlink filename"))?;
         let build_id = data.0;
         Ok(Some((filename, build_id)))
     }
@@ -664,7 +664,7 @@ pub trait FileHeader: DebugPod {
             return Err(Error(crate::nosym!("Invalid ELF section header entry size")));
         }
         data.read_slice_at(shoff, shnum)
-            .read_error("Invalid ELF section header offset/size/alignment")
+            .read_error(crate::nosym!("Invalid ELF section header offset/size/alignment"))
     }
 
     /// Return the string table for the section headers.

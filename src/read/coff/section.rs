@@ -31,7 +31,7 @@ impl<'data> SectionTable<'data> {
     ) -> Result<Self> {
         let sections = data
             .read_slice_at(offset, header.number_of_sections.get(LE).into())
-            .read_error("Invalid COFF/PE section headers")?;
+            .read_error(crate::nosym!("Invalid COFF/PE section headers"))?;
         Ok(SectionTable { sections })
     }
 
@@ -64,7 +64,7 @@ impl<'data> SectionTable<'data> {
     pub fn section(&self, index: usize) -> read::Result<&'data pe::ImageSectionHeader> {
         self.sections
             .get(index.wrapping_sub(1))
-            .read_error("Invalid COFF/PE section index")
+            .read_error(crate::nosym!("Invalid COFF/PE section index"))
     }
 
     /// Return the section header with the given name.

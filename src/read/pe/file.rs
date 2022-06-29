@@ -555,7 +555,7 @@ pub fn optional_header_magic<'data, R: ReadRef<'data>>(data: R) -> Result<u16> {
     // of reading the optional header magic.
     let nt_headers = data
         .read_at::<pe::ImageNtHeaders32>(offset)
-        .read_error("Invalid NT headers offset, size, or alignment")?;
+        .read_error(crate::nosym!("Invalid NT headers offset, size, or alignment"))?;
     if nt_headers.signature() != pe::IMAGE_NT_SIGNATURE {
         return Err(Error(crate::nosym!("Invalid PE magic")));
     }

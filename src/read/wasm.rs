@@ -102,9 +102,9 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
 
                     for import in section
                         .get_import_section_reader()
-                        .read_error("Couldn't read header of the import section")?
+                        .read_error(crate::nosym!("Couldn't read header of the import section"))?
                     {
-                        let import = import.read_error("Couldn't read an import item")?;
+                        let import = import.read_error(crate::nosym!("Couldn't read an import item"))?;
                         let module_name = import.module;
 
                         if last_module_name != Some(module_name) {
@@ -144,7 +144,7 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
                         LocalFunctionKind::Unknown;
                         section
                             .get_function_section_reader()
-                            .read_error("Couldn't read header of the function section")?
+                            .read_error(crate::nosym!("Couldn't read header of the function section"))?
                             .get_count() as usize
                     ];
                 }
@@ -155,9 +155,9 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
 
                     for export in section
                         .get_export_section_reader()
-                        .read_error("Couldn't read header of the export section")?
+                        .read_error(crate::nosym!("Couldn't read header of the export section"))?
                     {
-                        let export = export.read_error("Couldn't read an export item")?;
+                        let export = export.read_error(crate::nosym!("Couldn't read an export item"))?;
 
                         let (kind, section_idx) = match export.kind {
                             wp::ExternalKind::Function => {
@@ -198,7 +198,7 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
                     entry_func_id = Some(
                         section
                             .get_start_section_content()
-                            .read_error("Couldn't read contents of the start section")?,
+                            .read_error(crate::nosym!("Couldn't read contents of the start section"))?,
                     );
                 }
                 wp::SectionCode::Code => {
@@ -208,12 +208,12 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
 
                     for (i, (body, local_func_kind)) in section
                         .get_code_section_reader()
-                        .read_error("Couldn't read header of the code section")?
+                        .read_error(crate::nosym!("Couldn't read header of the code section"))?
                         .into_iter()
                         .zip(&mut local_func_kinds)
                         .enumerate()
                     {
-                        let body = body.read_error("Couldn't read a function body")?;
+                        let body = body.read_error(crate::nosym!("Couldn't read a function body"))?;
                         let range = body.range();
 
                         let address = range.start as u64 - section.range().start as u64;
@@ -254,7 +254,7 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
                 } => {
                     for name in section
                         .get_name_section_reader()
-                        .read_error("Couldn't read header of the name section")?
+                        .read_error(crate::nosym!("Couldn't read header of the name section"))?
                     {
                         // TODO: Right now, ill-formed name subsections
                         // are silently ignored in order to maintain
@@ -271,7 +271,7 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
                             for _ in 0..name_map.get_count() {
                                 let naming = name_map
                                     .read()
-                                    .read_error("Couldn't read a function name")?;
+                                    .read_error(crate::nosym!("Couldn't read a function name"))?;
                                 if let Some(local_index) =
                                     naming.index.checked_sub(imported_funcs_count)
                                 {

@@ -317,9 +317,9 @@ impl<E: Endian> macho::DyldCacheImageInfo<E> {
     /// The file system path of this image.
     pub fn path<'data, R: ReadRef<'data>>(&self, endian: E, data: R) -> Result<&'data [u8]> {
         let r_start = self.path_file_offset.get(endian).into();
-        let r_end = data.len().read_error("Couldn't get data len()")?;
+        let r_end = data.len().read_error(crate::nosym!("Couldn't get data len()"))?;
         data.read_bytes_at_until(r_start..r_end, 0)
-            .read_error("Couldn't read dyld cache image path")
+            .read_error(crate::nosym!("Couldn't read dyld cache image path"))
     }
 
     /// Find the file offset of the image by looking up its address in the mappings.

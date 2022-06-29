@@ -751,7 +751,7 @@ impl<'data> CompressedData<'data> {
                     .uncompressed_size
                     .try_into()
                     .ok()
-                    .read_error("Uncompressed data size is too large.")?;
+                    .read_error(crate::nosym!("Uncompressed data size is too large."))?;
                 let mut decompressed = Vec::with_capacity(size);
                 let mut decompress = flate2::Decompress::new(true);
                 decompress
