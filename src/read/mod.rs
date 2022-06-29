@@ -191,9 +191,9 @@ impl FileKind {
     pub fn parse_at<'data, R: ReadRef<'data>>(data: R, offset: u64) -> Result<FileKind> {
         let magic = data
             .read_bytes_at(offset, 16)
-            .read_error("Could not read file magic")?;
+            .read_error(crate::nosym!("Could not read file magic"))?;
         if magic.len() < 16 {
-            return Err(Error("File too short"));
+            return Err(Error(crate::nosym!("File too short")));
         }
 
         let kind = match [magic[0], magic[1], magic[2], magic[3], magic[4], magic[5], magic[6], magic[7]] {
@@ -226,7 +226,7 @@ impl FileKind {
                     Ok(crate::pe::IMAGE_NT_OPTIONAL_HDR64_MAGIC) => {
                         FileKind::Pe64
                     }
-                    _ => return Err(Error("Unknown MS-DOS file")),
+                    _ => return Err(Error(crate::nosym!("Unknown MS-DOS file"))),
                 }
             }
             // TODO: more COFF machines
@@ -239,7 +239,7 @@ impl FileKind {
             | [0x4c, 0x01, ..]
             // COFF x86-64
             | [0x64, 0x86, ..] => FileKind::Coff,
-            _ => return Err(Error("Unknown file magic")),
+            _ => return Err(Error(crate::nosym!("Unknown file magic"))),
         };
         Ok(kind)
     }
@@ -702,7 +702,7 @@ impl CompressedFileRange {
     pub fn data<'data, R: ReadRef<'data>>(self, file: R) -> Result<CompressedData<'data>> {
         let data = file
             .read_bytes_at(self.offset, self.compressed_size)
-            .read_error("Invalid compressed data size or offset")?;
+            .read_error(crate::nosym!("Invalid compressed data size or offset"))?;
         Ok(CompressedData {
             format: self.format,
             data,
@@ -761,7 +761,7 @@ impl<'data> CompressedData<'data> {
                         flate2::FlushDecompress::Finish,
                     )
                     .ok()
-                    .read_error("Invalid zlib compressed data")?;
+                    .read_error(crate::nosym!("Invalid zlib compressed data"))?;
                 Ok(Cow::Owned(decompressed))
             }
             _ => Err(Error("Unsupported compressed data.")),

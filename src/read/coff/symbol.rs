@@ -44,16 +44,16 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
         let (symbols, strings) = if offset != 0 {
             let symbols = data
                 .read_slice(&mut offset, header.number_of_symbols.get(LE) as usize)
-                .read_error("Invalid COFF symbol table offset or size")?;
+                .read_error(crate::nosym!("Invalid COFF symbol table offset or size"))?;
 
             // Note: don't update data when reading length; the length includes itself.
             let length = data
                 .read_at::<U32Bytes<_>>(offset)
-                .read_error("Missing COFF string table")?
+                .read_error(crate::nosym!("Missing COFF string table"))?
                 .get(LE);
             let str_end = offset
                 .checked_add(length as u64)
-                .read_error("Invalid COFF string table length")?;
+                .read_error(crate::nosym!("Invalid COFF string table length"))?;
             let strings = StringTable::new(data, offset, str_end);
 
             (symbols, strings)
@@ -130,7 +130,7 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
             .checked_add(1)
             .and_then(|x| Some(x..x.checked_add(aux_count.into())?))
             .and_then(|x| self.symbols.get(x))
-            .read_error("Invalid COFF symbol index")?;
+            .read_error(crate::nosym!("Invalid COFF symbol index"))?;
         let bytes = bytes_of_slice(entries);
         // The name is padded with nulls.
         Ok(match memchr::memchr(b'\0', bytes) {
@@ -144,10 +144,10 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
         let bytes = index
             .checked_add(offset)
             .and_then(|x| self.symbols.get(x))
-            .read_error("Invalid COFF symbol index")?;
+            .read_error(crate::nosym!("Invalid COFF symbol index"))?;
         Bytes(&bytes.0[..])
             .read()
-            .read_error("Invalid COFF symbol data")
+            .read_error(crate::nosym!("Invalid COFF symbol data"))
     }
 
     /// Construct a map from addresses to a user-defined map entry.
@@ -206,7 +206,7 @@ impl pe::ImageSymbol {
             let offset = u32::from_le_bytes(self.name[4..8].try_into().unwrap());
             strings
                 .get(offset)
-                .read_error("Invalid COFF symbol name offset")
+                .read_error(crate::nosym!("Invalid COFF symbol name offset"))
         } else {
             // The name is inline and padded with nulls.
             Ok(match memchr::memchr(b'\0', &self.name) {
@@ -364,7 +364,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
         let name = self.name_bytes()?;
         str::from_utf8(name)
             .ok()
-            .read_error("Non UTF-8 COFF symbol name")
+            .read_error(crate::nosym!("Non UTF-8 COFF symbol name"))
     }
 
     fn address(&self) -> u64 {

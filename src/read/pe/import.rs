@@ -41,7 +41,7 @@ impl<'data> ImportTable<'data> {
         let offset = self.import_address.wrapping_sub(self.section_address);
         let mut data = self.section_data;
         data.skip(offset as usize)
-            .read_error("Invalid PE import descriptor address")?;
+            .read_error(crate::nosym!("Invalid PE import descriptor address"))?;
         Ok(ImportDescriptorIterator { data })
     }
 
@@ -52,7 +52,7 @@ impl<'data> ImportTable<'data> {
     pub fn name(&self, address: u32) -> Result<&'data [u8]> {
         self.section_data
             .read_string_at(address.wrapping_sub(self.section_address) as usize)
-            .read_error("Invalid PE import descriptor name")
+            .read_error(crate::nosym!("Invalid PE import descriptor name"))
     }
 
     /// Return a list of thunks given its address.
@@ -64,7 +64,7 @@ impl<'data> ImportTable<'data> {
         let offset = address.wrapping_sub(self.section_address);
         let mut data = self.section_data;
         data.skip(offset as usize)
-            .read_error("Invalid PE import thunk table address")?;
+            .read_error(crate::nosym!("Invalid PE import thunk table address"))?;
         Ok(ImportThunkList { data })
     }
 
@@ -89,14 +89,14 @@ impl<'data> ImportTable<'data> {
         let offset = address.wrapping_sub(self.section_address);
         let mut data = self.section_data;
         data.skip(offset as usize)
-            .read_error("Invalid PE import thunk address")?;
+            .read_error(crate::nosym!("Invalid PE import thunk address"))?;
         let hint = data
             .read::<U16Bytes<LE>>()
-            .read_error("Missing PE import thunk hint")?
+            .read_error(crate::nosym!("Missing PE import thunk hint"))?
             .get(LE);
         let name = data
             .read_string()
-            .read_error("Missing PE import thunk name")?;
+            .read_error(crate::nosym!("Missing PE import thunk name"))?;
         Ok((hint, name))
     }
 }
@@ -118,7 +118,7 @@ impl<'data> ImportDescriptorIterator<'data> {
         let import_desc = self
             .data
             .read::<pe::ImageImportDescriptor>()
-            .read_error("Missing PE null import descriptor")?;
+            .read_error(crate::nosym!("Missing PE null import descriptor"))?;
         if import_desc.is_null() {
             Ok(None)
         } else {
@@ -144,7 +144,7 @@ impl<'data> ImportThunkList<'data> {
         let thunk = self
             .data
             .read_at(index * mem::size_of::<Pe::ImageThunkData>())
-            .read_error("Invalid PE import thunk index")?;
+            .read_error(crate::nosym!("Invalid PE import thunk index"))?;
         Ok(*thunk)
     }
 
@@ -156,7 +156,7 @@ impl<'data> ImportThunkList<'data> {
         let thunk = self
             .data
             .read::<Pe::ImageThunkData>()
-            .read_error("Missing PE null import thunk")?;
+            .read_error(crate::nosym!("Missing PE null import thunk"))?;
         if thunk.address() == 0 {
             Ok(None)
         } else {
@@ -213,6 +213,7 @@ impl ImageThunkData for pe::ImageThunkData64 {
         self.0.get(LE) as u16
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(self) -> u32 {
         self.0.get(LE) as u32 & 0x7fff_ffff
     }

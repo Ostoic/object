@@ -132,7 +132,7 @@ where
         Ok(Some(
             str::from_utf8(name)
                 .ok()
-                .read_error("Non UTF-8 PE section name")?,
+                .read_error(crate::nosym!("Non UTF-8 PE section name"))?,
         ))
     }
 
@@ -292,7 +292,7 @@ where
         let name = self.name_bytes()?;
         str::from_utf8(name)
             .ok()
-            .read_error("Non UTF-8 PE section name")
+            .read_error(crate::nosym!("Non UTF-8 PE section name"))
     }
 
     #[cfg_attr(not(feature = "aggressive-inline"), inline)]
@@ -411,7 +411,7 @@ impl pe::ImageSectionHeader {
     pub fn pe_data<'data, R: ReadRef<'data>>(&self, data: R) -> Result<&'data [u8]> {
         let (offset, size) = self.pe_file_range();
         data.read_bytes_at(offset.into(), size.into())
-            .read_error("Invalid PE section offset or size")
+            .read_error(crate::nosym!("Invalid PE section offset or size"))
     }
 
     /// Return the data starting at the given virtual address, up to the end of the

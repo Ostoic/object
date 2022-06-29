@@ -76,7 +76,7 @@ impl<'data, Mach: MachHeader, R: ReadRef<'data>> SymbolTable<'data, Mach, R> {
     pub fn symbol(&self, index: usize) -> Result<&'data Mach::Nlist> {
         self.symbols
             .get(index)
-            .read_error("Invalid Mach-O symbol index")
+            .read_error(crate::nosym!("Invalid Mach-O symbol index"))
     }
 
     /// Construct a map from addresses to a user-defined map entry.
@@ -193,7 +193,7 @@ where
 
     fn symbol_by_index(&self, index: SymbolIndex) -> Result<Self::Symbol> {
         let nlist = self.file.symbols.symbol(index.0)?;
-        MachOSymbol::new(self.file, index, nlist).read_error("Unsupported Mach-O symbol index")
+        MachOSymbol::new(self.file, index, nlist).read_error(crate::nosym!("Unsupported Mach-O symbol index"))
     }
 }
 
@@ -308,7 +308,7 @@ where
         let name = self.name_bytes()?;
         str::from_utf8(name)
             .ok()
-            .read_error("Non UTF-8 Mach-O symbol name")
+            .read_error(crate::nosym!("Non UTF-8 Mach-O symbol name"))
     }
 
     #[cfg_attr(not(feature = "aggressive-inline"), inline)]
@@ -435,7 +435,7 @@ pub trait Nlist: DebugPod {
     ) -> Result<&'data [u8]> {
         strings
             .get(self.n_strx(endian))
-            .read_error("Invalid Mach-O symbol name offset")
+            .read_error(crate::nosym!("Invalid Mach-O symbol name offset"))
     }
 
     /// Return true if this is a STAB symbol.

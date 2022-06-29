@@ -26,13 +26,13 @@ impl<'data, Elf: FileHeader> HashTable<'data, Elf> {
         let mut offset = 0;
         let header = data
             .read::<elf::HashHeader<Elf::Endian>>(&mut offset)
-            .read_error("Invalid hash header")?;
+            .read_error(crate::nosym!("Invalid hash header"))?;
         let buckets = data
             .read_slice(&mut offset, header.bucket_count.get(endian) as usize)
-            .read_error("Invalid hash buckets")?;
+            .read_error(crate::nosym!("Invalid hash buckets"))?;
         let chains = data
             .read_slice(&mut offset, header.chain_count.get(endian) as usize)
-            .read_error("Invalid hash chains")?;
+            .read_error(crate::nosym!("Invalid hash chains"))?;
         Ok(HashTable { buckets, chains })
     }
 
@@ -99,19 +99,19 @@ impl<'data, Elf: FileHeader> GnuHashTable<'data, Elf> {
         let mut offset = 0;
         let header = data
             .read::<elf::GnuHashHeader<Elf::Endian>>(&mut offset)
-            .read_error("Invalid GNU hash header")?;
+            .read_error(crate::nosym!("Invalid GNU hash header"))?;
         let bloom_len =
             u64::from(header.bloom_count.get(endian)) * mem::size_of::<Elf::Word>() as u64;
         let bloom_filters = data
             .read_bytes(&mut offset, bloom_len)
-            .read_error("Invalid GNU hash bloom filters")?;
+            .read_error(crate::nosym!("Invalid GNU hash bloom filters"))?;
         let buckets = data
             .read_slice(&mut offset, header.bucket_count.get(endian) as usize)
-            .read_error("Invalid GNU hash buckets")?;
+            .read_error(crate::nosym!("Invalid GNU hash buckets"))?;
         let chain_count = (data.len() - offset as usize) / 4;
         let values = data
             .read_slice(&mut offset, chain_count)
-            .read_error("Invalid GNU hash values")?;
+            .read_error(crate::nosym!("Invalid GNU hash values"))?;
         Ok(GnuHashTable {
             symbol_base: header.symbol_base.get(endian),
             bloom_shift: header.bloom_shift.get(endian),

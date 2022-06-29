@@ -142,7 +142,7 @@ impl<'data, 'file, R: ReadRef<'data>> CoffSegment<'data, 'file, R> {
     fn bytes(&self) -> Result<&'data [u8]> {
         self.section
             .coff_data(self.file.data)
-            .read_error("Invalid COFF section offset or size")
+            .read_error(crate::nosym!("Invalid COFF section offset or size"))
     }
 }
 
@@ -201,7 +201,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSegment<'data> for CoffSegment<'data
         let name = self.section.name(self.file.common.symbols.strings())?;
         str::from_utf8(name)
             .ok()
-            .read_error("Non UTF-8 COFF section name")
+            .read_error(crate::nosym!("Non UTF-8 COFF section name"))
             .map(Some)
     }
 
@@ -248,7 +248,7 @@ impl<'data, 'file, R: ReadRef<'data>> CoffSection<'data, 'file, R> {
     fn bytes(&self) -> Result<&'data [u8]> {
         self.section
             .coff_data(self.file.data)
-            .read_error("Invalid COFF section offset or size")
+            .read_error(crate::nosym!("Invalid COFF section offset or size"))
     }
 }
 
@@ -326,7 +326,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for CoffSection<'data
         let name = self.name_bytes()?;
         str::from_utf8(name)
             .ok()
-            .read_error("Non UTF-8 COFF section name")
+            .read_error(crate::nosym!("Non UTF-8 COFF section name"))
     }
 
     #[cfg_attr(not(feature = "aggressive-inline"), inline)]
@@ -405,13 +405,13 @@ impl pe::ImageSectionHeader {
                     b'0'..=b'9' => byte - b'0' + 52,
                     b'+' => 62,
                     b'/' => 63,
-                    _ => return Err(Error("Invalid COFF section name base-64 offset")),
+                    _ => return Err(Error(crate::nosym!("Invalid COFF section name base-64 offset"))),
                 };
                 offset = offset * 64 + digit as u64;
             }
             u32::try_from(offset)
                 .ok()
-                .read_error("Invalid COFF section name base-64 offset")
+                .read_error(crate::nosym!("Invalid COFF section name base-64 offset"))
                 .map(Some)
         } else {
             let mut offset = 0;
@@ -419,7 +419,7 @@ impl pe::ImageSectionHeader {
                 let digit = match byte {
                     b'0'..=b'9' => byte - b'0',
                     0 => break,
-                    _ => return Err(Error("Invalid COFF section name base-10 offset")),
+                    _ => return Err(Error(crate::nosym!("Invalid COFF section name base-10 offset"))),
                 };
                 offset = offset * 10 + digit as u32;
             }
@@ -437,7 +437,7 @@ impl pe::ImageSectionHeader {
         if let Some(offset) = self.name_offset()? {
             strings
                 .get(offset)
-                .read_error("Invalid COFF section name offset")
+                .read_error(crate::nosym!("Invalid COFF section name offset"))
         } else {
             Ok(self.raw_name())
         }
@@ -517,17 +517,17 @@ impl pe::ImageSectionHeader {
             // relocations pointer.
             let extended_relocation_info = data
                 .read_at::<pe::ImageRelocation>(pointer)
-                .read_error("Invalid COFF relocation offset or number")?;
+                .read_error(crate::nosym!("Invalid COFF relocation offset or number"))?;
             number = extended_relocation_info.virtual_address.get(LE) as usize;
             if number == 0 {
-                return Err(Error("Invalid COFF relocation number"));
+                return Err(Error(crate::nosym!("Invalid COFF relocation number")));
             }
             pointer += core::mem::size_of::<pe::ImageRelocation>() as u64;
             // Extended relocation info does not contribute to the count of sections.
             number -= 1;
         }
         data.read_slice_at(pointer, number)
-            .read_error("Invalid COFF relocation offset or number")
+            .read_error(crate::nosym!("Invalid COFF relocation offset or number"))
     }
 }
 

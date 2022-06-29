@@ -88,7 +88,7 @@ where
         self.internal
             .section
             .data(self.file.endian, segment.data)
-            .read_error("Invalid Mach-O section size or offset")
+            .read_error(crate::nosym!("Invalid Mach-O section size or offset"))
     }
 }
 
@@ -174,7 +174,7 @@ where
     fn name(&self) -> Result<&str> {
         str::from_utf8(self.internal.section.name())
             .ok()
-            .read_error("Non UTF-8 Mach-O section name")
+            .read_error(crate::nosym!("Non UTF-8 Mach-O section name"))
     }
 
     #[cfg_attr(not(feature = "aggressive-inline"), inline)]
@@ -189,7 +189,7 @@ where
         Ok(Some(
             str::from_utf8(self.internal.section.segment_name())
                 .ok()
-                .read_error("Non UTF-8 Mach-O segment name")?,
+                .read_error(crate::nosym!("Non UTF-8 Mach-O segment name"))?,
         ))
     }
 
@@ -329,7 +329,7 @@ pub trait Section: DebugPod {
         data: R,
     ) -> Result<&'data [macho::Relocation<Self::Endian>]> {
         data.read_slice_at(self.reloff(endian).into(), self.nreloc(endian) as usize)
-            .read_error("Invalid Mach-O relocations offset or number")
+            .read_error(crate::nosym!("Invalid Mach-O relocations offset or number"))
     }
 }
 

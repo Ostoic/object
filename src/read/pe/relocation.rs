@@ -28,17 +28,17 @@ impl<'data> RelocationBlockIterator<'data> {
         let header = self
             .data
             .read::<pe::ImageBaseRelocation>()
-            .read_error("Invalid PE reloc section size")?;
+            .read_error(crate::nosym!("Invalid PE reloc section size"))?;
         let virtual_address = header.virtual_address.get(LE);
         let size = header.size_of_block.get(LE);
         if size <= 8 || size & 3 != 0 {
-            return Err(Error("Invalid PE reloc block size"));
+            return Err(Error(crate::nosym!("Invalid PE reloc block size")));
         }
         let count = (size - 8) / 2;
         let relocs = self
             .data
             .read_slice::<U16<LE>>(count as usize)
-            .read_error("Invalid PE reloc block size")?
+            .read_error(crate::nosym!("Invalid PE reloc block size"))?
             .iter();
         Ok(Some(RelocationIterator {
             virtual_address,

@@ -52,7 +52,7 @@ pub trait Dyn: DebugPod {
     ) -> Result<&'data [u8]> {
         self.val32(endian)
             .and_then(|val| strings.get(val).ok())
-            .read_error("Invalid ELF dyn string")
+            .read_error(crate::nosym!("Invalid ELF dyn string"))
     }
 
     /// Return true if the value is an address.

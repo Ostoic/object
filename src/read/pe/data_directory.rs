@@ -23,7 +23,7 @@ impl<'data> DataDirectories<'data> {
     pub fn parse(data: &'data [u8], number: u32) -> Result<Self> {
         let entries = data
             .read_slice_at(0, number as usize)
-            .read_error("Invalid PE number of RVA and sizes")?;
+            .read_error(crate::nosym!("Invalid PE number of RVA and sizes"))?;
         Ok(DataDirectories { entries })
     }
 
@@ -103,7 +103,7 @@ impl<'data> DataDirectories<'data> {
         let import_va = data_dir.virtual_address.get(LE);
         let (section_data, section_va) = sections
             .pe_data_containing(data, import_va)
-            .read_error("Invalid import data dir virtual address")?;
+            .read_error(crate::nosym!("Invalid import data dir virtual address"))?;
         Ok(Some(ImportTable::new(section_data, section_va, import_va)))
     }
 
@@ -157,10 +157,10 @@ impl pe::ImageDataDirectory {
     pub fn file_range<'data>(&self, sections: &SectionTable<'data>) -> Result<(u32, u32)> {
         let (offset, section_size) = sections
             .pe_file_range_at(self.virtual_address.get(LE))
-            .read_error("Invalid data dir virtual address")?;
+            .read_error(crate::nosym!("Invalid data dir virtual address"))?;
         let size = self.size.get(LE);
         if size > section_size {
-            return Err(Error("Invalid data dir size"));
+            return Err(Error(crate::nosym!("Invalid data dir size")));
         }
         Ok((offset, size))
     }
@@ -180,8 +180,8 @@ impl pe::ImageDataDirectory {
     ) -> Result<&'data [u8]> {
         sections
             .pe_data_at(data, self.virtual_address.get(LE))
-            .read_error("Invalid data dir virtual address")?
+            .read_error(crate::nosym!("Invalid data dir virtual address"))?
             .get(..self.size.get(LE) as usize)
-            .read_error("Invalid data dir size")
+            .read_error(crate::nosym!("Invalid data dir size"))
     }
 }

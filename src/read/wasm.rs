@@ -67,9 +67,9 @@ impl<T> ReadError<T> for wasmparser::Result<T> {
 impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
     /// Parse the raw wasm data.
     pub fn parse(data: R) -> Result<Self> {
-        let len = data.len().read_error("Unknown Wasm file size")?;
-        let data = data.read_bytes_at(0, len).read_error("Wasm read failed")?;
-        let module = wp::ModuleReader::new(data).read_error("Invalid Wasm header")?;
+        let len = data.len().read_error(crate::nosym!("Unknown Wasm file size"))?;
+        let data = data.read_bytes_at(0, len).read_error(crate::nosym!("Wasm read failed"))?;
+        let module = wp::ModuleReader::new(data).read_error(crate::nosym!("Invalid Wasm header"))?;
 
         let mut file = WasmFile {
             sections: Vec::new(),
@@ -94,7 +94,7 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
         let mut entry_func_id = None;
 
         for section in module {
-            let section = section.read_error("Invalid Wasm section header")?;
+            let section = section.read_error(crate::nosym!("Invalid Wasm section header"))?;
 
             match section.code {
                 wp::SectionCode::Import => {
@@ -360,7 +360,7 @@ where
             .id_sections
             .get(index.0)
             .and_then(|x| *x)
-            .read_error("Invalid Wasm section index")?;
+            .read_error(crate::nosym!("Invalid Wasm section index"))?;
         let section = self.sections.get(id_section).unwrap();
         Ok(WasmSection {
             section,
@@ -385,7 +385,7 @@ where
         let symbol = self
             .symbols
             .get(index.0)
-            .read_error("Invalid Wasm symbol index")?;
+            .read_error(crate::nosym!("Invalid Wasm symbol index"))?;
         Ok(WasmSymbol { index, symbol })
     }
 
@@ -810,7 +810,7 @@ impl<'data, 'file> ObjectSymbolTable<'data> for WasmSymbolTable<'data, 'file> {
         let symbol = self
             .symbols
             .get(index.0)
-            .read_error("Invalid Wasm symbol index")?;
+            .read_error(crate::nosym!("Invalid Wasm symbol index"))?;
         Ok(WasmSymbol { index, symbol })
     }
 }

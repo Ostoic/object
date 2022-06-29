@@ -185,7 +185,7 @@ impl<'data, Elf: FileHeader> VersionTable<'data, Elf> {
         self.versions
             .get(usize::from(index.index()))
             .filter(|version| version.valid)
-            .read_error("Invalid ELF symbol version index")
+            .read_error(crate::nosym!("Invalid ELF symbol version index"))
             .map(Some)
     }
 
@@ -244,12 +244,12 @@ impl<'data, Elf: FileHeader> VerdefIterator<'data, Elf> {
         let verdef = self
             .data
             .read_at::<elf::Verdef<_>>(0)
-            .read_error("ELF verdef is too short")?;
+            .read_error(crate::nosym!("ELF verdef is too short"))?;
 
         let mut verdaux_data = self.data;
         verdaux_data
             .skip(verdef.vd_aux.get(self.endian) as usize)
-            .read_error("Invalid ELF vd_aux")?;
+            .read_error(crate::nosym!("Invalid ELF vd_aux"))?;
         let verdaux =
             VerdauxIterator::new(self.endian, verdaux_data.0, verdef.vd_cnt.get(self.endian));
 
@@ -257,7 +257,7 @@ impl<'data, Elf: FileHeader> VerdefIterator<'data, Elf> {
         if next != 0 {
             self.data
                 .skip(next as usize)
-                .read_error("Invalid ELF vd_next")?;
+                .read_error(crate::nosym!("Invalid ELF vd_next"))?;
         } else {
             self.data = Bytes(&[]);
         }
@@ -293,11 +293,11 @@ impl<'data, Elf: FileHeader> VerdauxIterator<'data, Elf> {
         let verdaux = self
             .data
             .read_at::<elf::Verdaux<_>>(0)
-            .read_error("ELF verdaux is too short")?;
+            .read_error(crate::nosym!("ELF verdaux is too short"))?;
 
         self.data
             .skip(verdaux.vda_next.get(self.endian) as usize)
-            .read_error("Invalid ELF vda_next")?;
+            .read_error(crate::nosym!("Invalid ELF vda_next"))?;
         self.count -= 1;
         Ok(Some(verdaux))
     }
@@ -336,12 +336,12 @@ impl<'data, Elf: FileHeader> VerneedIterator<'data, Elf> {
         let verneed = self
             .data
             .read_at::<elf::Verneed<_>>(0)
-            .read_error("ELF verneed is too short")?;
+            .read_error(crate::nosym!("ELF verneed is too short"))?;
 
         let mut vernaux_data = self.data;
         vernaux_data
             .skip(verneed.vn_aux.get(self.endian) as usize)
-            .read_error("Invalid ELF vn_aux")?;
+            .read_error(crate::nosym!("Invalid ELF vn_aux"))?;
         let vernaux =
             VernauxIterator::new(self.endian, vernaux_data.0, verneed.vn_cnt.get(self.endian));
 
@@ -349,7 +349,7 @@ impl<'data, Elf: FileHeader> VerneedIterator<'data, Elf> {
         if next != 0 {
             self.data
                 .skip(next as usize)
-                .read_error("Invalid ELF vn_next")?;
+                .read_error(crate::nosym!("Invalid ELF vn_next"))?;
         } else {
             self.data = Bytes(&[]);
         }
@@ -385,11 +385,11 @@ impl<'data, Elf: FileHeader> VernauxIterator<'data, Elf> {
         let vernaux = self
             .data
             .read_at::<elf::Vernaux<_>>(0)
-            .read_error("ELF vernaux is too short")?;
+            .read_error(crate::nosym!("ELF vernaux is too short"))?;
 
         self.data
             .skip(vernaux.vna_next.get(self.endian) as usize)
-            .read_error("Invalid ELF vna_next")?;
+            .read_error(crate::nosym!("Invalid ELF vna_next"))?;
         self.count -= 1;
         Ok(Some(vernaux))
     }
@@ -404,7 +404,7 @@ impl<Endian: endian::Endian> elf::Verdaux<Endian> {
     ) -> Result<&'data [u8]> {
         strings
             .get(self.vda_name.get(endian))
-            .read_error("Invalid ELF vda_name")
+            .read_error(crate::nosym!("Invalid ELF vda_name"))
     }
 }
 
@@ -417,7 +417,7 @@ impl<Endian: endian::Endian> elf::Verneed<Endian> {
     ) -> Result<&'data [u8]> {
         strings
             .get(self.vn_file.get(endian))
-            .read_error("Invalid ELF vn_file")
+            .read_error(crate::nosym!("Invalid ELF vn_file"))
     }
 }
 
@@ -430,6 +430,6 @@ impl<Endian: endian::Endian> elf::Vernaux<Endian> {
     ) -> Result<&'data [u8]> {
         strings
             .get(self.vna_name.get(endian))
-            .read_error("Invalid ELF vna_name")
+            .read_error(crate::nosym!("Invalid ELF vna_name"))
     }
 }

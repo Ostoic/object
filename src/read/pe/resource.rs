@@ -42,12 +42,12 @@ impl<'data> ResourceDirectoryTable<'data> {
         let mut offset = u64::from(offset);
         let header = data
             .read::<pe::ImageResourceDirectory>(&mut offset)
-            .read_error("Invalid resource table header")?;
+            .read_error(crate::nosym!("Invalid resource table header"))?;
         let entries_count = header.number_of_id_entries.get(LE) as usize
             + header.number_of_named_entries.get(LE) as usize;
         let entries = data
             .read_slice::<pe::ImageResourceDirectoryEntry>(&mut offset, entries_count)
-            .read_error("Invalid resource table entries")?;
+            .read_error(crate::nosym!("Invalid resource table entries"))?;
         Ok(Self { header, entries })
     }
 }
@@ -111,7 +111,7 @@ impl pe::ImageResourceDirectoryEntry {
             section
                 .data
                 .read_at::<pe::ImageResourceDataEntry>(self.data_offset().into())
-                .read_error("Invalid resource entry")
+                .read_error(crate::nosym!("Invalid resource entry"))
                 .map(|d| ResourceDirectoryEntryData::Data(d))
         }
     }
@@ -174,11 +174,11 @@ impl ResourceName {
         let len = directory
             .data
             .read::<U16<LE>>(&mut offset)
-            .read_error("Invalid resource name offset")?;
+            .read_error(crate::nosym!("Invalid resource name offset"))?;
         directory
             .data
             .read_slice::<u16>(&mut offset, len.get(LE).into())
-            .read_error("Invalid resource name length")
+            .read_error(crate::nosym!("Invalid resource name length"))
     }
 }
 

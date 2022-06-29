@@ -73,7 +73,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ElfSegment<'data, 'file, 
     fn bytes(&self) -> read::Result<&'data [u8]> {
         self.segment
             .data(self.file.endian, self.file.data)
-            .read_error("Invalid ELF segment size or offset")
+            .read_error(crate::nosym!("Invalid ELF segment size or offset"))
     }
 }
 
@@ -228,7 +228,7 @@ pub trait ProgramHeader: DebugPod {
         }
         let dynamic = self
             .data_as_array(endian, data)
-            .read_error("Invalid ELF dynamic segment offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF dynamic segment offset or size"))?;
         Ok(Some(dynamic))
     }
 
@@ -246,7 +246,7 @@ pub trait ProgramHeader: DebugPod {
         }
         let data = self
             .data(endian, data)
-            .read_error("Invalid ELF note segment offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF note segment offset or size"))?;
         let notes = NoteIterator::new(endian, self.p_align(endian), data)?;
         Ok(Some(notes))
     }

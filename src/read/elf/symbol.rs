@@ -62,7 +62,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
 
         let symbols = section
             .data_as_array(endian, data)
-            .read_error("Invalid ELF symbol table data")?;
+            .read_error(crate::nosym!("Invalid ELF symbol table data"))?;
 
         let link = SectionIndex(section.sh_link(endian) as usize);
         let strings = sections.strings(endian, data, link)?;
@@ -76,7 +76,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
                 shndx_section = SectionIndex(i);
                 shndx = s
                     .data_as_array(endian, data)
-                    .read_error("Invalid ELF symtab_shndx data")?;
+                    .read_error(crate::nosym!("Invalid ELF symtab_shndx data"))?;
             }
         }
 
@@ -150,7 +150,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
     pub fn symbol(&self, index: usize) -> read::Result<&'data Elf::Sym> {
         self.symbols
             .get(index)
-            .read_error("Invalid ELF symbol index")
+            .read_error(crate::nosym!("Invalid ELF symbol index"))
     }
 
     /// Return the extended section index for the given symbol if present.
@@ -173,7 +173,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
             elf::SHN_UNDEF => Ok(None),
             elf::SHN_XINDEX => self
                 .shndx(index)
-                .read_error("Missing ELF symbol extended index")
+                .read_error(crate::nosym!("Missing ELF symbol extended index"))
                 .map(|index| Some(SectionIndex(index as usize))),
             shndx if shndx < elf::SHN_LORESERVE => Ok(Some(SectionIndex(shndx.into()))),
             _ => Ok(None),
@@ -350,7 +350,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
         let name = self.name_bytes()?;
         str::from_utf8(name)
             .ok()
-            .read_error("Non UTF-8 ELF symbol name")
+            .read_error(crate::nosym!("Non UTF-8 ELF symbol name"))
     }
 
     #[cfg_attr(not(feature = "aggressive-inline"), inline)]
@@ -487,7 +487,7 @@ pub trait Sym: DebugPod {
     ) -> read::Result<&'data [u8]> {
         strings
             .get(self.st_name(endian))
-            .read_error("Invalid ELF symbol name offset")
+            .read_error(crate::nosym!("Invalid ELF symbol name offset"))
     }
 
     /// Return true if the symbol is undefined.

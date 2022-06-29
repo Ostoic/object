@@ -47,7 +47,7 @@ impl RelocationSections {
                     continue;
                 }
                 if sh_info >= relocations.len() {
-                    return Err(Error("Invalid ELF sh_info for relocation section"));
+                    return Err(Error(crate::nosym!("Invalid ELF sh_info for relocation section")));
                 }
 
                 // Handle multiple relocation sections by chaining them.

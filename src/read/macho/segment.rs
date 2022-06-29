@@ -74,7 +74,7 @@ where
         self.internal
             .segment
             .data(self.file.endian, self.file.data)
-            .read_error("Invalid Mach-O segment size or offset")
+            .read_error(crate::nosym!("Invalid Mach-O segment size or offset"))
     }
 }
 
@@ -140,7 +140,7 @@ where
         Ok(Some(
             str::from_utf8(self.internal.segment.name())
                 .ok()
-                .read_error("Non UTF-8 Mach-O segment name")?,
+                .read_error(crate::nosym!("Non UTF-8 Mach-O segment name"))?,
         ))
     }
 
@@ -222,7 +222,7 @@ pub trait Segment: DebugPod {
     ) -> Result<&'data [Self::Section]> {
         section_data
             .read_slice_at(0, self.nsects(endian) as usize)
-            .read_error("Invalid Mach-O number of sections")
+            .read_error(crate::nosym!("Invalid Mach-O number of sections"))
     }
 }
 

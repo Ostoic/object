@@ -33,13 +33,13 @@ impl<'data, E: Endian> LoadCommandIterator<'data, E> {
         let header = self
             .data
             .read_at::<macho::LoadCommand<E>>(0)
-            .read_error("Invalid Mach-O load command header")?;
+            .read_error(crate::nosym!("Invalid Mach-O load command header"))?;
         let cmd = header.cmd.get(self.endian);
         let cmdsize = header.cmdsize.get(self.endian) as usize;
         let data = self
             .data
             .read_bytes(cmdsize)
-            .read_error("Invalid Mach-O load command size")?;
+            .read_error(crate::nosym!("Invalid Mach-O load command size"))?;
         self.ncmds -= 1;
         Ok(Some(LoadCommandData {
             cmd,
@@ -79,7 +79,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     pub fn data<T: Pod>(&self) -> Result<&'data T> {
         self.data
             .read_at(0)
-            .read_error("Invalid Mach-O command size")
+            .read_error(crate::nosym!("Invalid Mach-O command size"))
     }
 
     /// Parse a load command string value.
@@ -89,7 +89,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     pub fn string(&self, endian: E, s: macho::LcStr<E>) -> Result<&'data [u8]> {
         self.data
             .read_string_at(s.offset.get(endian) as usize)
-            .read_error("Invalid load command string offset")
+            .read_error(crate::nosym!("Invalid load command string offset"))
     }
 
     /// Parse the command data according to the `cmd` field.
@@ -97,13 +97,13 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
         Ok(match self.cmd {
             macho::LC_SEGMENT => {
                 let mut data = self.data;
-                let segment = data.read().read_error("Invalid Mach-O command size")?;
+                let segment = data.read().read_error(crate::nosym!("Invalid Mach-O command size"))?;
                 LoadCommandVariant::Segment32(segment, data.0)
             }
             macho::LC_SYMTAB => LoadCommandVariant::Symtab(self.data()?),
             macho::LC_THREAD | macho::LC_UNIXTHREAD => {
                 let mut data = self.data;
-                let thread = data.read().read_error("Invalid Mach-O command size")?;
+                let thread = data.read().read_error(crate::nosym!("Invalid Mach-O command size"))?;
                 LoadCommandVariant::Thread(thread, data.0)
             }
             macho::LC_DYSYMTAB => LoadCommandVariant::Dysymtab(self.data()?),
@@ -125,7 +125,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
             macho::LC_PREBIND_CKSUM => LoadCommandVariant::PrebindCksum(self.data()?),
             macho::LC_SEGMENT_64 => {
                 let mut data = self.data;
-                let segment = data.read().read_error("Invalid Mach-O command size")?;
+                let segment = data.read().read_error(crate::nosym!("Invalid Mach-O command size"))?;
                 LoadCommandVariant::Segment64(segment, data.0)
             }
             macho::LC_ROUTINES_64 => LoadCommandVariant::Routines64(self.data()?),
@@ -165,7 +165,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     pub fn segment_32(self) -> Result<Option<(&'data macho::SegmentCommand32<E>, &'data [u8])>> {
         if self.cmd == macho::LC_SEGMENT {
             let mut data = self.data;
-            let segment = data.read().read_error("Invalid Mach-O command size")?;
+            let segment = data.read().read_error(crate::nosym!("Invalid Mach-O command size"))?;
             Ok(Some((segment, data.0)))
         } else {
             Ok(None)
@@ -219,7 +219,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     pub fn segment_64(self) -> Result<Option<(&'data macho::SegmentCommand64<E>, &'data [u8])>> {
         if self.cmd == macho::LC_SEGMENT_64 {
             let mut data = self.data;
-            let command = data.read().read_error("Invalid Mach-O command size")?;
+            let command = data.read().read_error(crate::nosym!("Invalid Mach-O command size"))?;
             Ok(Some((command, data.0)))
         } else {
             Ok(None)
@@ -343,11 +343,11 @@ impl<E: Endian> macho::SymtabCommand<E> {
                 self.symoff.get(endian).into(),
                 self.nsyms.get(endian) as usize,
             )
-            .read_error("Invalid Mach-O symbol table offset or size")?;
+            .read_error(crate::nosym!("Invalid Mach-O symbol table offset or size"))?;
         let str_start: u64 = self.stroff.get(endian).into();
         let str_end = str_start
             .checked_add(self.strsize.get(endian).into())
-            .read_error("Invalid Mach-O string table length")?;
+            .read_error(crate::nosym!("Invalid Mach-O string table length"))?;
         let strings = StringTable::new(data, str_start, str_end);
         Ok(SymbolTable::new(symbols, strings))
     }

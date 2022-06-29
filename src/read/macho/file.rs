@@ -108,7 +108,7 @@ where
                     let (data, _offset) = image
                         .cache
                         .data_and_offset_for_address(addr)
-                        .read_error("Could not find segment data in dyld shared cache")?;
+                        .read_error(crate::nosym!("Could not find segment data in dyld shared cache"))?;
                     if segment.name() == macho::SEG_LINKEDIT.as_bytes() {
                         linkedit_data = Some(data);
                     }
@@ -154,7 +154,7 @@ where
             .0
             .checked_sub(1)
             .and_then(|index| self.sections.get(index))
-            .read_error("Invalid Mach-O section index")
+            .read_error(crate::nosym!("Invalid Mach-O section index"))
     }
 
     pub(super) fn segment_internal(
@@ -163,7 +163,7 @@ where
     ) -> Result<&MachOSegmentInternal<'data, Mach, R>> {
         self.segments
             .get(index)
-            .read_error("Invalid Mach-O segment index")
+            .read_error(crate::nosym!("Invalid Mach-O segment index"))
     }
 }
 
@@ -290,7 +290,7 @@ where
         index: SymbolIndex,
     ) -> Result<MachOSymbol<'data, 'file, Mach, R>> {
         let nlist = self.symbols.symbol(index.0)?;
-        MachOSymbol::new(self, index, nlist).read_error("Unsupported Mach-O symbol index")
+        MachOSymbol::new(self, index, nlist).read_error(crate::nosym!("Unsupported Mach-O symbol index"))
     }
 
     fn symbols(&'file self) -> MachOSymbolIterator<'data, 'file, Mach, R> {
@@ -355,7 +355,7 @@ where
                     libraries
                         .get(symbol.library_ordinal(self.endian) as usize)
                         .copied()
-                        .read_error("Invalid Mach-O symbol library ordinal")?
+                        .read_error(crate::nosym!("Invalid Mach-O symbol library ordinal"))?
                 } else {
                     &[]
                 };
@@ -605,9 +605,9 @@ pub trait MachHeader: DebugPod {
     fn parse<'data, R: ReadRef<'data>>(data: R, offset: u64) -> read::Result<&'data Self> {
         let header = data
             .read_at::<Self>(offset)
-            .read_error("Invalid Mach-O header size or alignment")?;
+            .read_error(crate::nosym!("Invalid Mach-O header size or alignment"))?;
         if !header.is_supported() {
-            return Err(Error("Unsupported Mach-O header"));
+            return Err(Error(crate::nosym!("Unsupported Mach-O header")));
         }
         Ok(header)
     }
@@ -617,7 +617,7 @@ pub trait MachHeader: DebugPod {
     }
 
     fn endian(&self) -> Result<Self::Endian> {
-        Self::Endian::from_big_endian(self.is_big_endian()).read_error("Unsupported Mach-O endian")
+        Self::Endian::from_big_endian(self.is_big_endian()).read_error(crate::nosym!("Unsupported Mach-O endian"))
     }
 
     fn load_commands<'data, R: ReadRef<'data>>(
@@ -631,7 +631,7 @@ pub trait MachHeader: DebugPod {
                 header_offset + mem::size_of::<Self>() as u64,
                 self.sizeofcmds(endian).into(),
             )
-            .read_error("Invalid Mach-O load command table size")?;
+            .read_error(crate::nosym!("Invalid Mach-O load command table size"))?;
         Ok(LoadCommandIterator::new(endian, data, self.ncmds(endian)))
     }
 

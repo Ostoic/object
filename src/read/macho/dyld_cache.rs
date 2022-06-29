@@ -56,7 +56,7 @@ where
         let subcaches_info = header.subcaches(endian, data)?.unwrap_or(&[]);
 
         if subcache_data.len() != subcaches_info.len() + symbols_subcache_uuid.is_some() as usize {
-            return Err(Error("Incorrect number of SubCaches"));
+            return Err(Error(crate::nosym!("Incorrect number of SubCaches")));
         }
 
         // Split out the .symbols subcache data from the other subcaches.
@@ -73,7 +73,7 @@ where
         for (&data, info) in subcache_data.iter().zip(subcaches_info.iter()) {
             let sc_header = macho::DyldCacheHeader::<E>::parse(data)?;
             if sc_header.uuid != info.uuid {
-                return Err(Error("Unexpected SubCache UUID"));
+                return Err(Error(crate::nosym!("Unexpected SubCache UUID")));
             }
             let mappings = sc_header.mappings(endian, data)?;
             subcaches.push(DyldSubCache { data, mappings });
@@ -224,7 +224,7 @@ impl<E: Endian> macho::DyldCacheHeader<E> {
     /// Read the dyld cache header.
     pub fn parse<'data, R: ReadRef<'data>>(data: R) -> Result<&'data Self> {
         data.read_at::<macho::DyldCacheHeader<E>>(0)
-            .read_error("Invalid dyld cache header size or alignment")
+            .read_error(crate::nosym!("Invalid dyld cache header size or alignment"))
     }
 
     /// Returns (arch, endian) based on the magic string.
@@ -241,10 +241,10 @@ impl<E: Endian> macho::DyldCacheHeader<E> {
             b"dyld_v1  armv7k\0" => (Architecture::Arm, false),
             b"dyld_v1   arm64\0" => (Architecture::Aarch64, false),
             b"dyld_v1  arm64e\0" => (Architecture::Aarch64, false),
-            _ => return Err(Error("Unrecognized dyld cache magic")),
+            _ => return Err(Error(crate::nosym!("Unrecognized dyld cache magic"))),
         };
         let endian =
-            E::from_big_endian(is_big_endian).read_error("Unsupported dyld cache endian")?;
+            E::from_big_endian(is_big_endian).read_error(crate::nosym!("Unsupported dyld cache endian"))?;
         Ok((arch, endian))
     }
 
@@ -258,7 +258,7 @@ impl<E: Endian> macho::DyldCacheHeader<E> {
             self.mapping_offset.get(endian).into(),
             self.mapping_count.get(endian) as usize,
         )
-        .read_error("Invalid dyld cache mapping size or alignment")
+        .read_error(crate::nosym!("Invalid dyld cache mapping size or alignment"))
     }
 
     /// Return the information about subcaches, if present.
@@ -273,7 +273,7 @@ impl<E: Endian> macho::DyldCacheHeader<E> {
                     self.subcaches_offset.get(endian).into(),
                     self.subcaches_count.get(endian) as usize,
                 )
-                .read_error("Invalid dyld subcaches size or alignment")?;
+                .read_error(crate::nosym!("Invalid dyld subcaches size or alignment"))?;
             Ok(Some(subcaches))
         } else {
             Ok(None)
@@ -302,13 +302,13 @@ impl<E: Endian> macho::DyldCacheHeader<E> {
                 self.images_across_all_subcaches_offset.get(endian).into(),
                 self.images_across_all_subcaches_count.get(endian) as usize,
             )
-            .read_error("Invalid dyld cache image size or alignment")
+            .read_error(crate::nosym!("Invalid dyld cache image size or alignment"))
         } else {
             data.read_slice_at::<macho::DyldCacheImageInfo<E>>(
                 self.images_offset.get(endian).into(),
                 self.images_count.get(endian) as usize,
             )
-            .read_error("Invalid dyld cache image size or alignment")
+            .read_error(crate::nosym!("Invalid dyld cache image size or alignment"))
         }
     }
 }
@@ -330,7 +330,7 @@ impl<E: Endian> macho::DyldCacheImageInfo<E> {
     ) -> Result<u64> {
         let address = self.address.get(endian);
         address_to_file_offset(address, endian, mappings)
-            .read_error("Invalid dyld cache image address")
+            .read_error(crate::nosym!("Invalid dyld cache image address"))
     }
 }
 

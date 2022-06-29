@@ -28,7 +28,6 @@ pub enum ArchiveKind {
 
 /// A partially parsed archive file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ArchiveFile<'data, R: ReadRef<'data> = &'data [u8]> {
     data: R,
@@ -40,15 +39,16 @@ pub struct ArchiveFile<'data, R: ReadRef<'data> = &'data [u8]> {
 }
 
 impl<'data, R: ReadRef<'data>> ArchiveFile<'data, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     /// Parse the archive header and special members.
     pub fn parse(data: R) -> read::Result<Self> {
-        let len = data.len().read_error("Unknown archive length")?;
+        let len = data.len().read_error(crate::nosym!("Unknown archive length"))?;
         let mut tail = 0;
         let magic = data
             .read_bytes(&mut tail, archive::MAGIC.len() as u64)
-            .read_error("Invalid archive size")?;
+            .read_error(crate::nosym!("Invalid archive size"))?;
         if magic != &archive::MAGIC[..] {
-            return Err(Error("Unsupported archive identifier"));
+            return Err(Error(crate::nosym!("Unsupported archive identifier")));
         }
 
         let mut file = ArchiveFile {
@@ -164,7 +164,6 @@ impl<'data, R: ReadRef<'data>> ArchiveFile<'data, R> {
 
 /// An iterator over the members of an archive.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ArchiveMemberIterator<'data, R: ReadRef<'data> = &'data [u8]> {
     data: R,
@@ -176,6 +175,7 @@ pub struct ArchiveMemberIterator<'data, R: ReadRef<'data> = &'data [u8]> {
 impl<'data, R: ReadRef<'data>> Iterator for ArchiveMemberIterator<'data, R> {
     type Item = read::Result<ArchiveMember<'data>>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         if self.offset >= self.len {
             return None;
@@ -203,6 +203,7 @@ impl<'data> ArchiveMember<'data> {
     /// Parse the archive member header, name, and file data.
     ///
     /// This reads the extended name (if any) and adjusts the file size.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn parse<R: ReadRef<'data>>(
         data: R,
         offset: &mut u64,
@@ -210,17 +211,17 @@ impl<'data> ArchiveMember<'data> {
     ) -> read::Result<Self> {
         let header = data
             .read::<archive::Header>(offset)
-            .read_error("Invalid archive member header")?;
+            .read_error(crate::nosym!("Invalid archive member header"))?;
         if header.terminator != archive::TERMINATOR {
-            return Err(Error("Invalid archive terminator"));
+            return Err(Error(crate::nosym!("Invalid archive terminator")));
         }
 
         let mut file_offset = *offset;
         let mut file_size =
-            parse_u64_digits(&header.size, 10).read_error("Invalid archive member size")?;
+            parse_u64_digits(&header.size, 10).read_error(crate::nosym!("Invalid archive member size"))?;
         *offset = offset
             .checked_add(file_size)
-            .read_error("Archive member size is too large")?;
+            .read_error(crate::nosym!("Archive member size is too large"))?;
         // Entries are padded to an even number of bytes.
         if (file_size & 1) != 0 {
             *offset = offset.saturating_add(1);
@@ -229,11 +230,11 @@ impl<'data> ArchiveMember<'data> {
         let name = if header.name[0] == b'/' && (header.name[1] as char).is_digit(10) {
             // Read file name from the names table.
             parse_sysv_extended_name(&header.name[1..], names)
-                .read_error("Invalid archive extended name offset")?
+                .read_error(crate::nosym!("Invalid archive extended name offset"))?
         } else if &header.name[..3] == b"#1/" && (header.name[3] as char).is_digit(10) {
             // Read file name from the start of the file data.
             parse_bsd_extended_name(&header.name[3..], data, &mut file_offset, &mut file_size)
-                .read_error("Invalid archive extended name length")?
+                .read_error(crate::nosym!("Invalid archive extended name length"))?
         } else if header.name[0] == b'/' {
             let name_len = memchr::memchr(b' ', &header.name).unwrap_or(header.name.len());
             &header.name[..name_len]
@@ -306,11 +307,12 @@ impl<'data> ArchiveMember<'data> {
     #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data<R: ReadRef<'data>>(&self, data: R) -> read::Result<&'data [u8]> {
         data.read_bytes_at(self.offset, self.size)
-            .read_error("Archive member size is too large")
+            .read_error(crate::nosym!("Archive member size is too large"))
     }
 }
 
 // Ignores bytes starting from the first space.
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 fn parse_u64_digits(digits: &[u8], radix: u32) -> Option<u64> {
     if let [b' ', ..] = digits {
         return None;
@@ -329,6 +331,7 @@ fn parse_u64_digits(digits: &[u8], radix: u32) -> Option<u64> {
     Some(result)
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 fn parse_sysv_extended_name<'data>(digits: &[u8], names: &'data [u8]) -> Result<&'data [u8], ()> {
     let offset = parse_u64_digits(digits, 10).ok_or(())?;
     let offset = offset.try_into().map_err(|_| ())?;
@@ -341,6 +344,7 @@ fn parse_sysv_extended_name<'data>(digits: &[u8], names: &'data [u8]) -> Result<
 }
 
 /// Modifies `data` to start after the extended name.
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 fn parse_bsd_extended_name<'data, R: ReadRef<'data>>(
     digits: &[u8],
     data: R,

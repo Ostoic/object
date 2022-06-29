@@ -472,9 +472,9 @@ pub trait FileHeader: DebugPod {
     fn parse<'data, R: ReadRef<'data>>(data: R) -> read::Result<&'data Self> {
         let header = data
             .read_at::<Self>(0)
-            .read_error("Invalid ELF header size or alignment")?;
+            .read_error(crate::nosym!("Invalid ELF header size or alignment"))?;
         if !header.is_supported() {
-            return Err(Error("Unsupported ELF header"));
+            return Err(Error(crate::nosym!("Unsupported ELF header")));
         }
         // TODO: Check self.e_ehsize?
         Ok(header)
@@ -510,7 +510,7 @@ pub trait FileHeader: DebugPod {
     }
 
     fn endian(&self) -> read::Result<Self::Endian> {
-        Self::Endian::from_big_endian(self.is_big_endian()).read_error("Unsupported ELF endian")
+        Self::Endian::from_big_endian(self.is_big_endian()).read_error(crate::nosym!("Unsupported ELF endian"))
     }
 
     /// Return the first section header, if present.
@@ -530,11 +530,11 @@ pub trait FileHeader: DebugPod {
         let shentsize = usize::from(self.e_shentsize(endian));
         if shentsize != mem::size_of::<Self::SectionHeader>() {
             // Section header size must match.
-            return Err(Error("Invalid ELF section header entry size"));
+            return Err(Error(crate::nosym!("Invalid ELF section header entry size")));
         }
         data.read_at(shoff)
             .map(Some)
-            .read_error("Invalid ELF section header offset or size")
+            .read_error(crate::nosym!("Invalid ELF section header offset or size"))
     }
 
     /// Return the `e_phnum` field of the header. Handles extended values.
@@ -552,7 +552,7 @@ pub trait FileHeader: DebugPod {
             Ok(section_0.sh_info(endian) as usize)
         } else {
             // Section 0 must exist if e_phnum overflows.
-            Err(Error("Missing ELF section headers for e_phnum overflow"))
+            Err(Error(crate::nosym!("Missing ELF section headers for e_phnum overflow")))
         }
     }
 
@@ -573,7 +573,7 @@ pub trait FileHeader: DebugPod {
                 .into()
                 .try_into()
                 .ok()
-                .read_error("Invalid ELF extended e_shnum")
+                .read_error(crate::nosym!("Invalid ELF extended e_shnum"))
         } else {
             // No section headers is ok.
             Ok(0)
@@ -595,10 +595,10 @@ pub trait FileHeader: DebugPod {
             section_0.sh_link(endian)
         } else {
             // Section 0 must exist if we're trying to read e_shstrndx.
-            return Err(Error("Missing ELF section headers for e_shstrndx overflow"));
+            return Err(Error(crate::nosym!("Missing ELF section headers for e_shstrndx overflow")));
         };
         if index == 0 {
-            return Err(Error("Missing ELF e_shstrndx"));
+            return Err(Error(crate::nosym!("Missing ELF e_shstrndx")));
         }
         Ok(index)
     }
@@ -625,10 +625,10 @@ pub trait FileHeader: DebugPod {
         let phentsize = self.e_phentsize(endian) as usize;
         if phentsize != mem::size_of::<Self::ProgramHeader>() {
             // Program header size must match.
-            return Err(Error("Invalid ELF program header entry size"));
+            return Err(Error(crate::nosym!("Invalid ELF program header entry size")));
         }
         data.read_slice_at(phoff, phnum)
-            .read_error("Invalid ELF program header size or alignment")
+            .read_error(crate::nosym!("Invalid ELF program header size or alignment"))
     }
 
     /// Return the slice of section headers.
@@ -653,7 +653,7 @@ pub trait FileHeader: DebugPod {
         let shentsize = usize::from(self.e_shentsize(endian));
         if shentsize != mem::size_of::<Self::SectionHeader>() {
             // Section header size must match.
-            return Err(Error("Invalid ELF section header entry size"));
+            return Err(Error(crate::nosym!("Invalid ELF section header entry size")));
         }
         data.read_slice_at(shoff, shnum)
             .read_error("Invalid ELF section header offset/size/alignment")
@@ -670,11 +670,11 @@ pub trait FileHeader: DebugPod {
             return Ok(StringTable::default());
         }
         let index = self.shstrndx(endian, data)? as usize;
-        let shstrtab = sections.get(index).read_error("Invalid ELF e_shstrndx")?;
+        let shstrtab = sections.get(index).read_error(crate::nosym!("Invalid ELF e_shstrndx"))?;
         let strings = if let Some((shstrtab_offset, shstrtab_size)) = shstrtab.file_range(endian) {
             let shstrtab_end = shstrtab_offset
                 .checked_add(shstrtab_size)
-                .read_error("Invalid ELF shstrtab size")?;
+                .read_error(crate::nosym!("Invalid ELF shstrtab size"))?;
             StringTable::new(data, shstrtab_offset, shstrtab_end)
         } else {
             StringTable::default()

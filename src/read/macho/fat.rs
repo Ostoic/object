@@ -9,7 +9,7 @@ impl FatHeader {
     /// Does not validate the magic value.
     pub fn parse<'data, R: ReadRef<'data>>(file: R) -> Result<&'data FatHeader> {
         file.read_at::<FatHeader>(0)
-            .read_error("Invalid fat header size or alignment")
+            .read_error(crate::nosym!("Invalid fat header size or alignment"))
     }
 
     /// Attempt to parse a fat header and 32-bit fat arches.
@@ -17,12 +17,12 @@ impl FatHeader {
         let mut offset = 0;
         let header = file
             .read::<FatHeader>(&mut offset)
-            .read_error("Invalid fat header size or alignment")?;
+            .read_error(crate::nosym!("Invalid fat header size or alignment"))?;
         if header.magic.get(BigEndian) != macho::FAT_MAGIC {
-            return Err(Error("Invalid 32-bit fat magic"));
+            return Err(Error(crate::nosym!("Invalid 32-bit fat magic")));
         }
         file.read_slice::<FatArch32>(&mut offset, header.nfat_arch.get(BigEndian) as usize)
-            .read_error("Invalid nfat_arch")
+            .read_error(crate::nosym!("Invalid nfat_arch"))
     }
 
     /// Attempt to parse a fat header and 64-bit fat arches.
@@ -30,12 +30,12 @@ impl FatHeader {
         let mut offset = 0;
         let header = file
             .read::<FatHeader>(&mut offset)
-            .read_error("Invalid fat header size or alignment")?;
+            .read_error(crate::nosym!("Invalid fat header size or alignment"))?;
         if header.magic.get(BigEndian) != macho::FAT_MAGIC_64 {
-            return Err(Error("Invalid 64-bit fat magic"));
+            return Err(Error(crate::nosym!("Invalid 64-bit fat magic")));
         }
         file.read_slice::<FatArch64>(&mut offset, header.nfat_arch.get(BigEndian) as usize)
-            .read_error("Invalid nfat_arch")
+            .read_error(crate::nosym!("Invalid nfat_arch"))
     }
 }
 
@@ -67,7 +67,7 @@ pub trait FatArch: Pod {
 
     fn data<'data, R: ReadRef<'data>>(&self, file: R) -> Result<&'data [u8]> {
         file.read_bytes_at(self.offset().into(), self.size().into())
-            .read_error("Invalid fat arch offset or size")
+            .read_error(crate::nosym!("Invalid fat arch offset or size"))
     }
 }
 

@@ -52,6 +52,7 @@ pub struct Export<'data> {
     pub target: ExportTarget<'data>,
 }
 
+#[cfg(not(feature = "nosym"))]
 impl<'a> Debug for Export<'a> {
     #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::result::Result<(), core::fmt::Error> {
@@ -63,6 +64,7 @@ impl<'a> Debug for Export<'a> {
     }
 }
 
+#[cfg(not(feature = "nosym"))]
 impl<'a> Debug for ExportTarget<'a> {
     #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::result::Result<(), core::fmt::Error> {
@@ -112,7 +114,7 @@ impl<'data> ExportTable<'data> {
                     address_of_functions.wrapping_sub(virtual_address) as usize,
                     directory.number_of_functions.get(LE) as usize,
                 )
-                .read_error("Invalid PE export address table")?;
+                .read_error(crate::nosym!("Invalid PE export address table"))?;
         }
 
         let mut names = &[][..];
@@ -121,7 +123,7 @@ impl<'data> ExportTable<'data> {
         let address_of_name_ordinals = directory.address_of_name_ordinals.get(LE);
         if address_of_names != 0 {
             if address_of_name_ordinals == 0 {
-                return Err(Error("Missing PE export ordinal table"));
+                return Err(Error(crate::nosym!("Missing PE export ordinal table")));
             }
 
             let number = directory.number_of_names.get(LE) as usize;
@@ -130,13 +132,13 @@ impl<'data> ExportTable<'data> {
                     address_of_names.wrapping_sub(virtual_address) as usize,
                     number,
                 )
-                .read_error("Invalid PE export name pointer table")?;
+                .read_error(crate::nosym!("Invalid PE export name pointer table"))?;
             name_ordinals = data
                 .read_slice_at::<U16Bytes<_>>(
                     address_of_name_ordinals.wrapping_sub(virtual_address) as usize,
                     number,
                 )
-                .read_error("Invalid PE export ordinal table")?;
+                .read_error(crate::nosym!("Invalid PE export ordinal table"))?;
         }
 
         Ok(ExportTable {
@@ -153,7 +155,7 @@ impl<'data> ExportTable<'data> {
     #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse_directory(data: &'data [u8]) -> Result<&'data pe::ImageExportDirectory> {
         data.read_at::<pe::ImageExportDirectory>(0)
-            .read_error("Invalid PE export dir size")
+            .read_error(crate::nosym!("Invalid PE export dir size"))
     }
 
     /// Returns the header of the export table.
@@ -220,7 +222,7 @@ impl<'data> ExportTable<'data> {
         Ok(self
             .addresses
             .get(index as usize)
-            .read_error("Invalid PE export address index")?
+            .read_error(crate::nosym!("Invalid PE export address index"))?
             .get(LE))
     }
 
@@ -254,16 +256,16 @@ impl<'data> ExportTable<'data> {
             let i = forward
                 .iter()
                 .position(|x| *x == b'.')
-                .read_error("Missing PE forwarded export separator")?;
+                .read_error(crate::nosym!("Missing PE forwarded export separator"))?;
             let library = &forward[..i];
             match &forward[i + 1..] {
                 [b'#', digits @ ..] => {
                     let ordinal =
-                        parse_ordinal(digits).read_error("Invalid PE forwarded export ordinal")?;
+                        parse_ordinal(digits).read_error(crate::nosym!("Invalid PE forwarded export ordinal"))?;
                     ExportTarget::ForwardByOrdinal(library, ordinal)
                 }
                 [] => {
-                    return Err(Error("Missing PE forwarded export name"));
+                    return Err(Error(crate::nosym!("Missing PE forwarded export name")));
                 }
                 name => ExportTarget::ForwardByName(library, name),
             }
@@ -294,7 +296,7 @@ impl<'data> ExportTable<'data> {
         if let Some(offset) = self.forward_offset(address) {
             self.data
                 .read_string_at(offset)
-                .read_error("Invalid PE forwarded export address")
+                .read_error(crate::nosym!("Invalid PE forwarded export address"))
                 .map(Some)
         } else {
             Ok(None)
@@ -307,7 +309,7 @@ impl<'data> ExportTable<'data> {
         let offset = name_pointer.wrapping_sub(self.virtual_address);
         self.data
             .read_string_at(offset as usize)
-            .read_error("Invalid PE export name pointer")
+            .read_error(crate::nosym!("Invalid PE export name pointer"))
     }
 
     /// Returns the parsed exports in this table.
@@ -334,7 +336,7 @@ impl<'data> ExportTable<'data> {
             let name = self.name_from_pointer(name_pointer)?;
             exports
                 .get_mut(ordinal_index as usize)
-                .read_error("Invalid PE export ordinal")?
+                .read_error(crate::nosym!("Invalid PE export ordinal"))?
                 .name = Some(name);
         }
 

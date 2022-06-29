@@ -221,12 +221,12 @@ impl pe::ImageFileHeader {
     pub fn parse<'data, R: ReadRef<'data>>(data: R, offset: &mut u64) -> read::Result<&'data Self> {
         let header = data
             .read::<pe::ImageFileHeader>(offset)
-            .read_error("Invalid COFF file header size or alignment")?;
+            .read_error(crate::nosym!("Invalid COFF file header size or alignment"))?;
 
         // Skip over the optional header.
         *offset = offset
             .checked_add(header.size_of_optional_header.get(LE).into())
-            .read_error("Invalid COFF optional header size")?;
+            .read_error(crate::nosym!("Invalid COFF optional header size"))?;
 
         // TODO: maybe validate that the machine is known?
         Ok(header)

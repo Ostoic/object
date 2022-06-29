@@ -323,7 +323,7 @@ where
         let debug_data = data_dir.data(self.data, &self.common.sections).map(Bytes)?;
         let debug_dir = debug_data
             .read_at::<pe::ImageDebugDirectory>(0)
-            .read_error("Invalid PE debug dir size")?;
+            .read_error(crate::nosym!("Invalid PE debug dir size"))?;
 
         if debug_dir.typ.get(LE) != pe::IMAGE_DEBUG_TYPE_CODEVIEW {
             return Ok(None);
@@ -335,29 +335,29 @@ where
                 debug_dir.pointer_to_raw_data.get(LE) as u64,
                 debug_dir.size_of_data.get(LE) as usize,
             )
-            .read_error("Invalid CodeView Info address")?;
+            .read_error(crate::nosym!("Invalid CodeView Info address"))?;
 
         let mut info = Bytes(info);
 
         let sig = info
             .read_bytes(4)
-            .read_error("Invalid CodeView signature")?;
+            .read_error(crate::nosym!("Invalid CodeView signature"))?;
         if sig.0 != b"RSDS" {
             return Ok(None);
         }
 
         let guid: [u8; 16] = info
             .read_bytes(16)
-            .read_error("Invalid CodeView GUID")?
+            .read_error(crate::nosym!("Invalid CodeView GUID"))?
             .0
             .try_into()
             .unwrap();
 
-        let age = info.read::<U32<LE>>().read_error("Invalid CodeView Age")?;
+        let age = info.read::<U32<LE>>().read_error(crate::nosym!("Invalid CodeView Age"))?;
 
         let path = info
             .read_string()
-            .read_error("Invalid CodeView file path")?;
+            .read_error(crate::nosym!("Invalid CodeView file path"))?;
 
         Ok(Some(CodeView {
             path: ByteString(path),
@@ -512,6 +512,7 @@ where
 {
     type Item = SectionIndex;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         None
     }
@@ -521,13 +522,14 @@ impl pe::ImageDosHeader {
     /// Read the DOS header.
     ///
     /// Also checks that the `e_magic` field in the header is valid.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse<'data, R: ReadRef<'data>>(data: R) -> read::Result<&'data Self> {
         // DOS header comes first.
         let dos_header = data
             .read_at::<pe::ImageDosHeader>(0)
-            .read_error("Invalid DOS header size or alignment")?;
+            .read_error(crate::nosym!("Invalid DOS header size or alignment"))?;
         if dos_header.e_magic.get(LE) != pe::IMAGE_DOS_SIGNATURE {
-            return Err(Error("Invalid DOS magic"));
+            return Err(Error(crate::nosym!("Invalid DOS magic")));
         }
         Ok(dos_header)
     }
@@ -544,6 +546,7 @@ impl pe::ImageDosHeader {
 ///
 /// It can be useful to know this magic value before trying to
 /// fully parse the NT headers.
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn optional_header_magic<'data, R: ReadRef<'data>>(data: R) -> Result<u16> {
     let dos_header = pe::ImageDosHeader::parse(data)?;
     // NT headers are at an offset specified in the DOS header.
@@ -554,7 +557,7 @@ pub fn optional_header_magic<'data, R: ReadRef<'data>>(data: R) -> Result<u16> {
         .read_at::<pe::ImageNtHeaders32>(offset)
         .read_error("Invalid NT headers offset, size, or alignment")?;
     if nt_headers.signature() != pe::IMAGE_NT_SIGNATURE {
-        return Err(Error("Invalid PE magic"));
+        return Err(Error(crate::nosym!("Invalid PE magic")));
     }
     Ok(nt_headers.optional_header().magic())
 }
@@ -592,6 +595,7 @@ pub trait ImageNtHeaders: DebugPod {
     /// It is updated to point after the optional header, which is where the section headers are located.
     ///
     /// Also checks that the `signature` and `magic` fields in the headers are valid.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn parse<'data, R: ReadRef<'data>>(
         data: R,
         offset: &mut u64,
@@ -599,22 +603,22 @@ pub trait ImageNtHeaders: DebugPod {
         // Note that this does not include the data directories in the optional header.
         let nt_headers = data
             .read::<Self>(offset)
-            .read_error("Invalid PE headers offset or size")?;
+            .read_error(crate::nosym!("Invalid PE headers offset or size"))?;
         if nt_headers.signature() != pe::IMAGE_NT_SIGNATURE {
-            return Err(Error("Invalid PE magic"));
+            return Err(Error(crate::nosym!("Invalid PE magic")));
         }
         if !nt_headers.is_valid_optional_magic() {
-            return Err(Error("Invalid PE optional header magic"));
+            return Err(Error(crate::nosym!("Invalid PE optional header magic")));
         }
 
         // Read the rest of the optional header, and then read the data directories from that.
         let optional_data_size =
             u64::from(nt_headers.file_header().size_of_optional_header.get(LE))
                 .checked_sub(mem::size_of::<Self::ImageOptionalHeader>() as u64)
-                .read_error("PE optional header size is too small")?;
+                .read_error(crate::nosym!("PE optional header size is too small"))?;
         let optional_data = data
             .read_bytes(offset, optional_data_size)
-            .read_error("Invalid PE optional header size")?;
+            .read_error(crate::nosym!("Invalid PE optional header size"))?;
         let data_directories = DataDirectories::parse(
             optional_data,
             nt_headers.optional_header().number_of_rva_and_sizes(),

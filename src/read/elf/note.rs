@@ -35,7 +35,7 @@ where
         let align = match align.into() {
             0u64..=4 => 4,
             8 => 8,
-            _ => return Err(Error("Invalid ELF note alignment")),
+            _ => return Err(Error(crate::nosym!("Invalid ELF note alignment"))),
         };
         // TODO: check data alignment?
         Ok(NoteIterator {
@@ -54,14 +54,14 @@ where
 
         let header = data
             .read_at::<Elf::NoteHeader>(0)
-            .read_error("ELF note is too short")?;
+            .read_error(crate::nosym!("ELF note is too short"))?;
 
         // The name has no alignment requirement.
         let offset = mem::size_of::<Elf::NoteHeader>();
         let namesz = header.n_namesz(self.endian) as usize;
         let name = data
             .read_bytes_at(offset, namesz)
-            .read_error("Invalid ELF note namesz")?
+            .read_error(crate::nosym!("Invalid ELF note namesz"))?
             .0;
 
         // The descriptor must be aligned.
@@ -69,7 +69,7 @@ where
         let descsz = header.n_descsz(self.endian) as usize;
         let desc = data
             .read_bytes_at(offset, descsz)
-            .read_error("Invalid ELF note descsz")?
+            .read_error(crate::nosym!("Invalid ELF note descsz"))?
             .0;
 
         // The next note (if any) must be aligned.

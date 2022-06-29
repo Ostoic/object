@@ -564,36 +564,42 @@ mod aligned {
         }
     }
 
+    #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for U16<E> {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "U16({:x})", self.0)
         }
     }
 
+    #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for U32<E> {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "U32({:x})", self.0)
         }
     }
 
+    #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for U64<E> {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "U64({:x})", self.0)
         }
     }
 
+    #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for I16<E> {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "I16({:x})", self.0)
         }
     }
 
+    #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for I32<E> {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "I32({:x})", self.0)
         }
     }
 
+    #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for I64<E> {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "I64({:x})", self.0)

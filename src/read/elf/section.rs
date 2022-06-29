@@ -61,7 +61,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     pub fn section(&self, index: SectionIndex) -> read::Result<&'data Elf::SectionHeader> {
         self.sections
             .get(index.0)
-            .read_error("Invalid ELF section index")
+            .read_error(crate::nosym!("Invalid ELF section index"))
     }
 
     /// Return the section header with the given name.
@@ -100,7 +100,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     ) -> read::Result<StringTable<'data, R>> {
         self.section(index)?
             .strings(endian, data)?
-            .read_error("Invalid ELF string section type")
+            .read_error(crate::nosym!("Invalid ELF string section type"))
     }
 
     /// Return the symbol table of the given section type.
@@ -142,7 +142,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
         let section = self.section(index)?;
         match section.sh_type(endian) {
             elf::SHT_DYNSYM | elf::SHT_SYMTAB => {}
-            _ => return Err(Error("Invalid ELF symbol table section type")),
+            _ => return Err(Error(crate::nosym!("Invalid ELF symbol table section type"))),
         }
         SymbolTable::parse(endian, data, self, index, section)
     }
@@ -389,7 +389,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ElfSection<'data, 'file, 
     fn bytes(&self) -> read::Result<&'data [u8]> {
         self.section
             .data(self.file.endian, self.file.data)
-            .read_error("Invalid ELF section size or offset")
+            .read_error(crate::nosym!("Invalid ELF section size or offset"))
     }
 
     fn maybe_compressed(&self) -> read::Result<Option<CompressedFileRange>> {
@@ -400,20 +400,20 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ElfSection<'data, 'file, 
         let (section_offset, section_size) = self
             .section
             .file_range(endian)
-            .read_error("Invalid ELF compressed section type")?;
+            .read_error(crate::nosym!("Invalid ELF compressed section type"))?;
         let mut offset = section_offset;
         let header = self
             .file
             .data
             .read::<Elf::CompressionHeader>(&mut offset)
-            .read_error("Invalid ELF compressed section offset")?;
+            .read_error(crate::nosym!("Invalid ELF compressed section offset"))?;
         if header.ch_type(endian) != elf::ELFCOMPRESS_ZLIB {
-            return Err(Error("Unsupported ELF compression type"));
+            return Err(Error(crate::nosym!("Unsupported ELF compression type")));
         }
         let uncompressed_size = header.ch_size(endian).into();
         let compressed_size = section_size
             .checked_sub(offset - section_offset)
-            .read_error("Invalid ELF compressed section size")?;
+            .read_error(crate::nosym!("Invalid ELF compressed section size"))?;
         Ok(Some(CompressedFileRange {
             format: CompressionFormat::Zlib,
             offset,
@@ -435,7 +435,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ElfSection<'data, 'file, 
         let (section_offset, section_size) = self
             .section
             .file_range(self.file.endian)
-            .read_error("Invalid ELF GNU compressed section type")?;
+            .read_error(crate::nosym!("Invalid ELF GNU compressed section type"))?;
         let mut offset = section_offset;
         let data = self.file.data;
         // Assume ZLIB-style uncompressed data is no more than 4GB to avoid accidentally
@@ -443,19 +443,19 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ElfSection<'data, 'file, 
         // .debug_str that happens to start with "ZLIB".
         if data
             .read_bytes(&mut offset, 8)
-            .read_error("ELF GNU compressed section is too short")?
+            .read_error(crate::nosym!("ELF GNU compressed section is too short"))?
             != b"ZLIB\0\0\0\0"
         {
-            return Err(Error("Invalid ELF GNU compressed section header"));
+            return Err(Error(crate::nosym!("Invalid ELF GNU compressed section header")));
         }
         let uncompressed_size = data
             .read::<U32Bytes<_>>(&mut offset)
-            .read_error("ELF GNU compressed section is too short")?
+            .read_error(crate::nosym!("ELF GNU compressed section is too short"))?
             .get(endian::BigEndian)
             .into();
         let compressed_size = section_size
             .checked_sub(offset - section_offset)
-            .read_error("ELF GNU compressed section is too short")?;
+            .read_error(crate::nosym!("ELF GNU compressed section is too short"))?;
         Ok(Some(CompressedFileRange {
             format: CompressionFormat::Zlib,
             offset,
@@ -548,7 +548,7 @@ where
         let name = self.name_bytes()?;
         str::from_utf8(name)
             .ok()
-            .read_error("Non UTF-8 ELF section name")
+            .read_error(crate::nosym!("Non UTF-8 ELF section name"))
     }
 
     #[cfg_attr(not(feature = "aggressive-inline"), inline)]
@@ -648,7 +648,7 @@ pub trait SectionHeader: DebugPod {
     ) -> read::Result<&'data [u8]> {
         strings
             .get(self.sh_name(endian))
-            .read_error("Invalid ELF section name offset")
+            .read_error(crate::nosym!("Invalid ELF section name offset"))
     }
 
     /// Return the offset and size of the section in the file.
@@ -673,7 +673,7 @@ pub trait SectionHeader: DebugPod {
     ) -> read::Result<&'data [u8]> {
         if let Some((offset, size)) = self.file_range(endian) {
             data.read_bytes_at(offset, size)
-                .read_error("Invalid ELF section size or offset")
+                .read_error(crate::nosym!("Invalid ELF section size or offset"))
         } else {
             Ok(&[])
         }
@@ -691,7 +691,7 @@ pub trait SectionHeader: DebugPod {
     ) -> read::Result<&'data [T]> {
         let mut data = self.data(endian, data).map(Bytes)?;
         data.read_slice(data.len() / mem::size_of::<T>())
-            .read_error("Invalid ELF section size or offset")
+            .read_error(crate::nosym!("Invalid ELF section size or offset"))
     }
 
     /// Return the strings in the section.
@@ -710,7 +710,7 @@ pub trait SectionHeader: DebugPod {
         let str_size = self.sh_size(endian).into();
         let str_end = str_offset
             .checked_add(str_size)
-            .read_error("Invalid ELF string section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF string section offset or size"))?;
         Ok(Some(StringTable::new(data, str_offset, str_end)))
     }
 
@@ -753,7 +753,7 @@ pub trait SectionHeader: DebugPod {
         }
         let rel = self
             .data_as_array(endian, data)
-            .read_error("Invalid ELF relocation section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF relocation section offset or size"))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((rel, link)))
     }
@@ -774,7 +774,7 @@ pub trait SectionHeader: DebugPod {
         }
         let rela = self
             .data_as_array(endian, data)
-            .read_error("Invalid ELF relocation section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF relocation section offset or size"))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((rela, link)))
     }
@@ -795,7 +795,7 @@ pub trait SectionHeader: DebugPod {
         }
         let dynamic = self
             .data_as_array(endian, data)
-            .read_error("Invalid ELF dynamic section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF dynamic section offset or size"))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((dynamic, link)))
     }
@@ -814,7 +814,7 @@ pub trait SectionHeader: DebugPod {
         }
         let data = self
             .data(endian, data)
-            .read_error("Invalid ELF note section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF note section offset or size"))?;
         let notes = NoteIterator::new(endian, self.sh_addralign(endian), data)?;
         Ok(Some(notes))
     }
@@ -836,16 +836,16 @@ pub trait SectionHeader: DebugPod {
         }
         let mut data = self
             .data(endian, data)
-            .read_error("Invalid ELF group section offset or size")
+            .read_error(crate::nosym!("Invalid ELF group section offset or size"))
             .map(Bytes)?;
         let flag = data
             .read::<U32Bytes<_>>()
-            .read_error("Invalid ELF group section offset or size")?
+            .read_error(crate::nosym!("Invalid ELF group section offset or size"))?
             .get(endian);
         let count = data.len() / mem::size_of::<U32Bytes<Self::Endian>>();
         let sections = data
             .read_slice(count)
-            .read_error("Invalid ELF group section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF group section offset or size"))?;
         Ok(Some((flag, sections)))
     }
 
@@ -863,10 +863,10 @@ pub trait SectionHeader: DebugPod {
         }
         let data = self
             .data(endian, data)
-            .read_error("Invalid ELF hash section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF hash section offset or size"))?;
         let header = data
             .read_at::<elf::HashHeader<Self::Endian>>(0)
-            .read_error("Invalid hash header")?;
+            .read_error(crate::nosym!("Invalid hash header"))?;
         Ok(Some(header))
     }
 
@@ -886,7 +886,7 @@ pub trait SectionHeader: DebugPod {
         }
         let data = self
             .data(endian, data)
-            .read_error("Invalid ELF hash section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF hash section offset or size"))?;
         let hash = HashTable::parse(endian, data)?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((hash, link)))
@@ -906,10 +906,10 @@ pub trait SectionHeader: DebugPod {
         }
         let data = self
             .data(endian, data)
-            .read_error("Invalid ELF GNU hash section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF GNU hash section offset or size"))?;
         let header = data
             .read_at::<elf::GnuHashHeader<Self::Endian>>(0)
-            .read_error("Invalid GNU hash header")?;
+            .read_error(crate::nosym!("Invalid GNU hash header"))?;
         Ok(Some(header))
     }
 
@@ -929,7 +929,7 @@ pub trait SectionHeader: DebugPod {
         }
         let data = self
             .data(endian, data)
-            .read_error("Invalid ELF GNU hash section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF GNU hash section offset or size"))?;
         let hash = GnuHashTable::parse(endian, data)?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((hash, link)))
@@ -951,7 +951,7 @@ pub trait SectionHeader: DebugPod {
         }
         let versym = self
             .data_as_array(endian, data)
-            .read_error("Invalid ELF GNU versym section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF GNU versym section offset or size"))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((versym, link)))
     }
@@ -972,7 +972,7 @@ pub trait SectionHeader: DebugPod {
         }
         let verdef = self
             .data(endian, data)
-            .read_error("Invalid ELF GNU verdef section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF GNU verdef section offset or size"))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((VerdefIterator::new(endian, verdef), link)))
     }
@@ -993,7 +993,7 @@ pub trait SectionHeader: DebugPod {
         }
         let verneed = self
             .data(endian, data)
-            .read_error("Invalid ELF GNU verneed section offset or size")?;
+            .read_error(crate::nosym!("Invalid ELF GNU verneed section offset or size"))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((VerneedIterator::new(endian, verneed), link)))
     }

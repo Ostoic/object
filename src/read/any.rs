@@ -218,7 +218,7 @@ impl<'data, R: ReadRef<'data>> File<'data, R> {
             #[cfg(feature = "coff")]
             FileKind::Coff => FileInternal::Coff(coff::CoffFile::parse(data)?),
             #[allow(unreachable_patterns)]
-            _ => return Err(Error("Unsupported file format")),
+            _ => return Err(Error(crate::nosym!("Unsupported file format"))),
         };
         Ok(File { inner })
     }
@@ -235,7 +235,7 @@ impl<'data, R: ReadRef<'data>> File<'data, R> {
             Some(AddressSize::U32) => {
                 FileInternal::MachO32(macho::MachOFile32::parse_dyld_cache_image(image)?)
             }
-            _ => return Err(Error("Unsupported file format")),
+            _ => return Err(Error(crate::nosym!("Unsupported file format"))),
         };
         Ok(File { inner })
     }

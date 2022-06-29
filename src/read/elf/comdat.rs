@@ -124,7 +124,7 @@ where
         let name = self.name_bytes()?;
         str::from_utf8(name)
             .ok()
-            .read_error("Non UTF-8 ELF COMDAT name")
+            .read_error(crate::nosym!("Non UTF-8 ELF COMDAT name"))
     }
 
     fn sections(&self) -> Self::SectionIterator {
