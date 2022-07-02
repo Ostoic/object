@@ -79,22 +79,26 @@ impl std::error::Error for Error {}
 pub type Result<T> = result::Result<T, Error>;
 
 trait ReadError<T> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_error(self, error: &'static str) -> Result<T>;
 }
 
 impl<T> ReadError<T> for result::Result<T, ()> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_error(self, error: &'static str) -> Result<T> {
         self.map_err(|()| Error(error))
     }
 }
 
 impl<T> ReadError<T> for result::Result<T, Error> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_error(self, error: &'static str) -> Result<T> {
         self.map_err(|_| Error(error))
     }
 }
 
 impl<T> ReadError<T> for Option<T> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_error(self, error: &'static str) -> Result<T> {
         self.ok_or(Error(error))
     }
@@ -183,11 +187,13 @@ pub enum FileKind {
 
 impl FileKind {
     /// Determine a file kind by parsing the start of the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse<'data, R: ReadRef<'data>>(data: R) -> Result<FileKind> {
         Self::parse_at(data, 0)
     }
 
     /// Determine a file kind by parsing at the given offset.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse_at<'data, R: ReadRef<'data>>(data: R, offset: u64) -> Result<FileKind> {
         let magic = data
             .read_bytes_at(offset, 16)
@@ -311,6 +317,7 @@ impl SymbolSection {
 /// An entry in a `SymbolMap`.
 pub trait SymbolMapEntry {
     /// The symbol address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64;
 }
 
@@ -326,12 +333,14 @@ impl<T: SymbolMapEntry> SymbolMap<T> {
     /// Construct a new symbol map.
     ///
     /// This function will sort the symbols by address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(mut symbols: Vec<T>) -> Self {
         symbols.sort_unstable_by_key(|s| s.address());
         SymbolMap { symbols }
     }
 
     /// Get the symbol before the given address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get(&self, address: u64) -> Option<&T> {
         let index = match self
             .symbols
@@ -362,6 +371,7 @@ pub struct SymbolMapName<'data> {
 
 impl<'data> SymbolMapName<'data> {
     /// Construct a `SymbolMapName`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(address: u64, name: &'data str) -> Self {
         SymbolMapName { address, name }
     }
@@ -402,6 +412,7 @@ pub struct ObjectMap<'data> {
 
 impl<'data> ObjectMap<'data> {
     /// Get the entry containing the given address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get(&self, address: u64) -> Option<&ObjectMapEntry<'data>> {
         self.symbols
             .get(address)
@@ -581,7 +592,6 @@ pub enum RelocationTarget {
 
 /// A relocation entry.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Relocation {
     kind: RelocationKind,
@@ -699,6 +709,7 @@ impl CompressedFileRange {
     }
 
     /// Convert to `CompressedData` by reading from the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data<'data, R: ReadRef<'data>>(self, file: R) -> Result<CompressedData<'data>> {
         let data = file
             .read_bytes_at(self.offset, self.compressed_size)
@@ -741,6 +752,7 @@ impl<'data> CompressedData<'data> {
     /// Returns an error for invalid data or unsupported compression.
     /// This includes if the data is compressed but the `compression` feature
     /// for this crate is disabled.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn decompress(self) -> Result<Cow<'data, [u8]>> {
         match self.format {
             CompressionFormat::None => Ok(Cow::Borrowed(self.data)),

@@ -1,10 +1,10 @@
 use core::convert::TryInto;
 use core::fmt::Debug;
 
-use crate::{elf, DebugPod};
 use crate::endian;
 use crate::pod::Pod;
 use crate::read::{ReadError, Result, StringTable};
+use crate::{elf, DebugPod};
 
 /// A trait for generic access to `Dyn32` and `Dyn64`.
 #[allow(missing_docs)]
@@ -12,20 +12,25 @@ pub trait Dyn: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn d_tag(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn d_val(&self, endian: Self::Endian) -> Self::Word;
 
     /// Try to convert the tag to a `u32`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn tag32(&self, endian: Self::Endian) -> Option<u32> {
         self.d_tag(endian).into().try_into().ok()
     }
 
     /// Try to convert the value to a `u32`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn val32(&self, endian: Self::Endian) -> Option<u32> {
         self.d_val(endian).into().try_into().ok()
     }
 
     /// Return true if the value is an offset in the dynamic string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_string(&self, endian: Self::Endian) -> bool {
         if let Some(tag) = self.tag32(endian) {
             match tag {
@@ -45,6 +50,7 @@ pub trait Dyn: DebugPod {
     /// Use the value to get a string in a string table.
     ///
     /// Does not check for an appropriate tag.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn string<'data>(
         &self,
         endian: Self::Endian,
@@ -56,6 +62,7 @@ pub trait Dyn: DebugPod {
     }
 
     /// Return true if the value is an address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_address(&self, endian: Self::Endian) -> bool {
         if let Some(tag) = self.tag32(endian) {
             match tag {

@@ -17,7 +17,6 @@ use crate::read::{
 ///
 /// Also includes the string table used for the symbol names.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolTable<'data, R = &'data [u8]>
 where
@@ -28,6 +27,7 @@ where
 }
 
 impl<'data, R: ReadRef<'data>> Default for SymbolTable<'data, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn default() -> Self {
         Self {
             symbols: &[],
@@ -38,6 +38,7 @@ impl<'data, R: ReadRef<'data>> Default for SymbolTable<'data, R> {
 
 impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
     /// Read the symbol table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(header: &pe::ImageFileHeader, data: R) -> Result<Self> {
         // The symbol table may not be present.
         let mut offset = header.pointer_to_symbol_table.get(LE).into();
@@ -125,6 +126,7 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
     /// Return the auxiliary file name for the symbol table entry at the given index.
     ///
     /// Note that the index is of the symbol, not the first auxiliary record.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn aux_file_name(&self, index: usize, aux_count: u8) -> Result<&'data [u8]> {
         let entries = index
             .checked_add(1)
@@ -140,6 +142,7 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
     }
 
     /// Return the symbol table entry or auxiliary record at the given index and offset.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get<T: Pod>(&self, index: usize, offset: usize) -> Result<&'data T> {
         let bytes = index
             .checked_add(offset)
@@ -151,6 +154,7 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
     }
 
     /// Construct a map from addresses to a user-defined map entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn map<Entry: SymbolMapEntry, F: Fn(&'data pe::ImageSymbol) -> Option<Entry>>(
         &self,
         f: F,
@@ -172,7 +176,6 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
 ///
 /// Yields the index and symbol structure for each symbol.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolIterator<'data, 'table, R = &'data [u8]>
 where
@@ -185,6 +188,7 @@ where
 impl<'data, 'table, R: ReadRef<'data>> Iterator for SymbolIterator<'data, 'table, R> {
     type Item = (usize, &'data pe::ImageSymbol);
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         let index = self.index;
         let symbol = self.symbols.symbol(index).ok()?;
@@ -197,6 +201,7 @@ impl pe::ImageSymbol {
     /// Parse a COFF symbol name.
     ///
     /// `strings` must be the string table used for symbol names.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name<'data, R: ReadRef<'data>>(
         &'data self,
         strings: StringTable<'data, R>,
@@ -219,6 +224,7 @@ impl pe::ImageSymbol {
     /// Return the symbol address.
     ///
     /// This takes into account the image base and the section address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn address(&self, image_base: u64, sections: &SectionTable) -> Result<u64> {
         let section_number = self.section_number.get(LE) as usize;
         let section = sections.section(section_number)?;
@@ -228,6 +234,7 @@ impl pe::ImageSymbol {
     }
 
     /// Return true if the symbol is a definition of a function or data object.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_definition(&self) -> bool {
         let section_number = self.section_number.get(LE);
         if section_number == pe::IMAGE_SYM_UNDEFINED {
@@ -244,16 +251,19 @@ impl pe::ImageSymbol {
     }
 
     /// Return true if the symbol has an auxiliary file name.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn has_aux_file_name(&self) -> bool {
         self.number_of_aux_symbols > 0 && self.storage_class == pe::IMAGE_SYM_CLASS_FILE
     }
 
     /// Return true if the symbol has an auxiliary function symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn has_aux_function(&self) -> bool {
         self.number_of_aux_symbols > 0 && self.derived_type() == pe::IMAGE_SYM_DTYPE_FUNCTION
     }
 
     /// Return true if the symbol has an auxiliary section symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn has_aux_section(&self) -> bool {
         self.number_of_aux_symbols > 0
             && self.storage_class == pe::IMAGE_SYM_CLASS_STATIC
@@ -280,6 +290,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbolTable<'data>
     type Symbol = CoffSymbol<'data, 'file, R>;
     type SymbolIterator = CoffSymbolIterator<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&self) -> Self::SymbolIterator {
         CoffSymbolIterator {
             file: self.file,
@@ -287,6 +298,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbolTable<'data>
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&self, index: SymbolIndex) -> Result<Self::Symbol> {
         let symbol = self.file.symbols.symbol(index.0)?;
         Ok(CoffSymbol {
@@ -308,6 +320,7 @@ where
 }
 
 impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for CoffSymbolIterator<'data, 'file, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("CoffSymbolIterator").finish()
     }
@@ -316,6 +329,7 @@ impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for CoffSymbolIterator<'data, '
 impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffSymbolIterator<'data, 'file, R> {
     type Item = CoffSymbol<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         let index = self.index;
         let symbol = self.file.symbols.symbol(index).ok()?;
@@ -350,6 +364,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
         self.index
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> read::Result<&'data [u8]> {
         if self.symbol.has_aux_file_name() {
             self.file
@@ -360,6 +375,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> read::Result<&'data str> {
         let name = self.name_bytes()?;
         str::from_utf8(name)
@@ -367,6 +383,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
             .read_error(crate::nosym!("Non UTF-8 COFF symbol name"))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         // Only return an address for storage classes that we know use an address.
         match self.symbol.storage_class {
@@ -386,6 +403,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
             .unwrap_or(0)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         match self.symbol.storage_class {
             pe::IMAGE_SYM_CLASS_STATIC => {
@@ -421,6 +439,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SymbolKind {
         let derived_kind = if self.symbol.derived_type() == pe::IMAGE_SYM_DTYPE_FUNCTION {
             SymbolKind::Text
@@ -443,6 +462,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section(&self) -> SymbolSection {
         match self.symbol.section_number.get(LE) {
             pe::IMAGE_SYM_UNDEFINED => {
@@ -522,6 +542,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for CoffSymbol<'data, 
         !self.is_global()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SymbolFlags<SectionIndex> {
         if self.symbol.has_aux_section() {
             if let Ok(aux) = self.file.symbols.aux_section(self.index.0) {

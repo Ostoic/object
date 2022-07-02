@@ -173,6 +173,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn single() {
         let x = u32::to_be(0x0123_4567);
         let mut x_mut = x;
@@ -213,6 +214,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn slice() {
         let x = [
             u16::to_be(0x0123),

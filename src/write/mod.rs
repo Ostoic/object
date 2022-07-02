@@ -57,7 +57,6 @@ pub type Result<T> = result::Result<T, Error>;
 
 /// A writable object file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Object<'a> {
     format: BinaryFormat,
@@ -702,7 +701,6 @@ pub struct SectionId(usize);
 
 /// A section in an object file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Section<'a> {
     segment: Vec<u8>,
@@ -855,7 +853,6 @@ pub struct SymbolId(usize);
 
 /// A symbol in an object file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Symbol {
     /// The name of the symbol.
@@ -912,7 +909,6 @@ impl Symbol {
 
 /// A relocation in an object file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Relocation {
     /// The section offset of the place of the relocation.
@@ -941,7 +937,6 @@ pub struct ComdatId(usize);
 
 /// A COMDAT section group.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Comdat {
     /// The COMDAT selection kind.

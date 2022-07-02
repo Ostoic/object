@@ -4,7 +4,6 @@ use core::fmt::Debug;
 use core::slice;
 use core::str;
 
-use crate::{elf, DebugPod};
 use crate::endian::{self, Endianness};
 use crate::pod::Pod;
 use crate::read::util::StringTable;
@@ -12,6 +11,7 @@ use crate::read::{
     self, ObjectSymbol, ObjectSymbolTable, ReadError, ReadRef, SectionIndex, SymbolFlags,
     SymbolIndex, SymbolKind, SymbolMap, SymbolMapEntry, SymbolScope, SymbolSection,
 };
+use crate::{elf, DebugPod};
 
 use super::{FileHeader, SectionHeader, SectionTable};
 
@@ -34,6 +34,7 @@ where
 }
 
 impl<'data, Elf: FileHeader, R: ReadRef<'data>> Default for SymbolTable<'data, Elf, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn default() -> Self {
         SymbolTable {
             section: SectionIndex(0),
@@ -48,6 +49,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> Default for SymbolTable<'data, E
 
 impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
     /// Parse the given symbol table section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(
         endian: Elf::Endian,
         data: R,
@@ -147,6 +149,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
     }
 
     /// Return the symbol at the given index.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol(&self, index: usize) -> read::Result<&'data Elf::Sym> {
         self.symbols
             .get(index)
@@ -163,6 +166,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
     /// Return the section index for the given symbol.
     ///
     /// This uses the extended section index if present.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol_section(
         &self,
         endian: Elf::Endian,
@@ -181,6 +185,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
     }
 
     /// Return the symbol name for the given symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol_name(
         &self,
         endian: Elf::Endian,
@@ -190,6 +195,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
     }
 
     /// Construct a map from addresses to a user-defined map entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn map<Entry: SymbolMapEntry, F: Fn(&'data Elf::Sym) -> Option<Entry>>(
         &self,
         endian: Elf::Endian,
@@ -240,6 +246,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbolTable<'data>
     type Symbol = ElfSymbol<'data, 'file, Elf, R>;
     type SymbolIterator = ElfSymbolIterator<'data, 'file, Elf, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&self) -> Self::SymbolIterator {
         ElfSymbolIterator {
             endian: self.endian,
@@ -248,6 +255,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbolTable<'data>
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&self, index: SymbolIndex) -> read::Result<Self::Symbol> {
         let symbol = self.symbols.symbol(index.0)?;
         Ok(ElfSymbol {
@@ -282,6 +290,7 @@ where
 impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> fmt::Debug
     for ElfSymbolIterator<'data, 'file, Elf, R>
 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ElfSymbolIterator").finish()
     }
@@ -292,6 +301,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> Iterator
 {
     type Item = ElfSymbol<'data, 'file, Elf, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         let index = self.index;
         let symbol = self.symbols.symbols.get(index)?;
@@ -342,10 +352,12 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
         self.index
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> read::Result<&'data [u8]> {
         self.symbol.name(self.endian, self.symbols.strings())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> read::Result<&'data str> {
         let name = self.name_bytes()?;
         str::from_utf8(name)
@@ -365,6 +377,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
         self.symbol.st_size(self.endian).into()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SymbolKind {
         match self.symbol.st_type() {
             elf::STT_NOTYPE if self.index.0 == 0 => SymbolKind::Null,
@@ -377,6 +390,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section(&self) -> SymbolSection {
         match self.symbol.st_shndx(self.endian) {
             elf::SHN_UNDEF => SymbolSection::Undefined,
@@ -423,6 +437,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
         self.symbol.st_bind() == elf::STB_WEAK
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn scope(&self) -> SymbolScope {
         if self.symbol.st_shndx(self.endian) == elf::SHN_UNDEF {
             SymbolScope::Unknown
@@ -469,17 +484,27 @@ pub trait Sym: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_name(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_info(&self) -> u8;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_bind(&self) -> u8;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_type(&self) -> u8;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_other(&self) -> u8;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_visibility(&self) -> u8;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_shndx(&self, endian: Self::Endian) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_value(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn st_size(&self, endian: Self::Endian) -> Self::Word;
 
     /// Parse the symbol name from the string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -498,6 +523,7 @@ pub trait Sym: DebugPod {
     }
 
     /// Return true if the symbol is a definition of a function or data object.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_definition(&self, endian: Self::Endian) -> bool {
         let st_type = self.st_type();
         (st_type == elf::STT_NOTYPE || st_type == elf::STT_FUNC || st_type == elf::STT_OBJECT)

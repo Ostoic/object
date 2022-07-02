@@ -170,7 +170,6 @@ macro_rules! next_inner {
 ///
 /// Most functionality is provided by the `Object` trait implementation.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct File<'data, R: ReadRef<'data> = &'data [u8]> {
     inner: FileInternal<'data, R>,
@@ -199,6 +198,7 @@ enum FileInternal<'data, R: ReadRef<'data>> {
 
 impl<'data, R: ReadRef<'data>> File<'data, R> {
     /// Parse the raw file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(data: R) -> Result<Self> {
         let inner = match FileKind::parse(data)? {
             #[cfg(feature = "elf")]
@@ -225,6 +225,7 @@ impl<'data, R: ReadRef<'data>> File<'data, R> {
 
     /// Parse a Mach-O image from the dyld shared cache.
     #[cfg(feature = "macho")]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse_dyld_cache_image<'cache, E: Endian>(
         image: &macho::DyldCacheImage<'data, 'cache, E, R>,
     ) -> Result<Self> {
@@ -241,6 +242,7 @@ impl<'data, R: ReadRef<'data>> File<'data, R> {
     }
 
     /// Return the file format.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn format(&self) -> BinaryFormat {
         match self.inner {
             #[cfg(feature = "coff")]
@@ -275,22 +277,27 @@ where
     type SymbolTable = SymbolTable<'data, 'file, R>;
     type DynamicRelocationIterator = DynamicRelocationIterator<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn architecture(&self) -> Architecture {
         with_inner!(self.inner, FileInternal, |x| x.architecture())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_little_endian(&self) -> bool {
         with_inner!(self.inner, FileInternal, |x| x.is_little_endian())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_64(&self) -> bool {
         with_inner!(self.inner, FileInternal, |x| x.is_64())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ObjectKind {
         with_inner!(self.inner, FileInternal, |x| x.kind())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segments(&'file self) -> SegmentIterator<'data, 'file, R> {
         SegmentIterator {
             inner: map_inner!(self.inner, FileInternal, SegmentIteratorInternal, |x| x
@@ -298,18 +305,21 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_name_bytes(&'file self, section_name: &[u8]) -> Option<Section<'data, 'file, R>> {
         map_inner_option!(self.inner, FileInternal, SectionInternal, |x| x
             .section_by_name_bytes(section_name))
         .map(|inner| Section { inner })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_index(&'file self, index: SectionIndex) -> Result<Section<'data, 'file, R>> {
         map_inner_option!(self.inner, FileInternal, SectionInternal, |x| x
             .section_by_index(index))
         .map(|inner| Section { inner })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&'file self) -> SectionIterator<'data, 'file, R> {
         SectionIterator {
             inner: map_inner!(self.inner, FileInternal, SectionIteratorInternal, |x| x
@@ -317,6 +327,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn comdats(&'file self) -> ComdatIterator<'data, 'file, R> {
         ComdatIterator {
             inner: map_inner!(self.inner, FileInternal, ComdatIteratorInternal, |x| x
@@ -324,6 +335,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&'file self, index: SymbolIndex) -> Result<Symbol<'data, 'file, R>> {
         map_inner_option!(self.inner, FileInternal, SymbolInternal, |x| x
             .symbol_by_index(index)
@@ -331,6 +343,7 @@ where
         .map(|inner| Symbol { inner })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&'file self) -> SymbolIterator<'data, 'file, R> {
         SymbolIterator {
             inner: map_inner!(self.inner, FileInternal, SymbolIteratorInternal, |x| (
@@ -340,6 +353,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_table(&'file self) -> Option<SymbolTable<'data, 'file, R>> {
         map_inner_option!(self.inner, FileInternal, SymbolTableInternal, |x| x
             .symbol_table()
@@ -347,6 +361,7 @@ where
         .map(|inner| SymbolTable { inner })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbols(&'file self) -> SymbolIterator<'data, 'file, R> {
         SymbolIterator {
             inner: map_inner!(self.inner, FileInternal, SymbolIteratorInternal, |x| (
@@ -356,6 +371,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbol_table(&'file self) -> Option<SymbolTable<'data, 'file, R>> {
         map_inner_option!(self.inner, FileInternal, SymbolTableInternal, |x| x
             .dynamic_symbol_table()
@@ -364,6 +380,7 @@ where
     }
 
     #[cfg(feature = "elf")]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_relocations(&'file self) -> Option<DynamicRelocationIterator<'data, 'file, R>> {
         let inner = match self.inner {
             FileInternal::Elf32(ref elf) => {
@@ -379,26 +396,32 @@ where
     }
 
     #[cfg(not(feature = "elf"))]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_relocations(&'file self) -> Option<DynamicRelocationIterator<'data, 'file, R>> {
         None
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_map(&self) -> SymbolMap<SymbolMapName<'data>> {
         with_inner!(self.inner, FileInternal, |x| x.symbol_map())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn object_map(&self) -> ObjectMap<'data> {
         with_inner!(self.inner, FileInternal, |x| x.object_map())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn imports(&self) -> Result<Vec<Import<'data>>> {
         with_inner!(self.inner, FileInternal, |x| x.imports())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn exports(&self) -> Result<Vec<Export<'data>>> {
         with_inner!(self.inner, FileInternal, |x| x.exports())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn has_debug_symbols(&self) -> bool {
         with_inner!(self.inner, FileInternal, |x| x.has_debug_symbols())
     }
@@ -433,14 +456,17 @@ where
         with_inner!(self.inner, FileInternal, |x| x.pdb_info())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relative_address_base(&self) -> u64 {
         with_inner!(self.inner, FileInternal, |x| x.relative_address_base())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn entry(&self) -> u64 {
         with_inner!(self.inner, FileInternal, |x| x.entry())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> FileFlags {
         with_inner!(self.inner, FileInternal, |x| x.flags())
     }
@@ -448,7 +474,6 @@ where
 
 /// An iterator over the segments of a `File`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SegmentIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
@@ -484,6 +509,7 @@ where
 impl<'data, 'file, R: ReadRef<'data>> Iterator for SegmentIterator<'data, 'file, R> {
     type Item = Segment<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         next_inner!(self.inner, SegmentIteratorInternal, SegmentInternal)
             .map(|inner| Segment { inner })
@@ -524,6 +550,7 @@ where
 }
 
 impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for Segment<'data, 'file, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // It's painful to do much better than this
         let mut s = f.debug_struct("Segment");
@@ -545,38 +572,47 @@ impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for Segment<'data, 'file, R> {
 impl<'data, 'file, R: ReadRef<'data>> read::private::Sealed for Segment<'data, 'file, R> {}
 
 impl<'data, 'file, R: ReadRef<'data>> ObjectSegment<'data> for Segment<'data, 'file, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         with_inner!(self.inner, SegmentInternal, |x| x.address())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         with_inner!(self.inner, SegmentInternal, |x| x.size())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
         with_inner!(self.inner, SegmentInternal, |x| x.align())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> (u64, u64) {
         with_inner!(self.inner, SegmentInternal, |x| x.file_range())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]> {
         with_inner!(self.inner, SegmentInternal, |x| x.data())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> Result<Option<&'data [u8]>> {
         with_inner!(self.inner, SegmentInternal, |x| x.data_range(address, size))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<Option<&[u8]>> {
         with_inner!(self.inner, SegmentInternal, |x| x.name_bytes())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<Option<&str>> {
         with_inner!(self.inner, SegmentInternal, |x| x.name())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SegmentFlags {
         with_inner!(self.inner, SegmentInternal, |x| x.flags())
     }
@@ -584,7 +620,6 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSegment<'data> for Segment<'data, 'f
 
 /// An iterator of the sections of a `File`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
@@ -621,6 +656,7 @@ where
 impl<'data, 'file, R: ReadRef<'data>> Iterator for SectionIterator<'data, 'file, R> {
     type Item = Section<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         next_inner!(self.inner, SectionIteratorInternal, SectionInternal)
             .map(|inner| Section { inner })
@@ -660,6 +696,7 @@ where
 
 #[cfg(not(feature = "nosym"))]
 impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for Section<'data, 'file, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // It's painful to do much better than this
         let mut s = f.debug_struct("Section");
@@ -687,62 +724,77 @@ impl<'data, 'file, R: ReadRef<'data>> read::private::Sealed for Section<'data, '
 impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for Section<'data, 'file, R> {
     type RelocationIterator = SectionRelocationIterator<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SectionIndex {
         with_inner!(self.inner, SectionInternal, |x| x.index())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         with_inner!(self.inner, SectionInternal, |x| x.address())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         with_inner!(self.inner, SectionInternal, |x| x.size())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
         with_inner!(self.inner, SectionInternal, |x| x.align())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> Option<(u64, u64)> {
         with_inner!(self.inner, SectionInternal, |x| x.file_range())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]> {
         with_inner!(self.inner, SectionInternal, |x| x.data())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> Result<Option<&'data [u8]>> {
         with_inner!(self.inner, SectionInternal, |x| x.data_range(address, size))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_file_range(&self) -> Result<CompressedFileRange> {
         with_inner!(self.inner, SectionInternal, |x| x.compressed_file_range())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_data(&self) -> Result<CompressedData<'data>> {
         with_inner!(self.inner, SectionInternal, |x| x.compressed_data())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&[u8]> {
         with_inner!(self.inner, SectionInternal, |x| x.name_bytes())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&str> {
         with_inner!(self.inner, SectionInternal, |x| x.name())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name_bytes(&self) -> Result<Option<&[u8]>> {
         with_inner!(self.inner, SectionInternal, |x| x.segment_name_bytes())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name(&self) -> Result<Option<&str>> {
         with_inner!(self.inner, SectionInternal, |x| x.segment_name())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SectionKind {
         with_inner!(self.inner, SectionInternal, |x| x.kind())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relocations(&self) -> SectionRelocationIterator<'data, 'file, R> {
         SectionRelocationIterator {
             inner: map_inner!(
@@ -754,6 +806,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for Section<'data, 'f
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SectionFlags {
         with_inner!(self.inner, SectionInternal, |x| x.flags())
     }
@@ -761,7 +814,6 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for Section<'data, 'f
 
 /// An iterator of the COMDAT section groups of a `File`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ComdatIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
@@ -797,6 +849,7 @@ where
 impl<'data, 'file, R: ReadRef<'data>> Iterator for ComdatIterator<'data, 'file, R> {
     type Item = Comdat<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         next_inner!(self.inner, ComdatIteratorInternal, ComdatInternal)
             .map(|inner| Comdat { inner })
@@ -836,6 +889,7 @@ where
 
 #[cfg(not(feature = "nosym"))]
 impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for Comdat<'data, 'file, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut s = f.debug_struct("Comdat");
         s.field("symbol", &self.symbol())
@@ -850,22 +904,27 @@ impl<'data, 'file, R: ReadRef<'data>> read::private::Sealed for Comdat<'data, 'f
 impl<'data, 'file, R: ReadRef<'data>> ObjectComdat<'data> for Comdat<'data, 'file, R> {
     type SectionIterator = ComdatSectionIterator<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ComdatKind {
         with_inner!(self.inner, ComdatInternal, |x| x.kind())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol(&self) -> SymbolIndex {
         with_inner!(self.inner, ComdatInternal, |x| x.symbol())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&[u8]> {
         with_inner!(self.inner, ComdatInternal, |x| x.name_bytes())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&str> {
         with_inner!(self.inner, ComdatInternal, |x| x.name())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&self) -> ComdatSectionIterator<'data, 'file, R> {
         ComdatSectionIterator {
             inner: map_inner!(
@@ -880,7 +939,6 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectComdat<'data> for Comdat<'data, 'fil
 
 /// An iterator over COMDAT section entries.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ComdatSectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
@@ -916,6 +974,7 @@ where
 impl<'data, 'file, R: ReadRef<'data>> Iterator for ComdatSectionIterator<'data, 'file, R> {
     type Item = SectionIndex;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         with_inner_mut!(self.inner, ComdatSectionIteratorInternal, |x| x.next())
     }
@@ -923,7 +982,6 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for ComdatSectionIterator<'data, 
 
 /// A symbol table.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolTable<'data, 'file, R = &'data [u8]>
 where
@@ -984,6 +1042,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbolTable<'data> for SymbolTable<'
     type Symbol = Symbol<'data, 'file, R>;
     type SymbolIterator = SymbolIterator<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&self) -> Self::SymbolIterator {
         SymbolIterator {
             inner: map_inner!(
@@ -995,6 +1054,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbolTable<'data> for SymbolTable<'
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&self, index: SymbolIndex) -> Result<Self::Symbol> {
         map_inner_option!(self.inner, SymbolTableInternal, SymbolInternal, |x| x
             .0
@@ -1006,7 +1066,6 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbolTable<'data> for SymbolTable<'
 
 /// An iterator over symbol table entries.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SymbolIterator<'data, 'file, R = &'data [u8]>
 where
@@ -1064,6 +1123,7 @@ where
 impl<'data, 'file, R: ReadRef<'data>> Iterator for SymbolIterator<'data, 'file, R> {
     type Item = Symbol<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         map_inner_option_mut!(self.inner, SymbolIteratorInternal, SymbolInternal, |iter| {
             iter.0.next().map(|x| (x, PhantomData))
@@ -1127,6 +1187,7 @@ where
 
 #[cfg(not(feature = "nosym"))]
 impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for Symbol<'data, 'file, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Symbol")
             .field("name", &self.name().unwrap_or("<invalid>"))
@@ -1144,62 +1205,77 @@ impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for Symbol<'data, 'file, R> {
 impl<'data, 'file, R: ReadRef<'data>> read::private::Sealed for Symbol<'data, 'file, R> {}
 
 impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for Symbol<'data, 'file, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SymbolIndex {
         with_inner!(self.inner, SymbolInternal, |x| x.0.index())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&'data [u8]> {
         with_inner!(self.inner, SymbolInternal, |x| x.0.name_bytes())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&'data str> {
         with_inner!(self.inner, SymbolInternal, |x| x.0.name())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64 {
         with_inner!(self.inner, SymbolInternal, |x| x.0.address())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64 {
         with_inner!(self.inner, SymbolInternal, |x| x.0.size())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SymbolKind {
         with_inner!(self.inner, SymbolInternal, |x| x.0.kind())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section(&self) -> SymbolSection {
         with_inner!(self.inner, SymbolInternal, |x| x.0.section())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_undefined(&self) -> bool {
         with_inner!(self.inner, SymbolInternal, |x| x.0.is_undefined())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_definition(&self) -> bool {
         with_inner!(self.inner, SymbolInternal, |x| x.0.is_definition())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_common(&self) -> bool {
         with_inner!(self.inner, SymbolInternal, |x| x.0.is_common())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_weak(&self) -> bool {
         with_inner!(self.inner, SymbolInternal, |x| x.0.is_weak())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn scope(&self) -> SymbolScope {
         with_inner!(self.inner, SymbolInternal, |x| x.0.scope())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_global(&self) -> bool {
         with_inner!(self.inner, SymbolInternal, |x| x.0.is_global())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_local(&self) -> bool {
         with_inner!(self.inner, SymbolInternal, |x| x.0.is_local())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SymbolFlags<SectionIndex> {
         with_inner!(self.inner, SymbolInternal, |x| x.0.flags())
     }
@@ -1207,7 +1283,6 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for Symbol<'data, 'fil
 
 /// An iterator over dynamic relocation entries.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DynamicRelocationIterator<'data, 'file, R = &'data [u8]>
 where
@@ -1236,6 +1311,7 @@ where
 impl<'data, 'file, R: ReadRef<'data>> Iterator for DynamicRelocationIterator<'data, 'file, R> {
     type Item = (u64, Relocation);
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         match self.inner {
             #[cfg(feature = "elf")]
@@ -1249,7 +1325,6 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for DynamicRelocationIterator<'da
 
 /// An iterator over section relocation entries.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SectionRelocationIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
@@ -1285,6 +1360,7 @@ where
 impl<'data, 'file, R: ReadRef<'data>> Iterator for SectionRelocationIterator<'data, 'file, R> {
     type Item = (u64, Relocation);
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         with_inner_mut!(self.inner, SectionRelocationIteratorInternal, |x| x.next())
     }

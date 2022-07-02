@@ -101,7 +101,6 @@ impl<'a> Object<'a> {
 
     #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn elf_fixup_relocation(&mut self, mut relocation: &mut Relocation) -> Result<i64> {
-        // Return true if we should use a section symbol to avoid preemption.
         fn want_section_symbol(relocation: &Relocation, symbol: &Symbol) -> bool {
             if symbol.scope != SymbolScope::Dynamic {
                 // Only dynamic symbols can be preemptible.
@@ -155,7 +154,7 @@ impl<'a> Object<'a> {
         }
     }
 
-    #[cfg_attr(feature = "aggressive-inline", inline(always))]
+    #[cfg_attr(feature = "aggressive-inline", inline)]
     pub(crate) fn elf_write(&self, buffer: &mut dyn WritableBuffer) -> Result<()> {
         // Create reloc section header names so we can reference them.
         let is_rela = self.elf_has_relocation_addend()?;

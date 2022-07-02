@@ -3,6 +3,7 @@ use object::read::macho::{DyldCache, FatArch, FatHeader};
 use object::{Endianness, Object, ObjectComdat, ObjectSection, ObjectSymbol};
 use std::io::{Result, Write};
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn print<W: Write, E: Write>(
     w: &mut W,
     e: &mut E,

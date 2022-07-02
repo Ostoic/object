@@ -3,6 +3,7 @@ use object::elf::*;
 use object::read::elf::*;
 use object::read::{SectionIndex, StringTable};
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_elf32(p: &mut Printer<'_>, data: &[u8]) {
     if let Some(elf) = FileHeader32::<Endianness>::parse(data).print_err(p) {
         writeln!(p.w(), "Format: ELF 32-bit").unwrap();
@@ -10,6 +11,7 @@ pub(super) fn print_elf32(p: &mut Printer<'_>, data: &[u8]) {
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_elf64(p: &mut Printer<'_>, data: &[u8]) {
     if let Some(elf) = FileHeader64::<Endianness>::parse(data).print_err(p) {
         writeln!(p.w(), "Format: ELF 64-bit").unwrap();

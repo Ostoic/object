@@ -942,6 +942,7 @@ impl<'a> Writer<'a> {
     /// This function does nothing if extended section indices are not needed.
     #[cfg_attr(feature = "aggressive-inline", inline(always))]
     /// This must be called after [`Self::reserve_symbol_index`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_symtab_shndx(&mut self) {
         debug_assert_eq!(self.symtab_shndx_offset, 0);
         if !self.need_symtab_shndx {

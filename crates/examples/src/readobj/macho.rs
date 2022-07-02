@@ -3,6 +3,7 @@ use object::macho::*;
 use object::read::macho::*;
 use object::BigEndian;
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_dyld_cache(p: &mut Printer<'_>, data: &[u8]) {
     if let Some(header) = DyldCacheHeader::<Endianness>::parse(data).print_err(p) {
         if let Some((_, endian)) = header.parse_magic().print_err(p) {
@@ -18,6 +19,7 @@ pub(super) fn print_dyld_cache(p: &mut Printer<'_>, data: &[u8]) {
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_dyld_cache_header(
     p: &mut Printer<'_>,
     endian: Endianness,
@@ -33,6 +35,7 @@ pub(super) fn print_dyld_cache_header(
     });
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_dyld_cache_mappings(
     p: &mut Printer<'_>,
     endian: Endianness,
@@ -51,6 +54,7 @@ pub(super) fn print_dyld_cache_mappings(
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_dyld_cache_images(
     p: &mut Printer<'_>,
     endian: Endianness,
@@ -80,6 +84,7 @@ pub(super) fn print_dyld_cache_images(
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_macho_fat32(p: &mut Printer<'_>, data: &[u8]) {
     if let Some(arches) = FatHeader::parse_arch32(data).print_err(p) {
         writeln!(p.w(), "Format: Mach-O Fat 32-bit").unwrap();
@@ -96,6 +101,7 @@ pub(super) fn print_macho_fat32(p: &mut Printer<'_>, data: &[u8]) {
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_macho_fat64(p: &mut Printer<'_>, data: &[u8]) {
     if let Some(arches) = FatHeader::parse_arch64(data).print_err(p) {
         writeln!(p.w(), "Format: Mach-O Fat 64-bit").unwrap();
@@ -112,6 +118,7 @@ pub(super) fn print_macho_fat64(p: &mut Printer<'_>, data: &[u8]) {
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_fat_header(p: &mut Printer<'_>, data: &[u8]) {
     if let Some(header) = FatHeader::parse(data).print_err(p) {
         p.group("FatHeader", |p| {
@@ -121,6 +128,7 @@ pub(super) fn print_fat_header(p: &mut Printer<'_>, data: &[u8]) {
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_fat_arch<Arch: FatArch>(p: &mut Printer<'_>, arch: &Arch) {
     p.group("FatArch", |p| {
         print_cputype(p, arch.cputype(), arch.cpusubtype());
@@ -130,6 +138,7 @@ pub(super) fn print_fat_arch<Arch: FatArch>(p: &mut Printer<'_>, arch: &Arch) {
     });
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_macho32(p: &mut Printer<'_>, data: &[u8], offset: u64) {
     if let Some(header) = MachHeader32::parse(data, offset).print_err(p) {
         writeln!(p.w(), "Format: Mach-O 32-bit").unwrap();
@@ -137,6 +146,7 @@ pub(super) fn print_macho32(p: &mut Printer<'_>, data: &[u8], offset: u64) {
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_macho64(p: &mut Printer<'_>, data: &[u8], offset: u64) {
     if let Some(header) = MachHeader64::parse(data, offset).print_err(p) {
         writeln!(p.w(), "Format: Mach-O 64-bit").unwrap();

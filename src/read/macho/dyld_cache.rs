@@ -6,7 +6,6 @@ use crate::{macho, Architecture, Endian, Endianness};
 
 /// A parsed representation of the dyld shared cache.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DyldCache<'data, E = Endianness, R = &'data [u8]>
 where
@@ -23,7 +22,6 @@ where
 
 /// Information about a subcache.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DyldSubCache<'data, E = Endianness, R = &'data [u8]>
 where
@@ -47,6 +45,7 @@ where
     /// supplied as well, in the correct order, with the .symbols subcache last (if present).
     /// For example, data would be the data for dyld_shared_cache_x86_64,
     /// and subcache_data would be the data for [dyld_shared_cache_x86_64.1, dyld_shared_cache_x86_64.2, ...]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(data: R, subcache_data: &[R]) -> Result<Self> {
         let header = macho::DyldCacheHeader::parse(data)?;
         let (arch, endian) = header.parse_magic()?;
@@ -105,6 +104,7 @@ where
     }
 
     /// Get the architecture type of the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn architecture(&self) -> Architecture {
         self.arch
     }
@@ -121,11 +121,13 @@ where
     }
 
     /// Return true if the file is little endian, false if it is big endian.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_little_endian(&self) -> bool {
         self.endian.is_little_endian()
     }
 
     /// Iterate over the images in this cache.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn images<'cache>(&'cache self) -> DyldCacheImageIterator<'data, 'cache, E, R> {
         DyldCacheImageIterator {
             cache: self,
@@ -135,6 +137,7 @@ where
 
     /// Find the address in a mapping and return the cache or subcache data it was found in,
     /// together with the translated file offset.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data_and_offset_for_address(&self, address: u64) -> Option<(R, u64)> {
         if let Some(file_offset) = address_to_file_offset(address, self.endian, self.mappings) {
             return Some((self.data, file_offset));
@@ -152,7 +155,6 @@ where
 
 /// An iterator over all the images (dylibs) in the dyld shared cache.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DyldCacheImageIterator<'data, 'cache, E = Endianness, R = &'data [u8]>
 where
@@ -170,6 +172,7 @@ where
 {
     type Item = DyldCacheImage<'data, 'cache, E, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<DyldCacheImage<'data, 'cache, E, R>> {
         let image_info = self.iter.next()?;
         Some(DyldCacheImage {
@@ -181,7 +184,6 @@ where
 
 /// One image (dylib) from inside the dyld shared cache.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DyldCacheImage<'data, 'cache, E = Endianness, R = &'data [u8]>
 where
@@ -198,6 +200,7 @@ where
     R: ReadRef<'data>,
 {
     /// The file system path of this image.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn path(&self) -> Result<&'data str> {
         let path = self.image_info.path(self.cache.endian, self.cache.data)?;
         // The path should always be ascii, so from_utf8 should alway succeed.
@@ -207,6 +210,7 @@ where
 
     /// The subcache data which contains the Mach-O header for this image,
     /// together with the file offset at which this image starts.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn image_data_and_offset(&self) -> Result<(R, u64)> {
         let address = self.image_info.address.get(self.cache.endian);
         self.cache
@@ -215,6 +219,7 @@ where
     }
 
     /// Parse this image into an Object.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse_object(&self) -> Result<File<'data, R>> {
         File::parse_dyld_cache_image(self)
     }
@@ -222,12 +227,14 @@ where
 
 impl<E: Endian> macho::DyldCacheHeader<E> {
     /// Read the dyld cache header.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse<'data, R: ReadRef<'data>>(data: R) -> Result<&'data Self> {
         data.read_at::<macho::DyldCacheHeader<E>>(0)
             .read_error(crate::nosym!("Invalid dyld cache header size or alignment"))
     }
 
     /// Returns (arch, endian) based on the magic string.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse_magic(&self) -> Result<(Architecture, E)> {
         let (arch, is_big_endian) = match &self.magic {
             b"dyld_v1    i386\0" => (Architecture::I386, false),
@@ -243,12 +250,13 @@ impl<E: Endian> macho::DyldCacheHeader<E> {
             b"dyld_v1  arm64e\0" => (Architecture::Aarch64, false),
             _ => return Err(Error(crate::nosym!("Unrecognized dyld cache magic"))),
         };
-        let endian =
-            E::from_big_endian(is_big_endian).read_error(crate::nosym!("Unsupported dyld cache endian"))?;
+        let endian = E::from_big_endian(is_big_endian)
+            .read_error(crate::nosym!("Unsupported dyld cache endian"))?;
         Ok((arch, endian))
     }
 
     /// Return the mapping information table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn mappings<'data, R: ReadRef<'data>>(
         &self,
         endian: E,
@@ -258,10 +266,13 @@ impl<E: Endian> macho::DyldCacheHeader<E> {
             self.mapping_offset.get(endian).into(),
             self.mapping_count.get(endian) as usize,
         )
-        .read_error(crate::nosym!("Invalid dyld cache mapping size or alignment"))
+        .read_error(crate::nosym!(
+            "Invalid dyld cache mapping size or alignment"
+        ))
     }
 
     /// Return the information about subcaches, if present.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn subcaches<'data, R: ReadRef<'data>>(
         &self,
         endian: E,
@@ -281,6 +292,7 @@ impl<E: Endian> macho::DyldCacheHeader<E> {
     }
 
     /// Return the UUID for the .symbols subcache, if present.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbols_subcache_uuid(&self, endian: E) -> Option<[u8; 16]> {
         if self.mapping_offset.get(endian) >= MIN_HEADER_SIZE_SUBCACHES {
             let uuid = self.symbols_subcache_uuid;
@@ -292,6 +304,7 @@ impl<E: Endian> macho::DyldCacheHeader<E> {
     }
 
     /// Return the image information table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn images<'data, R: ReadRef<'data>>(
         &self,
         endian: E,
@@ -315,14 +328,18 @@ impl<E: Endian> macho::DyldCacheHeader<E> {
 
 impl<E: Endian> macho::DyldCacheImageInfo<E> {
     /// The file system path of this image.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn path<'data, R: ReadRef<'data>>(&self, endian: E, data: R) -> Result<&'data [u8]> {
         let r_start = self.path_file_offset.get(endian).into();
-        let r_end = data.len().read_error(crate::nosym!("Couldn't get data len()"))?;
+        let r_end = data
+            .len()
+            .read_error(crate::nosym!("Couldn't get data len()"))?;
         data.read_bytes_at_until(r_start..r_end, 0)
             .read_error(crate::nosym!("Couldn't read dyld cache image path"))
     }
 
     /// Find the file offset of the image by looking up its address in the mappings.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn file_offset(
         &self,
         endian: E,

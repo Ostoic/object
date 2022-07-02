@@ -8,7 +8,6 @@ use super::{FileHeader, Sym, SymbolTable, Version, VersionTable};
 
 /// A SysV symbol hash table in an ELF file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct HashTable<'data, Elf: FileHeader> {
     buckets: &'data [U32<Elf::Endian>],
@@ -22,6 +21,7 @@ impl<'data, Elf: FileHeader> HashTable<'data, Elf> {
     /// segment pointed to via the `DT_HASH` entry.
     ///
     /// The header is read at offset 0 in the given `data`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(endian: Elf::Endian, data: &'data [u8]) -> Result<Self> {
         let mut offset = 0;
         let header = data
@@ -37,11 +37,13 @@ impl<'data, Elf: FileHeader> HashTable<'data, Elf> {
     }
 
     /// Return the symbol table length.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol_table_length(&self) -> u32 {
         self.chains.len() as u32
     }
 
     /// Use the hash table to find the symbol table entry with the given name, hash and version.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn find<R: ReadRef<'data>>(
         &self,
         endian: Elf::Endian,
@@ -73,7 +75,6 @@ impl<'data, Elf: FileHeader> HashTable<'data, Elf> {
 
 /// A GNU symbol hash table in an ELF file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct GnuHashTable<'data, Elf: FileHeader> {
     symbol_base: u32,
@@ -95,6 +96,7 @@ impl<'data, Elf: FileHeader> GnuHashTable<'data, Elf> {
     /// will be used as the hash table values. It does not matter if this
     /// is longer than needed, and this will often the case when accessing
     /// the hash table via the `DT_GNU_HASH` entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(endian: Elf::Endian, data: &'data [u8]) -> Result<Self> {
         let mut offset = 0;
         let header = data
@@ -122,6 +124,7 @@ impl<'data, Elf: FileHeader> GnuHashTable<'data, Elf> {
     }
 
     /// Return the symbol table index of the first symbol in the hash table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol_base(&self) -> u32 {
         self.symbol_base
     }
@@ -129,6 +132,7 @@ impl<'data, Elf: FileHeader> GnuHashTable<'data, Elf> {
     /// Determine the symbol table length by finding the last entry in the hash table.
     ///
     /// Returns `None` if the hash table is empty or invalid.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol_table_length(&self, endian: Elf::Endian) -> Option<u32> {
         // Ensure we find a non-empty bucket.
         if self.symbol_base == 0 {
@@ -159,6 +163,7 @@ impl<'data, Elf: FileHeader> GnuHashTable<'data, Elf> {
     }
 
     /// Use the hash table to find the symbol table entry with the given name, hash, and version.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn find<R: ReadRef<'data>>(
         &self,
         endian: Elf::Endian,

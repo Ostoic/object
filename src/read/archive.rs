@@ -42,8 +42,11 @@ pub struct ArchiveFile<'data, R: ReadRef<'data> = &'data [u8]> {
 impl<'data, R: ReadRef<'data>> ArchiveFile<'data, R> {
     #[cfg_attr(feature = "aggressive-inline", inline(always))]
     /// Parse the archive header and special members.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(data: R) -> read::Result<Self> {
-        let len = data.len().read_error(crate::nosym!("Unknown archive length"))?;
+        let len = data
+            .len()
+            .read_error(crate::nosym!("Unknown archive length"))?;
         let mut tail = 0;
         let magic = data
             .read_bytes(&mut tail, archive::MAGIC.len() as u64)
@@ -191,7 +194,6 @@ impl<'data, R: ReadRef<'data>> Iterator for ArchiveMemberIterator<'data, R> {
 
 /// A partially parsed archive member.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ArchiveMember<'data> {
     header: &'data archive::Header,
@@ -218,8 +220,8 @@ impl<'data> ArchiveMember<'data> {
         }
 
         let mut file_offset = *offset;
-        let mut file_size =
-            parse_u64_digits(&header.size, 10).read_error(crate::nosym!("Invalid archive member size"))?;
+        let mut file_size = parse_u64_digits(&header.size, 10)
+            .read_error(crate::nosym!("Invalid archive member size"))?;
         *offset = offset
             .checked_add(file_size)
             .read_error(crate::nosym!("Archive member size is too large"))?;
@@ -299,6 +301,7 @@ impl<'data> ArchiveMember<'data> {
     }
 
     /// Return the offset and size of the file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn file_range(&self) -> (u64, u64) {
         (self.offset, self.size)
     }
@@ -367,6 +370,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind() {
         let data = b"!<arch>\n";
         let archive = ArchiveFile::parse(&data[..]).unwrap();
@@ -466,6 +470,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn gnu_names() {
         let data = b"\
             !<arch>\n\
@@ -498,6 +503,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn bsd_names() {
         let data = b"\
             !<arch>\n\

@@ -10,22 +10,27 @@ pub trait WritableBuffer {
     /// Returns position/offset for data to be written at.
     ///
     /// Should only be used in debug assertions
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn len(&self) -> usize;
 
     /// Reserves specified number of bytes in the buffer.
     ///
     /// This will be called exactly once before writing anything to the buffer,
     /// and the given size is the exact total number of bytes that will be written.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn reserve(&mut self, size: usize) -> Result<(), ()>;
 
     /// Writes zero bytes at the end of the buffer until the buffer
     /// has the specified length.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn resize(&mut self, new_len: usize);
 
     /// Writes the specified slice of bytes at the end of the buffer.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_bytes(&mut self, val: &[u8]);
 
     /// Writes the specified `Pod` type at the end of the buffer.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_pod<T: Pod>(&mut self, val: &T)
     where
         Self: Sized,
@@ -34,6 +39,7 @@ pub trait WritableBuffer {
     }
 
     /// Writes the specified `Pod` slice at the end of the buffer.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_pod_slice<T: Pod>(&mut self, val: &[T])
     where
         Self: Sized,
@@ -44,11 +50,13 @@ pub trait WritableBuffer {
 
 impl<'a> dyn WritableBuffer + 'a {
     /// Writes the specified `Pod` type at the end of the buffer.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write<T: Pod>(&mut self, val: &T) {
         self.write_bytes(bytes_of(val))
     }
 
     /// Writes the specified `Pod` slice at the end of the buffer.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write_slice<T: Pod>(&mut self, val: &[T]) {
         self.write_bytes(bytes_of_slice(val))
     }
@@ -92,7 +100,6 @@ impl WritableBuffer for Vec<u8> {
 /// instead of an unbuffered writer like [`File`](std::fs::File).
 #[cfg(feature = "std")]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct StreamingBuffer<W> {
     writer: W,
@@ -103,6 +110,7 @@ pub struct StreamingBuffer<W> {
 #[cfg(feature = "std")]
 impl<W> StreamingBuffer<W> {
     /// Create a new `StreamingBuffer` backed by the given writer.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(writer: W) -> Self {
         StreamingBuffer {
             writer,
@@ -112,11 +120,13 @@ impl<W> StreamingBuffer<W> {
     }
 
     /// Unwraps this [`StreamingBuffer`] giving back the original writer.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn into_inner(self) -> W {
         self.writer
     }
 
     /// Returns any error that occurred during writing.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn result(&mut self) -> Result<(), io::Error> {
         mem::replace(&mut self.result, Ok(()))
     }
@@ -160,6 +170,7 @@ impl<W: io::Write> WritableBuffer for StreamingBuffer<W> {
 ///
 /// It provides convenience methods for `Pod` types.
 pub(crate) trait BytesMut {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_at<T: Pod>(self, offset: usize, val: &T) -> Result<(), ()>;
 }
 
@@ -175,6 +186,7 @@ impl<'a> BytesMut for &'a mut [u8] {
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(crate) fn align(offset: usize, size: usize) -> usize {
     (offset + (size - 1)) & !(size - 1)
 }
@@ -189,6 +201,7 @@ pub(crate) fn align_u64(offset: u64, size: u64) -> u64 {
     (offset + (size - 1)) & !(size - 1)
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(crate) fn write_align(buffer: &mut dyn WritableBuffer, size: usize) {
     let new_len = align(buffer.len(), size);
     buffer.resize(new_len);
@@ -199,6 +212,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn bytes_mut() {
         let data = vec![0x01, 0x23, 0x45, 0x67];
 

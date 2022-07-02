@@ -24,7 +24,6 @@ pub(crate) struct CoffCommon<'data, R: ReadRef<'data>> {
 
 /// A COFF object file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffFile<'data, R: ReadRef<'data> = &'data [u8]> {
     pub(super) header: &'data pe::ImageFileHeader,
@@ -34,6 +33,7 @@ pub struct CoffFile<'data, R: ReadRef<'data> = &'data [u8]> {
 
 impl<'data, R: ReadRef<'data>> CoffFile<'data, R> {
     /// Parse the raw COFF file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(data: R) -> Result<Self> {
         let mut offset = 0;
         let header = pe::ImageFileHeader::parse(data, &mut offset)?;
@@ -70,6 +70,7 @@ where
     type SymbolTable = CoffSymbolTable<'data, 'file, R>;
     type DynamicRelocationIterator = NoDynamicRelocationIterator;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn architecture(&self) -> Architecture {
         match self.header.machine.get(LE) {
             pe::IMAGE_FILE_MACHINE_ARMNT => Architecture::Arm,
@@ -93,10 +94,12 @@ where
         false
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ObjectKind {
         ObjectKind::Relocatable
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segments(&'file self) -> CoffSegmentIterator<'data, 'file, R> {
         CoffSegmentIterator {
             file: self,
@@ -104,6 +107,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_name_bytes(
         &'file self,
         section_name: &[u8],
@@ -112,6 +116,7 @@ where
             .find(|section| section.name_bytes() == Ok(section_name))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_index(&'file self, index: SectionIndex) -> Result<CoffSection<'data, 'file, R>> {
         let section = self.common.sections.section(index.0)?;
         Ok(CoffSection {
@@ -121,6 +126,7 @@ where
         })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&'file self) -> CoffSectionIterator<'data, 'file, R> {
         CoffSectionIterator {
             file: self,
@@ -128,6 +134,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn comdats(&'file self) -> CoffComdatIterator<'data, 'file, R> {
         CoffComdatIterator {
             file: self,
@@ -135,6 +142,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&'file self, index: SymbolIndex) -> Result<CoffSymbol<'data, 'file, R>> {
         let symbol = self.common.symbols.symbol(index.0)?;
         Ok(CoffSymbol {
@@ -144,6 +152,7 @@ where
         })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&'file self) -> CoffSymbolIterator<'data, 'file, R> {
         CoffSymbolIterator {
             file: &self.common,
@@ -157,6 +166,7 @@ where
         Some(CoffSymbolTable { file: &self.common })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbols(&'file self) -> CoffSymbolIterator<'data, 'file, R> {
         CoffSymbolIterator {
             file: &self.common,
@@ -191,10 +201,12 @@ where
         Ok(Vec::new())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn has_debug_symbols(&self) -> bool {
         self.section_by_name(".debug_info").is_some()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relative_address_base(&self) -> u64 {
         0
     }
@@ -205,6 +217,7 @@ where
         0
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> FileFlags {
         FileFlags::Coff {
             characteristics: self.header.characteristics.get(LE),
@@ -218,6 +231,7 @@ impl pe::ImageFileHeader {
     /// `data` must be the entire file data.
     /// `offset` must be the file header offset. It is updated to point after the optional header,
     /// which is where the section headers are located.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse<'data, R: ReadRef<'data>>(data: R, offset: &mut u64) -> read::Result<&'data Self> {
         let header = data
             .read::<pe::ImageFileHeader>(offset)

@@ -25,6 +25,7 @@ struct SymbolOffsets {
 }
 
 impl<'a> Object<'a> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn macho_set_subsections_via_symbols(&mut self) {
         let flags = match self.flags {
             FileFlags::MachO { flags } => flags,
@@ -35,6 +36,7 @@ impl<'a> Object<'a> {
         };
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn macho_segment_name(&self, segment: StandardSegment) -> &'static [u8] {
         match segment {
             StandardSegment::Text => &b"__TEXT"[..],
@@ -43,6 +45,7 @@ impl<'a> Object<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn macho_section_info(
         &self,
         section: StandardSection,
@@ -81,6 +84,7 @@ impl<'a> Object<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn macho_tlv_bootstrap(&mut self) -> SymbolId {
         match self.tlv_bootstrap {
             Some(id) => id,
@@ -109,6 +113,7 @@ impl<'a> Object<'a> {
     /// to point to the initializer.
     ///
     /// If `symbol_id` is not for a TLS variable, then it is returned unchanged.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn macho_add_thread_var(&mut self, symbol_id: SymbolId) -> SymbolId {
         let symbol = self.symbol_mut(symbol_id);
         if symbol.kind != SymbolKind::Tls {
@@ -175,6 +180,7 @@ impl<'a> Object<'a> {
         init_symbol_id
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn macho_fixup_relocation(&mut self, mut relocation: &mut Relocation) -> i64 {
         let constant = match relocation.kind {
             RelocationKind::Relative
@@ -186,6 +192,7 @@ impl<'a> Object<'a> {
         constant
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn macho_write(&self, buffer: &mut dyn WritableBuffer) -> Result<()> {
         let address_size = self.architecture.address_size().unwrap();
         let endian = self.endian;
@@ -673,13 +680,21 @@ struct Nlist {
 }
 
 trait MachO {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn mach_header_size(&self) -> usize;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_command_size(&self) -> usize;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_header_size(&self) -> usize;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn nlist_size(&self) -> usize;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_mach_header(&self, buffer: &mut dyn WritableBuffer, section: MachHeader);
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_segment_command(&self, buffer: &mut dyn WritableBuffer, segment: SegmentCommand);
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_section(&self, buffer: &mut dyn WritableBuffer, section: SectionHeader);
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_nlist(&self, buffer: &mut dyn WritableBuffer, nlist: Nlist);
 }
 
@@ -689,22 +704,27 @@ struct MachO32<E> {
 }
 
 impl<E: Endian> MachO for MachO32<E> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn mach_header_size(&self) -> usize {
         mem::size_of::<macho::MachHeader32<E>>()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_command_size(&self) -> usize {
         mem::size_of::<macho::SegmentCommand32<E>>()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_header_size(&self) -> usize {
         mem::size_of::<macho::Section32<E>>()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn nlist_size(&self) -> usize {
         mem::size_of::<macho::Nlist32<E>>()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_mach_header(&self, buffer: &mut dyn WritableBuffer, header: MachHeader) {
         let endian = self.endian;
         let magic = if endian.is_big_endian() {
@@ -724,6 +744,7 @@ impl<E: Endian> MachO for MachO32<E> {
         buffer.write(&header);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_segment_command(&self, buffer: &mut dyn WritableBuffer, segment: SegmentCommand) {
         let endian = self.endian;
         let segment = macho::SegmentCommand32 {
@@ -742,6 +763,7 @@ impl<E: Endian> MachO for MachO32<E> {
         buffer.write(&segment);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_section(&self, buffer: &mut dyn WritableBuffer, section: SectionHeader) {
         let endian = self.endian;
         let section = macho::Section32 {
@@ -760,6 +782,7 @@ impl<E: Endian> MachO for MachO32<E> {
         buffer.write(&section);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_nlist(&self, buffer: &mut dyn WritableBuffer, nlist: Nlist) {
         let endian = self.endian;
         let nlist = macho::Nlist32 {
@@ -779,22 +802,27 @@ struct MachO64<E> {
 }
 
 impl<E: Endian> MachO for MachO64<E> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn mach_header_size(&self) -> usize {
         mem::size_of::<macho::MachHeader64<E>>()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_command_size(&self) -> usize {
         mem::size_of::<macho::SegmentCommand64<E>>()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_header_size(&self) -> usize {
         mem::size_of::<macho::Section64<E>>()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn nlist_size(&self) -> usize {
         mem::size_of::<macho::Nlist64<E>>()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_mach_header(&self, buffer: &mut dyn WritableBuffer, header: MachHeader) {
         let endian = self.endian;
         let magic = if endian.is_big_endian() {
@@ -815,6 +843,7 @@ impl<E: Endian> MachO for MachO64<E> {
         buffer.write(&header);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_segment_command(&self, buffer: &mut dyn WritableBuffer, segment: SegmentCommand) {
         let endian = self.endian;
         let segment = macho::SegmentCommand64 {
@@ -833,6 +862,7 @@ impl<E: Endian> MachO for MachO64<E> {
         buffer.write(&segment);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_section(&self, buffer: &mut dyn WritableBuffer, section: SectionHeader) {
         let endian = self.endian;
         let section = macho::Section64 {
@@ -852,6 +882,7 @@ impl<E: Endian> MachO for MachO64<E> {
         buffer.write(&section);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn write_nlist(&self, buffer: &mut dyn WritableBuffer, nlist: Nlist) {
         let endian = self.endian;
         let nlist = macho::Nlist64 {

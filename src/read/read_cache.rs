@@ -18,14 +18,12 @@ use crate::read::ReadRef;
 /// Entries are keyed on the offset and size of the read.
 /// Currently overlapping reads are considered separate reads.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ReadCache<R: Read + Seek> {
     cache: RefCell<ReadCacheInternal<R>>,
 }
 
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct ReadCacheInternal<R: Read + Seek> {
     read: R,
@@ -35,6 +33,7 @@ struct ReadCacheInternal<R: Read + Seek> {
 
 impl<R: Read + Seek> ReadCache<R> {
     /// Create an empty `ReadCache` for the given stream.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(read: R) -> Self {
         ReadCache {
             cache: RefCell::new(ReadCacheInternal {
@@ -47,6 +46,7 @@ impl<R: Read + Seek> ReadCache<R> {
 
     /// Return an implementation of `ReadRef` that restricts reads
     /// to the given range of the stream.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn range(&self, offset: u64, size: u64) -> ReadCacheRange<'_, R> {
         ReadCacheRange {
             r: self,
@@ -56,22 +56,26 @@ impl<R: Read + Seek> ReadCache<R> {
     }
 
     /// Free buffers used by the cache.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn clear(&mut self) {
         self.cache.borrow_mut().bufs.clear();
     }
 
     /// Unwrap this `ReadCache<R>`, returning the underlying reader.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn into_inner(self) -> R {
         self.cache.into_inner().read
     }
 }
 
 impl<'a, R: Read + Seek> ReadRef<'a> for &'a ReadCache<R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn len(self) -> Result<u64, ()> {
         let cache = &mut *self.cache.borrow_mut();
         cache.read.seek(SeekFrom::End(0)).map_err(|_| ())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_bytes_at(self, offset: u64, size: u64) -> Result<&'a [u8], ()> {
         if size == 0 {
             return Ok(&[]);
@@ -95,6 +99,7 @@ impl<'a, R: Read + Seek> ReadRef<'a> for &'a ReadCache<R> {
         Ok(unsafe { mem::transmute::<&[u8], &[u8]>(buf) })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_bytes_at_until(self, range: Range<u64>, delimiter: u8) -> Result<&'a [u8], ()> {
         let cache = &mut *self.cache.borrow_mut();
         let buf = match cache.strings.entry((range.start, delimiter)) {
@@ -140,7 +145,6 @@ impl<'a, R: Read + Seek> ReadRef<'a> for &'a ReadCache<R> {
 ///
 /// Shares an underlying `ReadCache` with a lifetime of `'a`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ReadCacheRange<'a, R: Read + Seek> {
     r: &'a ReadCache<R>,
@@ -149,6 +153,7 @@ pub struct ReadCacheRange<'a, R: Read + Seek> {
 }
 
 impl<'a, R: Read + Seek> Clone for ReadCacheRange<'a, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn clone(&self) -> Self {
         Self {
             r: self.r,
@@ -161,10 +166,12 @@ impl<'a, R: Read + Seek> Clone for ReadCacheRange<'a, R> {
 impl<'a, R: Read + Seek> Copy for ReadCacheRange<'a, R> {}
 
 impl<'a, R: Read + Seek> ReadRef<'a> for ReadCacheRange<'a, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn len(self) -> Result<u64, ()> {
         Ok(self.size)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_bytes_at(self, offset: u64, size: u64) -> Result<&'a [u8], ()> {
         if size == 0 {
             return Ok(&[]);
@@ -177,6 +184,7 @@ impl<'a, R: Read + Seek> ReadRef<'a> for ReadCacheRange<'a, R> {
         self.r.read_bytes_at(r_offset, size)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_bytes_at_until(self, range: Range<u64>, delimiter: u8) -> Result<&'a [u8], ()> {
         let r_start = self.offset.checked_add(range.start).ok_or(())?;
         let r_end = self.offset.checked_add(range.end).ok_or(())?;

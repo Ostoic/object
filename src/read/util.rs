@@ -17,6 +17,7 @@ use crate::ReadRef;
 pub struct Bytes<'data>(pub &'data [u8]);
 
 impl<'data> fmt::Debug for Bytes<'data> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         debug_list_bytes(self.0, fmt)
     }
@@ -193,6 +194,7 @@ fn debug_list_bytes(bytes: &[u8], fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
 struct DebugByte(u8);
 
 impl fmt::Debug for DebugByte {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(fmt, "0x{:02x}", self.0)
     }
@@ -202,6 +204,7 @@ impl fmt::Debug for DebugByte {
 struct DebugLen(usize);
 
 impl fmt::Debug for DebugLen {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(fmt, "...; {}", self.0)
     }
@@ -216,6 +219,7 @@ impl fmt::Debug for DebugLen {
 pub(crate) struct ByteString<'data>(pub &'data [u8]);
 
 impl<'data> fmt::Debug for ByteString<'data> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(fmt, "\"{}\"", String::from_utf8_lossy(self.0))
     }
@@ -258,6 +262,7 @@ where
 
 impl<'data, R: ReadRef<'data>> StringTable<'data, R> {
     /// Interpret the given data as a string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(data: R, start: u64, end: u64) -> Self {
         StringTable {
             data: Some(data),
@@ -268,6 +273,7 @@ impl<'data, R: ReadRef<'data>> StringTable<'data, R> {
     }
 
     /// Return the string at the given offset.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get(&self, offset: u32) -> Result<&'data [u8], ()> {
         match self.data {
             Some(data) => {
@@ -280,6 +286,7 @@ impl<'data, R: ReadRef<'data>> StringTable<'data, R> {
 }
 
 impl<'data, R: ReadRef<'data>> Default for StringTable<'data, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn default() -> Self {
         StringTable {
             data: None,
@@ -296,6 +303,7 @@ mod tests {
     use crate::pod::bytes_of;
 
     #[test]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn bytes() {
         let x = u32::to_be(0x0123_4567);
         let data = Bytes(bytes_of(&x));
@@ -379,6 +387,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn bytes_debug() {
         assert_eq!(format!("{:?}", Bytes(&[])), "[]");
         assert_eq!(format!("{:?}", Bytes(&[0x01])), "[0x01]");

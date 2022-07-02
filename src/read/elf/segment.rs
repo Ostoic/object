@@ -1,10 +1,10 @@
 use core::fmt::Debug;
 use core::{mem, slice, str};
 
-use crate::{elf, DebugPod};
 use crate::endian::{self, Endianness};
 use crate::pod::Pod;
 use crate::read::{self, Bytes, ObjectSegment, ReadError, ReadRef, SegmentFlags};
+use crate::{elf, DebugPod};
 
 use super::{ElfFile, FileHeader, NoteIterator};
 
@@ -17,7 +17,6 @@ pub type ElfSegmentIterator64<'data, 'file, Endian = Endianness, R = &'data [u8]
 
 /// An iterator over the segments of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSegmentIterator<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -35,6 +34,7 @@ where
 {
     type Item = ElfSegment<'data, 'file, Elf, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(segment) = self.iter.next() {
             if segment.p_type(self.file.endian) == elf::PT_LOAD {
@@ -57,7 +57,6 @@ pub type ElfSegment64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A segment of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSegment<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -70,6 +69,7 @@ where
 }
 
 impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ElfSegment<'data, 'file, Elf, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn bytes(&self) -> read::Result<&'data [u8]> {
         self.segment
             .data(self.file.endian, self.file.data)
@@ -119,6 +119,7 @@ where
         self.bytes()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> read::Result<Option<&'data [u8]>> {
         Ok(read::util::data_range(
             self.bytes()?,
@@ -155,16 +156,25 @@ pub trait ProgramHeader: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_type(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_flags(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_offset(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_vaddr(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_paddr(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_filesz(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_memsz(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn p_align(&self, endian: Self::Endian) -> Self::Word;
 
     /// Return the offset and size of the segment in the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self, endian: Self::Endian) -> (u64, u64) {
         (self.p_offset(endian).into(), self.p_filesz(endian).into())
     }
@@ -172,6 +182,7 @@ pub trait ProgramHeader: DebugPod {
     /// Return the segment data.
     ///
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -186,6 +197,7 @@ pub trait ProgramHeader: DebugPod {
     /// Allows padding at the end of the data.
     /// Returns `Ok(&[])` if the segment has no data.
     /// Returns `Err` for invalid values, including bad alignment.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_as_array<'data, T: Pod, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -199,6 +211,7 @@ pub trait ProgramHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the segment does not contain the address.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -218,6 +231,7 @@ pub trait ProgramHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the segment is not `PT_DYNAMIC`.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -236,6 +250,7 @@ pub trait ProgramHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the segment does not contain notes.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn notes<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,

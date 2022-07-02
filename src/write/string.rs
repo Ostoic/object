@@ -23,6 +23,7 @@ impl<'a> StringTable<'a> {
     ///
     /// Panics if the string table has already been written, or
     /// if the string contains a null byte.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn add(&mut self, string: &'a [u8]) -> StringId {
         assert!(self.offsets.is_empty());
         assert!(!string.contains(&0));
@@ -33,6 +34,7 @@ impl<'a> StringTable<'a> {
     /// Return the id of the given string.
     ///
     /// Panics if the string is not in the string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get_id(&self, string: &[u8]) -> StringId {
         let id = self.strings.get_index_of(string).unwrap();
         StringId(id)
@@ -41,6 +43,7 @@ impl<'a> StringTable<'a> {
     /// Return the string for the given id.
     ///
     /// Panics if the string is not in the string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get_string(&self, id: StringId) -> &'a [u8] {
         self.strings.get_index(id.0).unwrap()
     }
@@ -49,6 +52,7 @@ impl<'a> StringTable<'a> {
     ///
     /// Panics if the string table has not been written, or
     /// if the string is not in the string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get_offset(&self, id: StringId) -> usize {
         self.offsets[id.0]
     }
@@ -59,6 +63,7 @@ impl<'a> StringTable<'a> {
     /// `base` is the initial string table offset. For example,
     /// this should be 1 for ELF, to account for the initial
     /// null byte (which must have been written by the caller).
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn write(&mut self, base: usize, w: &mut Vec<u8>) {
         assert!(self.offsets.is_empty());
 
@@ -142,6 +147,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn string_table() {
         let mut table = StringTable::default();
         let id0 = table.add(b"");

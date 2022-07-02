@@ -3,19 +3,18 @@ use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::slice;
 
-use crate::{elf, DebugPod};
 use crate::endian::{self, Endianness};
 use crate::pod::Pod;
 use crate::read::{
     self, Error, ReadRef, Relocation, RelocationEncoding, RelocationKind, RelocationTarget,
     SectionIndex, SymbolIndex,
 };
+use crate::{elf, DebugPod};
 
 use super::{ElfFile, FileHeader, SectionHeader, SectionTable};
 
 /// A mapping from section index to associated relocation sections.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct RelocationSections {
     relocations: Vec<usize>,
@@ -25,6 +24,7 @@ impl RelocationSections {
     /// Create a new mapping using the section table.
     ///
     /// Skips relocation sections that do not use the given symbol table section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse<'data, Elf: FileHeader, R: ReadRef<'data>>(
         endian: Elf::Endian,
         sections: &SectionTable<'data, Elf, R>,
@@ -47,7 +47,9 @@ impl RelocationSections {
                     continue;
                 }
                 if sh_info >= relocations.len() {
-                    return Err(Error(crate::nosym!("Invalid ELF sh_info for relocation section")));
+                    return Err(Error(crate::nosym!(
+                        "Invalid ELF sh_info for relocation section"
+                    )));
                 }
 
                 // Handle multiple relocation sections by chaining them.
@@ -63,6 +65,7 @@ impl RelocationSections {
     ///
     /// This may also be called with a relocation section index, and it will return the
     /// next associated relocation section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get(&self, index: usize) -> Option<usize> {
         self.relocations.get(index).cloned().filter(|x| *x != 0)
     }
@@ -74,6 +77,7 @@ pub(super) enum ElfRelaIterator<'data, Elf: FileHeader> {
 }
 
 impl<'data, Elf: FileHeader> ElfRelaIterator<'data, Elf> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_rel(&self) -> bool {
         match self {
             ElfRelaIterator::Rel(_) => true,
@@ -85,6 +89,7 @@ impl<'data, Elf: FileHeader> ElfRelaIterator<'data, Elf> {
 impl<'data, Elf: FileHeader> Iterator for ElfRelaIterator<'data, Elf> {
     type Item = Elf::Rela;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         match self {
             ElfRelaIterator::Rel(ref mut i) => i.next().cloned().map(Self::Item::from),
@@ -120,6 +125,7 @@ where
 {
     type Item = (u64, Relocation);
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         let endian = self.file.endian;
         loop {
@@ -162,6 +168,7 @@ where
     Elf: FileHeader,
     R: ReadRef<'data>,
 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ElfDynamicRelocationIterator").finish()
     }
@@ -194,6 +201,7 @@ where
 {
     type Item = (u64, Relocation);
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         let endian = self.file.endian;
         loop {
@@ -230,6 +238,7 @@ where
     Elf: FileHeader,
     R: ReadRef<'data>,
 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ElfSectionRelocationIterator").finish()
     }
@@ -408,9 +417,13 @@ pub trait Rel: DebugPod + Clone {
     type Sword: Into<i64>;
     type Endian: endian::Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn r_offset(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn r_info(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn r_sym(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn r_type(&self, endian: Self::Endian) -> u32;
 }
 
@@ -481,10 +494,15 @@ pub trait Rela: DebugPod + Clone {
     type Sword: Into<i64>;
     type Endian: endian::Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn r_offset(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn r_info(&self, endian: Self::Endian, is_mips64el: bool) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn r_addend(&self, endian: Self::Endian) -> Self::Sword;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn r_sym(&self, endian: Self::Endian, is_mips64el: bool) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn r_type(&self, endian: Self::Endian, is_mips64el: bool) -> u32;
 }
 

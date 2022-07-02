@@ -2,7 +2,6 @@ use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::{fmt, slice, str};
 
-use crate::{endian::{self, Endianness}, DebugPod};
 use crate::macho;
 use crate::pod::Pod;
 use crate::read::util::StringTable;
@@ -10,6 +9,10 @@ use crate::read::{
     self, ObjectMap, ObjectMapEntry, ObjectSymbol, ObjectSymbolTable, ReadError, ReadRef, Result,
     SectionIndex, SectionKind, SymbolFlags, SymbolIndex, SymbolKind, SymbolMap, SymbolMapEntry,
     SymbolScope, SymbolSection,
+};
+use crate::{
+    endian::{self, Endianness},
+    DebugPod,
 };
 
 use super::{MachHeader, MachOFile};
@@ -29,6 +32,7 @@ where
 }
 
 impl<'data, Mach: MachHeader, R: ReadRef<'data>> Default for SymbolTable<'data, Mach, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn default() -> Self {
         SymbolTable {
             symbols: &[],
@@ -73,6 +77,7 @@ impl<'data, Mach: MachHeader, R: ReadRef<'data>> SymbolTable<'data, Mach, R> {
     }
 
     /// Return the symbol at the given index.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbol(&self, index: usize) -> Result<&'data Mach::Nlist> {
         self.symbols
             .get(index)
@@ -80,6 +85,7 @@ impl<'data, Mach: MachHeader, R: ReadRef<'data>> SymbolTable<'data, Mach, R> {
     }
 
     /// Construct a map from addresses to a user-defined map entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn map<Entry: SymbolMapEntry, F: Fn(&'data Mach::Nlist) -> Option<Entry>>(
         &self,
         f: F,
@@ -97,6 +103,7 @@ impl<'data, Mach: MachHeader, R: ReadRef<'data>> SymbolTable<'data, Mach, R> {
     }
 
     /// Construct a map from addresses to symbol names and object file names.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn object_map(&self, endian: Mach::Endian) -> ObjectMap<'data> {
         let mut symbols = Vec::new();
         let mut objects = Vec::new();
@@ -184,6 +191,7 @@ where
     type Symbol = MachOSymbol<'data, 'file, Mach, R>;
     type SymbolIterator = MachOSymbolIterator<'data, 'file, Mach, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&self) -> Self::SymbolIterator {
         MachOSymbolIterator {
             file: self.file,
@@ -191,9 +199,11 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&self, index: SymbolIndex) -> Result<Self::Symbol> {
         let nlist = self.file.symbols.symbol(index.0)?;
-        MachOSymbol::new(self.file, index, nlist).read_error(crate::nosym!("Unsupported Mach-O symbol index"))
+        MachOSymbol::new(self.file, index, nlist)
+            .read_error(crate::nosym!("Unsupported Mach-O symbol index"))
     }
 }
 
@@ -220,6 +230,7 @@ where
     Mach: MachHeader,
     R: ReadRef<'data>,
 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("MachOSymbolIterator").finish()
     }
@@ -232,6 +243,7 @@ where
 {
     type Item = MachOSymbol<'data, 'file, Mach, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         loop {
             let index = self.index;
@@ -270,6 +282,7 @@ where
     Mach: MachHeader,
     R: ReadRef<'data>,
 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn new(
         file: &'file MachOFile<'data, Mach, R>,
         index: SymbolIndex,
@@ -300,10 +313,12 @@ where
         self.index
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&'data [u8]> {
         self.nlist.name(self.file.endian, self.file.symbols.strings)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&'data str> {
         let name = self.name_bytes()?;
         str::from_utf8(name)
@@ -323,6 +338,7 @@ where
         0
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SymbolKind {
         self.section()
             .index()
@@ -342,6 +358,7 @@ where
             .unwrap_or(SymbolKind::Unknown)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section(&self) -> SymbolSection {
         match self.nlist.n_type() & macho::N_TYPE {
             macho::N_UNDF => SymbolSection::Undefined,
@@ -383,6 +400,7 @@ where
         self.nlist.n_desc(self.file.endian) & (macho::N_WEAK_REF | macho::N_WEAK_DEF) != 0
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn scope(&self) -> SymbolScope {
         let n_type = self.nlist.n_type();
         if n_type & macho::N_TYPE == macho::N_UNDF {
@@ -422,12 +440,18 @@ pub trait Nlist: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_strx(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_type(&self) -> u8;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_sect(&self) -> u8;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_desc(&self, endian: Self::Endian) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_value(&self, endian: Self::Endian) -> Self::Word;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -441,17 +465,20 @@ pub trait Nlist: DebugPod {
     /// Return true if this is a STAB symbol.
     ///
     /// This determines the meaning of the `n_type` field.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_stab(&self) -> bool {
         self.n_type() & macho::N_STAB != 0
     }
 
     /// Return true if this is an undefined symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_undefined(&self) -> bool {
         let n_type = self.n_type();
         n_type & macho::N_STAB == 0 && n_type & macho::N_TYPE == macho::N_UNDF
     }
 
     /// Return true if the symbol is a definition of a function or data object.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_definition(&self) -> bool {
         let n_type = self.n_type();
         n_type & macho::N_STAB == 0 && n_type & macho::N_TYPE != macho::N_UNDF
@@ -472,18 +499,23 @@ impl<Endian: endian::Endian> Nlist for macho::Nlist32<Endian> {
     type Word = u32;
     type Endian = Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_strx(&self, endian: Self::Endian) -> u32 {
         self.n_strx.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_type(&self) -> u8 {
         self.n_type
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_sect(&self) -> u8 {
         self.n_sect
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_desc(&self, endian: Self::Endian) -> u16 {
         self.n_desc.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_value(&self, endian: Self::Endian) -> Self::Word {
         self.n_value.get(endian)
     }
@@ -493,18 +525,23 @@ impl<Endian: endian::Endian> Nlist for macho::Nlist64<Endian> {
     type Word = u64;
     type Endian = Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_strx(&self, endian: Self::Endian) -> u32 {
         self.n_strx.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_type(&self) -> u8 {
         self.n_type
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_sect(&self) -> u8 {
         self.n_sect
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_desc(&self, endian: Self::Endian) -> u16 {
         self.n_desc.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_value(&self, endian: Self::Endian) -> Self::Word {
         self.n_value.get(endian)
     }

@@ -4,12 +4,15 @@ use core::{mem, str};
 
 use core::convert::TryInto;
 
-use crate::{read::coff::{CoffCommon, CoffSymbol, CoffSymbolIterator, CoffSymbolTable, SymbolTable}, DebugPod};
 use crate::read::{
     self, Architecture, ComdatKind, Error, Export, FileFlags, Import, NoDynamicRelocationIterator,
     Object, ObjectComdat, ObjectKind, ReadError, ReadRef, Result, SectionIndex, SymbolIndex,
 };
 use crate::{pe, ByteString, Bytes, CodeView, LittleEndian as LE, Pod, U32};
+use crate::{
+    read::coff::{CoffCommon, CoffSymbol, CoffSymbolIterator, CoffSymbolTable, SymbolTable},
+    DebugPod,
+};
 
 use super::{
     DataDirectories, ExportTable, ImageThunkData, ImportTable, PeSection, PeSectionIterator,
@@ -23,7 +26,6 @@ pub type PeFile64<'data, R = &'data [u8]> = PeFile<'data, pe::ImageNtHeaders64, 
 
 /// A PE object file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeFile<'data, Pe, R = &'data [u8]>
 where
@@ -193,6 +195,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segments(&'file self) -> PeSegmentIterator<'data, 'file, Pe, R> {
         PeSegmentIterator {
             file: self,
@@ -200,6 +203,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_name_bytes(
         &'file self,
         section_name: &[u8],
@@ -214,6 +218,7 @@ where
             })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_index(
         &'file self,
         index: SectionIndex,
@@ -226,6 +231,7 @@ where
         })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&'file self) -> PeSectionIterator<'data, 'file, Pe, R> {
         PeSectionIterator {
             file: self,
@@ -233,10 +239,12 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn comdats(&'file self) -> PeComdatIterator<'data, 'file, Pe, R> {
         PeComdatIterator { file: self }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&'file self, index: SymbolIndex) -> Result<CoffSymbol<'data, 'file, R>> {
         let symbol = self.common.symbols.symbol(index.0)?;
         Ok(CoffSymbol {
@@ -246,6 +254,7 @@ where
         })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&'file self) -> CoffSymbolIterator<'data, 'file, R> {
         CoffSymbolIterator {
             file: &self.common,
@@ -253,10 +262,12 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_table(&'file self) -> Option<CoffSymbolTable<'data, 'file, R>> {
         Some(CoffSymbolTable { file: &self.common })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbols(&'file self) -> CoffSymbolIterator<'data, 'file, R> {
         CoffSymbolIterator {
             file: &self.common,
@@ -265,14 +276,17 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbol_table(&'file self) -> Option<CoffSymbolTable<'data, 'file, R>> {
         None
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_relocations(&'file self) -> Option<NoDynamicRelocationIterator> {
         None
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn imports(&self) -> Result<Vec<Import<'data>>> {
         let mut imports = Vec::new();
         if let Some(import_table) = self.import_table()? {
@@ -298,6 +312,7 @@ where
         Ok(imports)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn exports(&self) -> Result<Vec<Export<'data>>> {
         let mut exports = Vec::new();
         if let Some(export_table) = self.export_table()? {
@@ -315,6 +330,7 @@ where
         Ok(exports)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn pdb_info(&self) -> Result<Option<CodeView>> {
         let data_dir = match self.data_directory(pe::IMAGE_DIRECTORY_ENTRY_DEBUG) {
             Some(data_dir) => data_dir,
@@ -353,7 +369,9 @@ where
             .try_into()
             .unwrap();
 
-        let age = info.read::<U32<LE>>().read_error(crate::nosym!("Invalid CodeView Age"))?;
+        let age = info
+            .read::<U32<LE>>()
+            .read_error(crate::nosym!("Invalid CodeView Age"))?;
 
         let path = info
             .read_string()
@@ -366,19 +384,23 @@ where
         }))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn has_debug_symbols(&self) -> bool {
         self.section_by_name(".debug_info").is_some()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relative_address_base(&self) -> u64 {
         self.common.image_base
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn entry(&self) -> u64 {
         u64::from(self.nt_headers.optional_header().address_of_entry_point())
             .wrapping_add(self.common.image_base)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> FileFlags {
         FileFlags::Coff {
             characteristics: self.nt_headers.file_header().characteristics.get(LE),
@@ -395,7 +417,6 @@ pub type PeComdatIterator64<'data, 'file, R = &'data [u8]> =
 
 /// An iterator over the COMDAT section groups of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeComdatIterator<'data, 'file, Pe, R = &'data [u8]>
 where
@@ -429,7 +450,6 @@ pub type PeComdat64<'data, 'file, R = &'data [u8]> =
 
 /// A COMDAT section group of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeComdat<'data, 'file, Pe, R = &'data [u8]>
 where
@@ -494,7 +514,6 @@ pub type PeComdatSectionIterator64<'data, 'file, R = &'data [u8]> =
 
 /// An iterator over the sections in a COMDAT section group of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeComdatSectionIterator<'data, 'file, Pe, R = &'data [u8]>
 where
@@ -555,7 +574,9 @@ pub fn optional_header_magic<'data, R: ReadRef<'data>>(data: R) -> Result<u16> {
     // of reading the optional header magic.
     let nt_headers = data
         .read_at::<pe::ImageNtHeaders32>(offset)
-        .read_error(crate::nosym!("Invalid NT headers offset, size, or alignment"))?;
+        .read_error(crate::nosym!(
+            "Invalid NT headers offset, size, or alignment"
+        ))?;
     if nt_headers.signature() != pe::IMAGE_NT_SIGNATURE {
         return Err(Error(crate::nosym!("Invalid PE magic")));
     }
@@ -571,18 +592,23 @@ pub trait ImageNtHeaders: DebugPod {
     /// Return true if this type is a 64-bit header.
     ///
     /// This is a property of the type, not a value in the header data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_type_64(&self) -> bool;
 
     /// Return true if the magic field in the optional header is valid.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_valid_optional_magic(&self) -> bool;
 
     /// Return the signature
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn signature(&self) -> u32;
 
     /// Return the file header.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_header(&self) -> &pe::ImageFileHeader;
 
     /// Return the optional header.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn optional_header(&self) -> &Self::ImageOptionalHeader;
 
     // Provided methods.
@@ -655,37 +681,67 @@ pub trait ImageNtHeaders: DebugPod {
 #[allow(missing_docs)]
 pub trait ImageOptionalHeader: DebugPod {
     // Standard fields.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn magic(&self) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_linker_version(&self) -> u8;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_linker_version(&self) -> u8;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_code(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_initialized_data(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_uninitialized_data(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address_of_entry_point(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn base_of_code(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn base_of_data(&self) -> Option<u32>;
 
     // NT additional fields.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn image_base(&self) -> u64;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_alignment(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_alignment(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_operating_system_version(&self) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_operating_system_version(&self) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_image_version(&self) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_image_version(&self) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn major_subsystem_version(&self) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn minor_subsystem_version(&self) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn win32_version_value(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_image(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_headers(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn check_sum(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn subsystem(&self) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dll_characteristics(&self) -> u16;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_stack_reserve(&self) -> u64;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_stack_commit(&self) -> u64;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_heap_reserve(&self) -> u64;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size_of_heap_commit(&self) -> u64;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn loader_flags(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn number_of_rva_and_sizes(&self) -> u32;
 }
 

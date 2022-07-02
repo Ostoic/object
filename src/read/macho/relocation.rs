@@ -35,6 +35,7 @@ where
 {
     type Item = (u64, Relocation);
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         loop {
             let reloc = self.relocations.next()?;
@@ -121,6 +122,7 @@ where
     Mach: MachHeader,
     R: ReadRef<'data>,
 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("MachORelocationIterator").finish()
     }

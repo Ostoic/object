@@ -4,6 +4,7 @@ use object::read::pe::*;
 use object::LittleEndian as LE;
 use object::{Bytes, U32Bytes, U64Bytes};
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_coff(p: &mut Printer<'_>, data: &[u8]) {
     let mut offset = 0;
     if let Some(header) = ImageFileHeader::parse(data, &mut offset).print_err(p) {
@@ -20,11 +21,13 @@ pub(super) fn print_coff(p: &mut Printer<'_>, data: &[u8]) {
     }
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_pe32(p: &mut Printer<'_>, data: &[u8]) {
     writeln!(p.w(), "Format: PE 32-bit").unwrap();
     print_pe::<ImageNtHeaders32>(p, data);
 }
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub(super) fn print_pe64(p: &mut Printer<'_>, data: &[u8]) {
     writeln!(p.w(), "Format: PE 64-bit").unwrap();
     print_pe::<ImageNtHeaders64>(p, data);

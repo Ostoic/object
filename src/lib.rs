@@ -116,12 +116,16 @@ pub mod pe;
 #[cfg(feature = "nosym")]
 #[macro_export]
 macro_rules! nosym {
-    ($s:expr) => ("");
+    ($s:expr) => {
+        ""
+    };
 }
 
 /// m
 #[cfg(not(feature = "nosym"))]
 #[macro_export]
 macro_rules! nosym {
-    ($s:expr) => {$s};
+    ($s:expr) => {
+        $s
+    };
 }

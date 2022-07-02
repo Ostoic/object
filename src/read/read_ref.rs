@@ -36,11 +36,13 @@ type Result<T> = result::Result<T, ()>;
 // convenient for implementers.
 pub trait ReadRef<'a>: Clone + Copy {
     /// The total size of the block of data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn len(self) -> Result<u64>;
 
     /// Get a reference to a `u8` slice at the given offset.
     ///
     /// Returns an error if offset or size are out of bounds.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_bytes_at(self, offset: u64, size: u64) -> Result<&'a [u8]>;
 
     /// Get a reference to a delimited `u8` slice which starts at range.start.
@@ -49,11 +51,13 @@ pub trait ReadRef<'a>: Clone + Copy {
     ///
     /// Returns an error if the range is out of bounds or the delimiter is
     /// not found in the range.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_bytes_at_until(self, range: Range<u64>, delimiter: u8) -> Result<&'a [u8]>;
 
     /// Get a reference to a `u8` slice at the given offset, and update the offset.
     ///
     /// Returns an error if offset or size are out of bounds.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_bytes(self, offset: &mut u64, size: u64) -> Result<&'a [u8]> {
         let bytes = self.read_bytes_at(*offset, size)?;
         *offset = offset.wrapping_add(size);
@@ -69,6 +73,7 @@ pub trait ReadRef<'a>: Clone + Copy {
     /// Implementors may want to provide their own implementation that ensures
     /// the alignment can be satisified. Alternatively, only use this method with
     /// types that do not need alignment (see the `unaligned` feature of this crate).
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read<T: Pod>(self, offset: &mut u64) -> Result<&'a T> {
         let size = mem::size_of::<T>().try_into().map_err(|_| ())?;
         let bytes = self.read_bytes(offset, size)?;
@@ -81,6 +86,7 @@ pub trait ReadRef<'a>: Clone + Copy {
     /// Returns an error if offset or size are out of bounds.
     ///
     /// Also see the `read` method for information regarding alignment of `T`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_at<T: Pod>(self, mut offset: u64) -> Result<&'a T> {
         self.read(&mut offset)
     }
@@ -90,6 +96,7 @@ pub trait ReadRef<'a>: Clone + Copy {
     /// Returns an error if offset or size are out of bounds.
     ///
     /// Also see the `read` method for information regarding alignment of `T`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_slice<T: Pod>(self, offset: &mut u64, count: usize) -> Result<&'a [T]> {
         let size = count
             .checked_mul(mem::size_of::<T>())
@@ -106,22 +113,26 @@ pub trait ReadRef<'a>: Clone + Copy {
     /// Returns an error if offset or size are out of bounds.
     ///
     /// Also see the `read` method for information regarding alignment of `T`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_slice_at<T: Pod>(self, mut offset: u64, count: usize) -> Result<&'a [T]> {
         self.read_slice(&mut offset, count)
     }
 }
 
 impl<'a> ReadRef<'a> for &'a [u8] {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn len(self) -> Result<u64> {
         self.len().try_into().map_err(|_| ())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_bytes_at(self, offset: u64, size: u64) -> Result<&'a [u8]> {
         let offset: usize = offset.try_into().map_err(|_| ())?;
         let size: usize = size.try_into().map_err(|_| ())?;
         self.get(offset..).ok_or(())?.get(..size).ok_or(())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_bytes_at_until(self, range: Range<u64>, delimiter: u8) -> Result<&'a [u8]> {
         let start: usize = range.start.try_into().map_err(|_| ())?;
         let end: usize = range.end.try_into().map_err(|_| ())?;

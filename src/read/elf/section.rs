@@ -1,13 +1,13 @@
 use core::fmt::Debug;
 use core::{iter, mem, slice, str};
 
-use crate::{elf, DebugPod};
 use crate::endian::{self, Endianness, U32Bytes};
 use crate::pod::Pod;
 use crate::read::{
     self, Bytes, CompressedData, CompressedFileRange, CompressionFormat, Error, ObjectSection,
     ReadError, ReadRef, SectionFlags, SectionIndex, SectionKind, StringTable,
 };
+use crate::{elf, DebugPod};
 
 use super::{
     CompressionHeader, ElfFile, ElfSectionRelocationIterator, FileHeader, GnuHashTable, HashTable,
@@ -58,6 +58,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     }
 
     /// Return the section header at the given index.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section(&self, index: SectionIndex) -> read::Result<&'data Elf::SectionHeader> {
         self.sections
             .get(index.0)
@@ -67,6 +68,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     /// Return the section header with the given name.
     ///
     /// Ignores sections with invalid names.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section_by_name(
         &self,
         endian: Elf::Endian,
@@ -79,6 +81,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     }
 
     /// Return the section name for the given section header.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section_name(
         &self,
         endian: Elf::Endian,
@@ -142,7 +145,11 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
         let section = self.section(index)?;
         match section.sh_type(endian) {
             elf::SHT_DYNSYM | elf::SHT_SYMTAB => {}
-            _ => return Err(Error(crate::nosym!("Invalid ELF symbol table section type"))),
+            _ => {
+                return Err(Error(crate::nosym!(
+                    "Invalid ELF symbol table section type"
+                )))
+            }
         }
         SymbolTable::parse(endian, data, self, index, section)
     }
@@ -164,6 +171,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     ///
     /// Returns `Ok(None)` if there is no `SHT_DYNAMIC` section.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn dynamic(
         &self,
         endian: Elf::Endian,
@@ -181,6 +189,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     ///
     /// Returns `Ok(None)` if there is no SysV GNU hash section.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn hash_header(
         &self,
         endian: Elf::Endian,
@@ -200,6 +209,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     ///
     /// Returns `Ok(None)` if there is no SysV hash section.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn hash(
         &self,
         endian: Elf::Endian,
@@ -217,6 +227,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     ///
     /// Returns `Ok(None)` if there is no GNU hash section.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn gnu_hash_header(
         &self,
         endian: Elf::Endian,
@@ -236,6 +247,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     ///
     /// Returns `Ok(None)` if there is no GNU hash section.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn gnu_hash(
         &self,
         endian: Elf::Endian,
@@ -255,6 +267,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     ///
     /// Returns `Ok(None)` if there is no `SHT_GNU_VERSYM` section.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn gnu_versym(
         &self,
         endian: Elf::Endian,
@@ -274,6 +287,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     ///
     /// Returns `Ok(None)` if there is no `SHT_GNU_VERDEF` section.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn gnu_verdef(
         &self,
         endian: Elf::Endian,
@@ -293,6 +307,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     ///
     /// Returns `Ok(None)` if there is no `SHT_GNU_VERNEED` section.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn gnu_verneed(
         &self,
         endian: Elf::Endian,
@@ -310,6 +325,7 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SectionTable<'data, Elf, R> {
     ///
     /// Returns `Ok(None)` if there is no `SHT_GNU_VERSYM` section.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn versions(
         &self,
         endian: Elf::Endian,
@@ -336,7 +352,6 @@ pub type ElfSectionIterator64<'data, 'file, Endian = Endianness, R = &'data [u8]
 
 /// An iterator over the sections of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSectionIterator<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -354,6 +369,7 @@ where
 {
     type Item = ElfSection<'data, 'file, Elf, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|(index, section)| ElfSection {
             index: SectionIndex(index),
@@ -372,7 +388,6 @@ pub type ElfSection64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A section of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfSection<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -386,12 +401,14 @@ where
 }
 
 impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ElfSection<'data, 'file, Elf, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn bytes(&self) -> read::Result<&'data [u8]> {
         self.section
             .data(self.file.endian, self.file.data)
             .read_error(crate::nosym!("Invalid ELF section size or offset"))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn maybe_compressed(&self) -> read::Result<Option<CompressedFileRange>> {
         let endian = self.file.endian;
         if (self.section.sh_flags(endian).into() & u64::from(elf::SHF_COMPRESSED)) == 0 {
@@ -423,6 +440,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ElfSection<'data, 'file, 
     }
 
     /// Try GNU-style "ZLIB" header decompression.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn maybe_compressed_gnu(&self) -> read::Result<Option<CompressedFileRange>> {
         let name = match self.name() {
             Ok(name) => name,
@@ -446,7 +464,9 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ElfSection<'data, 'file, 
             .read_error(crate::nosym!("ELF GNU compressed section is too short"))?
             != b"ZLIB\0\0\0\0"
         {
-            return Err(Error(crate::nosym!("Invalid ELF GNU compressed section header")));
+            return Err(Error(crate::nosym!(
+                "Invalid ELF GNU compressed section header"
+            )));
         }
         let uncompressed_size = data
             .read::<U32Bytes<_>>(&mut offset)
@@ -515,6 +535,7 @@ where
         self.bytes()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> read::Result<Option<&'data [u8]>> {
         Ok(read::util::data_range(
             self.bytes()?,
@@ -524,6 +545,7 @@ where
         ))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_file_range(&self) -> read::Result<CompressedFileRange> {
         Ok(if let Some(data) = self.maybe_compressed()? {
             data
@@ -534,16 +556,19 @@ where
         })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_data(&self) -> read::Result<CompressedData<'data>> {
         self.compressed_file_range()?.data(self.file.data)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> read::Result<&[u8]> {
         self.file
             .sections
             .section_name(self.file.endian, self.section)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> read::Result<&str> {
         let name = self.name_bytes()?;
         str::from_utf8(name)
@@ -563,6 +588,7 @@ where
         Ok(None)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SectionKind {
         let flags = self.section.sh_flags(self.file.endian).into();
         let sh_type = self.section.sh_type(self.file.endian);
@@ -607,6 +633,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relocations(&self) -> ElfSectionRelocationIterator<'data, 'file, Elf, R> {
         ElfSectionRelocationIterator {
             section_index: self.index,
@@ -615,6 +642,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SectionFlags {
         SectionFlags::Elf {
             sh_flags: self.section.sh_flags(self.file.endian).into(),
@@ -629,18 +657,29 @@ pub trait SectionHeader: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_name(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_type(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_flags(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_addr(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_offset(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_size(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_link(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_info(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_addralign(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sh_entsize(&self, endian: Self::Endian) -> Self::Word;
 
     /// Parse the section name from the string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -654,6 +693,7 @@ pub trait SectionHeader: DebugPod {
     /// Return the offset and size of the section in the file.
     ///
     /// Returns `None` for sections that have no data in the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self, endian: Self::Endian) -> Option<(u64, u64)> {
         if self.sh_type(endian) == elf::SHT_NOBITS {
             None
@@ -666,6 +706,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(&[])` if the section has no data.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -684,6 +725,7 @@ pub trait SectionHeader: DebugPod {
     /// Allows padding at the end of the data.
     /// Returns `Ok(&[])` if the section has no data.
     /// Returns `Err` for invalid values, including bad alignment.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_as_array<'data, T: Pod, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -698,6 +740,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section does not contain strings.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn strings<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -723,6 +766,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section does not contain symbols.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -743,6 +787,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section does not contain relocations.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn rel<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -751,9 +796,9 @@ pub trait SectionHeader: DebugPod {
         if self.sh_type(endian) != elf::SHT_REL {
             return Ok(None);
         }
-        let rel = self
-            .data_as_array(endian, data)
-            .read_error(crate::nosym!("Invalid ELF relocation section offset or size"))?;
+        let rel = self.data_as_array(endian, data).read_error(crate::nosym!(
+            "Invalid ELF relocation section offset or size"
+        ))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((rel, link)))
     }
@@ -764,6 +809,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section does not contain relocations.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn rela<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -772,9 +818,9 @@ pub trait SectionHeader: DebugPod {
         if self.sh_type(endian) != elf::SHT_RELA {
             return Ok(None);
         }
-        let rela = self
-            .data_as_array(endian, data)
-            .read_error(crate::nosym!("Invalid ELF relocation section offset or size"))?;
+        let rela = self.data_as_array(endian, data).read_error(crate::nosym!(
+            "Invalid ELF relocation section offset or size"
+        ))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((rela, link)))
     }
@@ -785,6 +831,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section type is not `SHT_DYNAMIC`.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -804,6 +851,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section does not contain notes.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn notes<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -826,6 +874,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section does not define a group.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn group<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -853,6 +902,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section does not contain a SysV hash.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn hash_header<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -876,6 +926,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section does not contain a SysV hash.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn hash<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -896,6 +947,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section does not contain a GNU hash.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn gnu_hash_header<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -919,6 +971,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section does not contain a GNU hash.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn gnu_hash<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -941,6 +994,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section type is not `SHT_GNU_VERSYM`.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn gnu_versym<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -949,9 +1003,9 @@ pub trait SectionHeader: DebugPod {
         if self.sh_type(endian) != elf::SHT_GNU_VERSYM {
             return Ok(None);
         }
-        let versym = self
-            .data_as_array(endian, data)
-            .read_error(crate::nosym!("Invalid ELF GNU versym section offset or size"))?;
+        let versym = self.data_as_array(endian, data).read_error(crate::nosym!(
+            "Invalid ELF GNU versym section offset or size"
+        ))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((versym, link)))
     }
@@ -962,6 +1016,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section type is not `SHT_GNU_VERDEF`.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn gnu_verdef<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -970,9 +1025,9 @@ pub trait SectionHeader: DebugPod {
         if self.sh_type(endian) != elf::SHT_GNU_VERDEF {
             return Ok(None);
         }
-        let verdef = self
-            .data(endian, data)
-            .read_error(crate::nosym!("Invalid ELF GNU verdef section offset or size"))?;
+        let verdef = self.data(endian, data).read_error(crate::nosym!(
+            "Invalid ELF GNU verdef section offset or size"
+        ))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((VerdefIterator::new(endian, verdef), link)))
     }
@@ -983,6 +1038,7 @@ pub trait SectionHeader: DebugPod {
     ///
     /// Returns `Ok(None)` if the section type is not `SHT_GNU_VERNEED`.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn gnu_verneed<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -991,9 +1047,9 @@ pub trait SectionHeader: DebugPod {
         if self.sh_type(endian) != elf::SHT_GNU_VERNEED {
             return Ok(None);
         }
-        let verneed = self
-            .data(endian, data)
-            .read_error(crate::nosym!("Invalid ELF GNU verneed section offset or size"))?;
+        let verneed = self.data(endian, data).read_error(crate::nosym!(
+            "Invalid ELF GNU verneed section offset or size"
+        ))?;
         let link = SectionIndex(self.sh_link(endian) as usize);
         Ok(Some((VerneedIterator::new(endian, verneed), link)))
     }

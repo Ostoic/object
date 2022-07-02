@@ -24,6 +24,7 @@ impl<'data> SectionTable<'data> {
     ///
     /// `data` must be the entire file data.
     /// `offset` must be after the optional file header.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse<R: ReadRef<'data>>(
         header: &pe::ImageFileHeader,
         data: R,
@@ -61,6 +62,7 @@ impl<'data> SectionTable<'data> {
     /// Return the section header at the given index.
     ///
     /// The index is 1-based.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section(&self, index: usize) -> read::Result<&'data pe::ImageSectionHeader> {
         self.sections
             .get(index.wrapping_sub(1))
@@ -72,6 +74,7 @@ impl<'data> SectionTable<'data> {
     /// The returned index is 1-based.
     ///
     /// Ignores sections with invalid names.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn section_by_name<R: ReadRef<'data>>(
         &self,
         strings: StringTable<'data, R>,
@@ -88,6 +91,7 @@ impl<'data> SectionTable<'data> {
     ///
     /// This will usually match the end of file, unless the PE file has a
     /// [data overlay](https://security.stackexchange.com/questions/77336/how-is-the-file-overlay-read-by-an-exe-virus)
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn max_section_file_offset(&self) -> u64 {
         let mut max = 0;
         for section in self.iter() {
@@ -111,7 +115,6 @@ impl<'data> SectionTable<'data> {
 
 /// An iterator over the loadable sections of a `CoffFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffSegmentIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,
@@ -121,6 +124,7 @@ pub struct CoffSegmentIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
 impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffSegmentIterator<'data, 'file, R> {
     type Item = CoffSegment<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|section| CoffSegment {
             file: self.file,
@@ -131,7 +135,6 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffSegmentIterator<'data, 'f
 
 /// A loadable section of a `CoffFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffSegment<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,
@@ -139,6 +142,7 @@ pub struct CoffSegment<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
 }
 
 impl<'data, 'file, R: ReadRef<'data>> CoffSegment<'data, 'file, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn bytes(&self) -> Result<&'data [u8]> {
         self.section
             .coff_data(self.file.data)
@@ -174,10 +178,12 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSegment<'data> for CoffSegment<'data
         (u64::from(offset), u64::from(size))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]> {
         self.bytes()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> Result<Option<&'data [u8]>> {
         Ok(read::util::data_range(
             self.bytes()?,
@@ -215,7 +221,6 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSegment<'data> for CoffSegment<'data
 
 /// An iterator over the sections of a `CoffFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffSectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,
@@ -225,6 +230,7 @@ pub struct CoffSectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
 impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffSectionIterator<'data, 'file, R> {
     type Item = CoffSection<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|(index, section)| CoffSection {
             file: self.file,
@@ -236,7 +242,6 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffSectionIterator<'data, 'f
 
 /// A section of a `CoffFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffSection<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,
@@ -245,6 +250,7 @@ pub struct CoffSection<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
 }
 
 impl<'data, 'file, R: ReadRef<'data>> CoffSection<'data, 'file, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn bytes(&self) -> Result<&'data [u8]> {
         self.section
             .coff_data(self.file.data)
@@ -289,10 +295,12 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for CoffSection<'data
         Some((u64::from(offset), u64::from(size)))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]> {
         self.bytes()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> Result<Option<&'data [u8]>> {
         Ok(read::util::data_range(
             self.bytes()?,
@@ -347,6 +355,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for CoffSection<'data
         self.section.kind()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relocations(&self) -> CoffRelocationIterator<'data, 'file, R> {
         let relocations = self.section.coff_relocations(self.file.data).unwrap_or(&[]);
         CoffRelocationIterator {
@@ -355,6 +364,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for CoffSection<'data
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SectionFlags {
         SectionFlags::Coff {
             characteristics: self.section.characteristics.get(LE),
@@ -363,6 +373,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for CoffSection<'data
 }
 
 impl pe::ImageSectionHeader {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn kind(&self) -> SectionKind {
         let characteristics = self.characteristics.get(LE);
         if characteristics & (pe::IMAGE_SCN_CNT_CODE | pe::IMAGE_SCN_MEM_EXECUTE) != 0 {
@@ -390,6 +401,7 @@ impl pe::ImageSectionHeader {
     ///
     /// Returns `Ok(None)` if the name doesn't use the string table
     /// and can be obtained with `raw_name` instead.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name_offset(&self) -> Result<Option<u32>> {
         let bytes = &self.name;
         if bytes[0] != b'/' {
@@ -405,7 +417,11 @@ impl pe::ImageSectionHeader {
                     b'0'..=b'9' => byte - b'0' + 52,
                     b'+' => 62,
                     b'/' => 63,
-                    _ => return Err(Error(crate::nosym!("Invalid COFF section name base-64 offset"))),
+                    _ => {
+                        return Err(Error(crate::nosym!(
+                            "Invalid COFF section name base-64 offset"
+                        )))
+                    }
                 };
                 offset = offset * 64 + digit as u64;
             }
@@ -419,7 +435,11 @@ impl pe::ImageSectionHeader {
                 let digit = match byte {
                     b'0'..=b'9' => byte - b'0',
                     0 => break,
-                    _ => return Err(Error(crate::nosym!("Invalid COFF section name base-10 offset"))),
+                    _ => {
+                        return Err(Error(crate::nosym!(
+                            "Invalid COFF section name base-10 offset"
+                        )))
+                    }
                 };
                 offset = offset * 10 + digit as u32;
             }
@@ -430,6 +450,7 @@ impl pe::ImageSectionHeader {
     /// Return the section name.
     ///
     /// This handles decoding names that are offsets into the symbol string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name<'data, R: ReadRef<'data>>(
         &'data self,
         strings: StringTable<'data, R>,
@@ -444,6 +465,7 @@ impl pe::ImageSectionHeader {
     }
 
     /// Return the raw section name.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn raw_name(&self) -> &[u8] {
         let bytes = &self.name;
         match memchr::memchr(b'\0', bytes) {
@@ -455,6 +477,7 @@ impl pe::ImageSectionHeader {
     /// Return the offset and size of the section in a COFF file.
     ///
     /// Returns `None` for sections that have no data in the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn coff_file_range(&self) -> Option<(u32, u32)> {
         if self.characteristics.get(LE) & pe::IMAGE_SCN_CNT_UNINITIALIZED_DATA != 0 {
             None
@@ -470,6 +493,7 @@ impl pe::ImageSectionHeader {
     ///
     /// Returns `Ok(&[])` if the section has no data.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn coff_data<'data, R: ReadRef<'data>>(&self, data: R) -> result::Result<&'data [u8], ()> {
         if let Some((offset, size)) = self.coff_file_range() {
             data.read_bytes_at(offset.into(), size.into())
@@ -481,6 +505,7 @@ impl pe::ImageSectionHeader {
     /// Return the section alignment in bytes.
     ///
     /// This is only valid for sections in a COFF file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn coff_alignment(&self) -> u64 {
         match self.characteristics.get(LE) & pe::IMAGE_SCN_ALIGN_MASK {
             pe::IMAGE_SCN_ALIGN_1BYTES => 1,
@@ -504,6 +529,7 @@ impl pe::ImageSectionHeader {
     /// Read the relocations in a COFF file.
     ///
     /// `data` must be the entire file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn coff_relocations<'data, R: ReadRef<'data>>(
         &self,
         data: R,
@@ -536,6 +562,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_offset() {
         let mut section = pe::ImageSectionHeader::default();
         section.name = *b"xxxxxxxx";

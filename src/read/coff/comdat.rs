@@ -10,7 +10,6 @@ use super::CoffFile;
 
 /// An iterator over the COMDAT section groups of a `CoffFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffComdatIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,
@@ -20,6 +19,7 @@ pub struct CoffComdatIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
 impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffComdatIterator<'data, 'file, R> {
     type Item = CoffComdat<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         loop {
             let index = self.index;
@@ -34,7 +34,6 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffComdatIterator<'data, 'fi
 
 /// A COMDAT section group of a `CoffFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffComdat<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     file: &'file CoffFile<'data, R>,
@@ -44,6 +43,7 @@ pub struct CoffComdat<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
 }
 
 impl<'data, 'file, R: ReadRef<'data>> CoffComdat<'data, 'file, R> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn parse(
         file: &'file CoffFile<'data, R>,
         section_symbol: &'data pe::ImageSymbol,
@@ -136,7 +136,6 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectComdat<'data> for CoffComdat<'data, 
 
 /// An iterator over the sections in a COMDAT section group of a `CoffFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct CoffComdatSectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     file: &'file CoffFile<'data, R>,
@@ -147,6 +146,7 @@ pub struct CoffComdatSectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u
 impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffComdatSectionIterator<'data, 'file, R> {
     type Item = SectionIndex;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         // Find associated COMDAT symbols.
         // TODO: it seems gcc doesn't use associated symbols for this

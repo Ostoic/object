@@ -16,7 +16,6 @@ pub type ElfComdatIterator64<'data, 'file, Endian = Endianness, R = &'data [u8]>
 
 /// An iterator over the COMDAT section groups of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfComdatIterator<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -35,6 +34,7 @@ where
 {
     type Item = ElfComdat<'data, 'file, Elf, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         while let Some((_index, section)) = self.iter.next() {
             if let Some(comdat) = ElfComdat::parse(self.file, section) {
@@ -54,7 +54,6 @@ pub type ElfComdat64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A COMDAT section group of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfComdat<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -71,6 +70,7 @@ where
     Elf: FileHeader,
     R: ReadRef<'data>,
 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn parse(
         file: &'file ElfFile<'data, Elf, R>,
         section: &'data Elf::SectionHeader,
@@ -113,6 +113,7 @@ where
         SymbolIndex(self.section.sh_info(self.file.endian) as usize)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> read::Result<&[u8]> {
         // FIXME: check sh_link
         let index = self.section.sh_info(self.file.endian) as usize;
@@ -120,6 +121,7 @@ where
         symbol.name(self.file.endian, self.file.symbols.strings())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> read::Result<&str> {
         let name = self.name_bytes()?;
         str::from_utf8(name)
@@ -127,6 +129,7 @@ where
             .read_error(crate::nosym!("Non UTF-8 ELF COMDAT name"))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&self) -> Self::SectionIterator {
         ElfComdatSectionIterator {
             file: self.file,
@@ -144,7 +147,6 @@ pub type ElfComdatSectionIterator64<'data, 'file, Endian = Endianness, R = &'dat
 
 /// An iterator over the sections in a COMDAT section group of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct ElfComdatSectionIterator<'data, 'file, Elf, R = &'data [u8]>
 where
@@ -163,6 +165,7 @@ where
 {
     type Item = SectionIndex;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         let index = self.sections.next()?;
         Some(SectionIndex(index.get(self.file.endian) as usize))

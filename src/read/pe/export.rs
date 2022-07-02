@@ -184,6 +184,7 @@ impl<'data> ExportTable<'data> {
     /// Returns the unparsed name pointer table.
     ///
     /// A name pointer table entry can be used with [`Self::name_from_pointer`].
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name_pointers(&self) -> &'data [U32Bytes<LE>] {
         self.names
     }
@@ -260,8 +261,8 @@ impl<'data> ExportTable<'data> {
             let library = &forward[..i];
             match &forward[i + 1..] {
                 [b'#', digits @ ..] => {
-                    let ordinal =
-                        parse_ordinal(digits).read_error(crate::nosym!("Invalid PE forwarded export ordinal"))?;
+                    let ordinal = parse_ordinal(digits)
+                        .read_error(crate::nosym!("Invalid PE forwarded export ordinal"))?;
                     ExportTarget::ForwardByOrdinal(library, ordinal)
                 }
                 [] => {

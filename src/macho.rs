@@ -2838,6 +2838,7 @@ impl<E: Endian> Relocation<E> {
     }
 
     /// Return the fields of a plain relocation.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn info(self, endian: E) -> RelocationInfo {
         let r_address = self.r_word0.get(endian);
         let r_word1 = self.r_word1.get(endian);
@@ -2863,6 +2864,7 @@ impl<E: Endian> Relocation<E> {
     }
 
     /// Return the fields of a scattered relocation.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn scattered_info(self, endian: E) -> ScatteredRelocationInfo {
         let r_word0 = self.r_word0.get(endian);
         let r_value = self.r_word1.get(endian);
@@ -2905,6 +2907,7 @@ pub struct RelocationInfo {
 
 impl RelocationInfo {
     /// Combine the fields into a `Relocation`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn relocation<E: Endian>(self, endian: E) -> Relocation<E> {
         let r_word0 = U32::new(endian, self.r_address);
         let r_word1 = U32::new(
@@ -3014,6 +3017,7 @@ pub struct ScatteredRelocationInfo {
 
 impl ScatteredRelocationInfo {
     /// Combine the fields into a `Relocation`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn relocation<E: Endian>(self, endian: E) -> Relocation<E> {
         let r_word0 = U32::new(
             endian,

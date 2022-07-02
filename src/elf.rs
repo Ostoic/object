@@ -1088,11 +1088,13 @@ impl<E: Endian> Rel32<E> {
     }
 
     /// Calculate the `r_info` field given the `r_sym` and `r_type` components.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_info(endian: E, r_sym: u32, r_type: u8) -> U32<E> {
         U32::new(endian, (r_sym << 8) | u32::from(r_type))
     }
 
     /// Set the `r_info` field given the `r_sym` and `r_type` components.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_r_info(&mut self, endian: E, r_sym: u32, r_type: u8) {
         self.r_info = Self::r_info(endian, r_sym, r_type)
     }
@@ -1128,17 +1130,20 @@ impl<E: Endian> Rela32<E> {
     }
 
     /// Calculate the `r_info` field given the `r_sym` and `r_type` components.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_info(endian: E, r_sym: u32, r_type: u8) -> U32<E> {
         U32::new(endian, (r_sym << 8) | u32::from(r_type))
     }
 
     /// Set the `r_info` field given the `r_sym` and `r_type` components.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_r_info(&mut self, endian: E, r_sym: u32, r_type: u8) {
         self.r_info = Self::r_info(endian, r_sym, r_type)
     }
 }
 
 impl<E: Endian> From<Rel32<E>> for Rela32<E> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn from(rel: Rel32<E>) -> Self {
         Rela32 {
             r_offset: rel.r_offset,
@@ -1176,17 +1181,20 @@ impl<E: Endian> Rel64<E> {
     }
 
     /// Calculate the `r_info` field given the `r_sym` and `r_type` components.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_info(endian: E, r_sym: u32, r_type: u32) -> U64<E> {
         U64::new(endian, (u64::from(r_sym) << 32) | u64::from(r_type))
     }
 
     /// Set the `r_info` field given the `r_sym` and `r_type` components.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_r_info(&mut self, endian: E, r_sym: u32, r_type: u32) {
         self.r_info = Self::r_info(endian, r_sym, r_type)
     }
 }
 
 impl<E: Endian> From<Rel64<E>> for Rela64<E> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn from(rel: Rel64<E>) -> Self {
         Rela64 {
             r_offset: rel.r_offset,
@@ -1211,6 +1219,7 @@ pub struct Rela64<E: Endian> {
 }
 
 impl<E: Endian> Rela64<E> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(crate) fn get_r_info(&self, endian: E, is_mips64el: bool) -> u64 {
         let mut t = self.r_info.get(endian);
         if is_mips64el {
@@ -1238,6 +1247,7 @@ impl<E: Endian> Rela64<E> {
     }
 
     /// Calculate the `r_info` field given the `r_sym` and `r_type` components.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn r_info(endian: E, is_mips64el: bool, r_sym: u32, r_type: u32) -> U64<E> {
         let mut t = (u64::from(r_sym) << 32) | u64::from(r_type);
         if is_mips64el {
@@ -1251,6 +1261,7 @@ impl<E: Endian> Rela64<E> {
     }
 
     /// Set the `r_info` field given the `r_sym` and `r_type` components.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set_r_info(&mut self, endian: E, is_mips64el: bool, r_sym: u32, r_type: u32) {
         self.r_info = Self::r_info(endian, is_mips64el, r_sym, r_type);
     }

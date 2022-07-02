@@ -17,6 +17,7 @@ pub struct LoadCommandIterator<'data, E: Endian> {
 }
 
 impl<'data, E: Endian> LoadCommandIterator<'data, E> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn new(endian: E, data: &'data [u8], ncmds: u32) -> Self {
         LoadCommandIterator {
             endian,
@@ -26,6 +27,7 @@ impl<'data, E: Endian> LoadCommandIterator<'data, E> {
     }
 
     /// Return the next load command.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn next(&mut self) -> Result<Option<LoadCommandData<'data, E>>> {
         if self.ncmds == 0 {
             return Ok(None);
@@ -64,11 +66,13 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     /// Return the `cmd` field of the `LoadCommand`.
     ///
     /// This is one of the `LC_` constants.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn cmd(&self) -> u32 {
         self.cmd
     }
 
     /// Return the `cmdsize` field of the `LoadCommand`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn cmdsize(&self) -> u32 {
         self.data.len() as u32
     }
@@ -86,6 +90,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     ///
     /// Strings used by load commands are specified by offsets that are
     /// relative to the load command header.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn string(&self, endian: E, s: macho::LcStr<E>) -> Result<&'data [u8]> {
         self.data
             .read_string_at(s.offset.get(endian) as usize)
@@ -93,17 +98,22 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     }
 
     /// Parse the command data according to the `cmd` field.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn variant(&self) -> Result<LoadCommandVariant<'data, E>> {
         Ok(match self.cmd {
             macho::LC_SEGMENT => {
                 let mut data = self.data;
-                let segment = data.read().read_error(crate::nosym!("Invalid Mach-O command size"))?;
+                let segment = data
+                    .read()
+                    .read_error(crate::nosym!("Invalid Mach-O command size"))?;
                 LoadCommandVariant::Segment32(segment, data.0)
             }
             macho::LC_SYMTAB => LoadCommandVariant::Symtab(self.data()?),
             macho::LC_THREAD | macho::LC_UNIXTHREAD => {
                 let mut data = self.data;
-                let thread = data.read().read_error(crate::nosym!("Invalid Mach-O command size"))?;
+                let thread = data
+                    .read()
+                    .read_error(crate::nosym!("Invalid Mach-O command size"))?;
                 LoadCommandVariant::Thread(thread, data.0)
             }
             macho::LC_DYSYMTAB => LoadCommandVariant::Dysymtab(self.data()?),
@@ -125,7 +135,9 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
             macho::LC_PREBIND_CKSUM => LoadCommandVariant::PrebindCksum(self.data()?),
             macho::LC_SEGMENT_64 => {
                 let mut data = self.data;
-                let segment = data.read().read_error(crate::nosym!("Invalid Mach-O command size"))?;
+                let segment = data
+                    .read()
+                    .read_error(crate::nosym!("Invalid Mach-O command size"))?;
                 LoadCommandVariant::Segment64(segment, data.0)
             }
             macho::LC_ROUTINES_64 => LoadCommandVariant::Routines64(self.data()?),
@@ -162,10 +174,13 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     /// Try to parse this command as a `SegmentCommand32`.
     ///
     /// Returns the segment command and the data containing the sections.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn segment_32(self) -> Result<Option<(&'data macho::SegmentCommand32<E>, &'data [u8])>> {
         if self.cmd == macho::LC_SEGMENT {
             let mut data = self.data;
-            let segment = data.read().read_error(crate::nosym!("Invalid Mach-O command size"))?;
+            let segment = data
+                .read()
+                .read_error(crate::nosym!("Invalid Mach-O command size"))?;
             Ok(Some((segment, data.0)))
         } else {
             Ok(None)
@@ -175,6 +190,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     /// Try to parse this command as a `SymtabCommand`.
     ///
     /// Returns the segment command and the data containing the sections.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symtab(self) -> Result<Option<&'data macho::SymtabCommand<E>>> {
         if self.cmd == macho::LC_SYMTAB {
             Some(self.data()).transpose()
@@ -184,6 +200,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     }
 
     /// Try to parse this command as a `DysymtabCommand`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn dysymtab(self) -> Result<Option<&'data macho::DysymtabCommand<E>>> {
         if self.cmd == macho::LC_DYSYMTAB {
             Some(self.data()).transpose()
@@ -193,6 +210,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     }
 
     /// Try to parse this command as a `DylibCommand`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn dylib(self) -> Result<Option<&'data macho::DylibCommand<E>>> {
         if self.cmd == macho::LC_LOAD_DYLIB
             || self.cmd == macho::LC_LOAD_WEAK_DYLIB
@@ -207,6 +225,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     }
 
     /// Try to parse this command as a `UuidCommand`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn uuid(self) -> Result<Option<&'data macho::UuidCommand<E>>> {
         if self.cmd == macho::LC_UUID {
             Some(self.data()).transpose()
@@ -216,10 +235,13 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     }
 
     /// Try to parse this command as a `SegmentCommand64`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn segment_64(self) -> Result<Option<(&'data macho::SegmentCommand64<E>, &'data [u8])>> {
         if self.cmd == macho::LC_SEGMENT_64 {
             let mut data = self.data;
-            let command = data.read().read_error(crate::nosym!("Invalid Mach-O command size"))?;
+            let command = data
+                .read()
+                .read_error(crate::nosym!("Invalid Mach-O command size"))?;
             Ok(Some((command, data.0)))
         } else {
             Ok(None)
@@ -227,6 +249,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     }
 
     /// Try to parse this command as a `DyldInfoCommand`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn dyld_info(self) -> Result<Option<&'data macho::DyldInfoCommand<E>>> {
         if self.cmd == macho::LC_DYLD_INFO || self.cmd == macho::LC_DYLD_INFO_ONLY {
             Some(self.data()).transpose()
@@ -236,6 +259,7 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
     }
 
     /// Try to parse this command as an `EntryPointCommand`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn entry_point(self) -> Result<Option<&'data macho::EntryPointCommand<E>>> {
         if self.cmd == macho::LC_MAIN {
             Some(self.data()).transpose()
@@ -333,6 +357,7 @@ pub enum LoadCommandVariant<'data, E: Endian> {
 
 impl<E: Endian> macho::SymtabCommand<E> {
     /// Return the symbol table that this command references.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn symbols<'data, Mach: MachHeader<Endian = E>, R: ReadRef<'data>>(
         &self,
         endian: E,

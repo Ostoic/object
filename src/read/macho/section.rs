@@ -1,12 +1,15 @@
 use core::fmt::Debug;
 use core::{fmt, result, slice, str};
 
-use crate::{endian::{self, Endianness}, DebugPod};
 use crate::macho;
 use crate::pod::Pod;
 use crate::read::{
     self, CompressedData, CompressedFileRange, ObjectSection, ReadError, ReadRef, Result,
     SectionFlags, SectionIndex, SectionKind,
+};
+use crate::{
+    endian::{self, Endianness},
+    DebugPod,
 };
 
 use super::{MachHeader, MachOFile, MachORelocationIterator};
@@ -35,6 +38,7 @@ where
     Mach: MachHeader,
     R: ReadRef<'data>,
 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // It's painful to do much better than this
         f.debug_struct("MachOSectionIterator").finish()
@@ -48,6 +52,7 @@ where
 {
     type Item = MachOSection<'data, 'file, Mach, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|&internal| MachOSection {
             file: self.file,
@@ -65,7 +70,6 @@ pub type MachOSection64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A section of a `MachOFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOSection<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -82,6 +86,7 @@ where
     Mach: MachHeader,
     R: ReadRef<'data>,
 {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn bytes(&self) -> Result<&'data [u8]> {
         let segment_index = self.internal.segment_index;
         let segment = self.file.segment_internal(segment_index)?;
@@ -142,6 +147,7 @@ where
         self.bytes()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> Result<Option<&'data [u8]>> {
         Ok(read::util::data_range(
             self.bytes()?,
@@ -193,10 +199,12 @@ where
         ))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SectionKind {
         self.internal.kind
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relocations(&self) -> MachORelocationIterator<'data, 'file, Mach, R> {
         MachORelocationIterator {
             file: self.file,
@@ -209,6 +217,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SectionFlags {
         SectionFlags::MachO {
             flags: self.internal.section.flags(self.file.endian),
@@ -226,6 +235,7 @@ pub(super) struct MachOSectionInternal<'data, Mach: MachHeader> {
 }
 
 impl<'data, Mach: MachHeader> MachOSectionInternal<'data, Mach> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn parse(
         index: SectionIndex,
         segment_index: usize,
@@ -266,17 +276,27 @@ pub trait Section: DebugPod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sectname(&self) -> &[u8; 16];
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segname(&self) -> &[u8; 16];
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn addr(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self, endian: Self::Endian) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn offset(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn reloff(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn nreloc(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self, endian: Self::Endian) -> u32;
 
     /// Return the `sectname` bytes up until the null terminator.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> &[u8] {
         let sectname = &self.sectname()[..];
         match memchr::memchr(b'\0', sectname) {
@@ -286,6 +306,7 @@ pub trait Section: DebugPod {
     }
 
     /// Return the `segname` bytes up until the null terminator.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name(&self) -> &[u8] {
         let segname = &self.segname()[..];
         match memchr::memchr(b'\0', segname) {
@@ -297,6 +318,7 @@ pub trait Section: DebugPod {
     /// Return the offset and size of the section in the file.
     ///
     /// Returns `None` for sections that have no data in the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self, endian: Self::Endian) -> Option<(u64, u64)> {
         match self.flags(endian) & macho::SECTION_TYPE {
             macho::S_ZEROFILL | macho::S_GB_ZEROFILL | macho::S_THREAD_LOCAL_ZEROFILL => None,
@@ -308,6 +330,7 @@ pub trait Section: DebugPod {
     ///
     /// Returns `Ok(&[])` if the section has no data.
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -323,6 +346,7 @@ pub trait Section: DebugPod {
     /// Return the relocation array.
     ///
     /// Returns `Err` for invalid values.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relocations<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -337,30 +361,39 @@ impl<Endian: endian::Endian> Section for macho::Section32<Endian> {
     type Word = u32;
     type Endian = Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sectname(&self) -> &[u8; 16] {
         &self.sectname
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segname(&self) -> &[u8; 16] {
         &self.segname
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn addr(&self, endian: Self::Endian) -> Self::Word {
         self.addr.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self, endian: Self::Endian) -> Self::Word {
         self.size.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn offset(&self, endian: Self::Endian) -> u32 {
         self.offset.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self, endian: Self::Endian) -> u32 {
         self.align.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn reloff(&self, endian: Self::Endian) -> u32 {
         self.reloff.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn nreloc(&self, endian: Self::Endian) -> u32 {
         self.nreloc.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self, endian: Self::Endian) -> u32 {
         self.flags.get(endian)
     }
@@ -370,30 +403,39 @@ impl<Endian: endian::Endian> Section for macho::Section64<Endian> {
     type Word = u64;
     type Endian = Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sectname(&self) -> &[u8; 16] {
         &self.sectname
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segname(&self) -> &[u8; 16] {
         &self.segname
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn addr(&self, endian: Self::Endian) -> Self::Word {
         self.addr.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self, endian: Self::Endian) -> Self::Word {
         self.size.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn offset(&self, endian: Self::Endian) -> u32 {
         self.offset.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self, endian: Self::Endian) -> u32 {
         self.align.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn reloff(&self, endian: Self::Endian) -> u32 {
         self.reloff.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn nreloc(&self, endian: Self::Endian) -> u32 {
         self.nreloc.get(endian)
     }
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self, endian: Self::Endian) -> u32 {
         self.flags.get(endian)
     }

@@ -19,16 +19,19 @@ pub trait Endian: Default + DebugClone + Copy + PartialEq + Eq + 'static {
     /// Construct a specification for the endianness of some values.
     ///
     /// Returns `None` if the type does not support specifying the given endianness.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn from_big_endian(big_endian: bool) -> Option<Self>;
 
     /// Construct a specification for the endianness of some values.
     ///
     /// Returns `None` if the type does not support specifying the given endianness.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn from_little_endian(little_endian: bool) -> Option<Self> {
         Self::from_big_endian(!little_endian)
     }
 
     /// Return true for big endian byte order.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_big_endian(self) -> bool;
 
     /// Return true for little endian byte order.
@@ -448,16 +451,19 @@ mod aligned {
 
     impl<E: Endian> U16<E> {
         /// Construct a new value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn new(e: E, n: u16) -> Self {
             Self(e.write_u16(n), PhantomData)
         }
 
         /// Return the value as a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn get(self, e: E) -> u16 {
             e.read_u16(self.0)
         }
 
         /// Set the value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn set(&mut self, e: E, n: u16) {
             self.0 = e.write_u16(n);
         }
@@ -471,14 +477,17 @@ mod aligned {
 
     impl<E: Endian> U32<E> {
         /// Construct a new value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn new(e: E, n: u32) -> Self {
             Self(e.write_u32(n), PhantomData)
         }
         /// Return the value as a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn get(self, e: E) -> u32 {
             e.read_u32(self.0)
         }
         /// Set the value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn set(&mut self, e: E, n: u32) {
             self.0 = e.write_u32(n);
         }
@@ -491,14 +500,17 @@ mod aligned {
 
     impl<E: Endian> U64<E> {
         /// Construct a new value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn new(e: E, n: u64) -> Self {
             Self(e.write_u64(n), PhantomData)
         }
         /// Return the value as a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn get(self, e: E) -> u64 {
             e.read_u64(self.0)
         }
         /// Set the value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn set(&mut self, e: E, n: u64) {
             self.0 = e.write_u64(n);
         }
@@ -511,14 +523,17 @@ mod aligned {
 
     impl<E: Endian> I16<E> {
         /// Construct a new value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn new(e: E, n: i16) -> Self {
             Self(e.write_i16(n), PhantomData)
         }
         /// Return the value as a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn get(self, e: E) -> i16 {
             e.read_i16(self.0)
         }
         /// Set the value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn set(&mut self, e: E, n: i16) {
             self.0 = e.write_i16(n);
         }
@@ -531,14 +546,17 @@ mod aligned {
 
     impl<E: Endian> I32<E> {
         /// Construct a new value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn new(e: E, n: i32) -> Self {
             Self(e.write_i32(n), PhantomData)
         }
         /// Return the value as a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn get(self, e: E) -> i32 {
             e.read_i32(self.0)
         }
         /// Set the value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn set(&mut self, e: E, n: i32) {
             self.0 = e.write_i32(n);
         }
@@ -551,14 +569,17 @@ mod aligned {
 
     impl<E: Endian> I64<E> {
         /// Construct a new value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn new(e: E, n: i64) -> Self {
             Self(e.write_i64(n), PhantomData)
         }
         /// Return the value as a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn get(self, e: E) -> i64 {
             e.read_i64(self.0)
         }
         /// Set the value given a native endian value.
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         pub fn set(&mut self, e: E, n: i64) {
             self.0 = e.write_i64(n);
         }
@@ -566,6 +587,7 @@ mod aligned {
 
     #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for U16<E> {
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "U16({:x})", self.0)
         }
@@ -573,6 +595,7 @@ mod aligned {
 
     #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for U32<E> {
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "U32({:x})", self.0)
         }
@@ -580,6 +603,7 @@ mod aligned {
 
     #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for U64<E> {
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "U64({:x})", self.0)
         }
@@ -587,6 +611,7 @@ mod aligned {
 
     #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for I16<E> {
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "I16({:x})", self.0)
         }
@@ -594,6 +619,7 @@ mod aligned {
 
     #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for I32<E> {
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "I32({:x})", self.0)
         }
@@ -601,6 +627,7 @@ mod aligned {
 
     #[cfg(not(feature = "nosym"))]
     impl<E: Endian> fmt::Debug for I64<E> {
+        #[cfg_attr(feature = "aggressive-inline", inline(always))]
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "I64({:x})", self.0)
         }
@@ -644,16 +671,19 @@ pub struct U16Bytes<E: Endian>([u8; 2], PhantomData<E>);
 
 impl<E: Endian> U16Bytes<E> {
     /// Construct a new value given a native endian value.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn new(e: E, n: u16) -> Self {
         Self(e.write_u16_bytes(n), PhantomData)
     }
 
     /// Return the value as a native endian value.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get(self, e: E) -> u16 {
         e.read_u16_bytes(self.0)
     }
 
     /// Set the value given a native endian value.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn set(&mut self, e: E, n: u16) {
         self.0 = e.write_u16_bytes(n);
     }

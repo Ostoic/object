@@ -7,12 +7,14 @@ impl FatHeader {
     /// Attempt to parse a fat header.
     ///
     /// Does not validate the magic value.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse<'data, R: ReadRef<'data>>(file: R) -> Result<&'data FatHeader> {
         file.read_at::<FatHeader>(0)
             .read_error(crate::nosym!("Invalid fat header size or alignment"))
     }
 
     /// Attempt to parse a fat header and 32-bit fat arches.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse_arch32<'data, R: ReadRef<'data>>(file: R) -> Result<&'data [FatArch32]> {
         let mut offset = 0;
         let header = file
@@ -26,6 +28,7 @@ impl FatHeader {
     }
 
     /// Attempt to parse a fat header and 64-bit fat arches.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse_arch64<'data, R: ReadRef<'data>>(file: R) -> Result<&'data [FatArch64]> {
         let mut offset = 0;
         let header = file
@@ -44,12 +47,18 @@ impl FatHeader {
 pub trait FatArch: Pod {
     type Word: Into<u64>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cputype(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cpusubtype(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn offset(&self) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> Self::Word;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u32;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn architecture(&self) -> Architecture {
         match self.cputype() {
             macho::CPU_TYPE_ARM => Architecture::Arm,
@@ -61,10 +70,12 @@ pub trait FatArch: Pod {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> (u64, u64) {
         (self.offset().into(), self.size().into())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data<'data, R: ReadRef<'data>>(&self, file: R) -> Result<&'data [u8]> {
         file.read_bytes_at(self.offset().into(), self.size().into())
             .read_error(crate::nosym!("Invalid fat arch offset or size"))
@@ -74,22 +85,27 @@ pub trait FatArch: Pod {
 impl FatArch for FatArch32 {
     type Word = u32;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cputype(&self) -> u32 {
         self.cputype.get(BigEndian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cpusubtype(&self) -> u32 {
         self.cpusubtype.get(BigEndian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn offset(&self) -> Self::Word {
         self.offset.get(BigEndian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> Self::Word {
         self.size.get(BigEndian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u32 {
         self.align.get(BigEndian)
     }
@@ -98,22 +114,27 @@ impl FatArch for FatArch32 {
 impl FatArch for FatArch64 {
     type Word = u64;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cputype(&self) -> u32 {
         self.cputype.get(BigEndian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cpusubtype(&self) -> u32 {
         self.cpusubtype.get(BigEndian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn offset(&self) -> Self::Word {
         self.offset.get(BigEndian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> Self::Word {
         self.size.get(BigEndian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u32 {
         self.align.get(BigEndian)
     }

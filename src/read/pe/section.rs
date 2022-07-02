@@ -20,7 +20,6 @@ pub type PeSegmentIterator64<'data, 'file, R = &'data [u8]> =
 
 /// An iterator over the loadable sections of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeSegmentIterator<'data, 'file, Pe, R = &'data [u8]>
 where
@@ -56,7 +55,6 @@ pub type PeSegment64<'data, 'file, R = &'data [u8]> =
 
 /// A loadable section of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeSegment<'data, 'file, Pe, R = &'data [u8]>
 where
@@ -104,10 +102,12 @@ where
         (u64::from(offset), u64::from(size))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]> {
         self.section.pe_data(self.file.data)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> Result<Option<&'data [u8]>> {
         Ok(read::util::data_range(
             self.data()?,
@@ -153,7 +153,6 @@ pub type PeSectionIterator64<'data, 'file, R = &'data [u8]> =
 
 /// An iterator over the sections of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeSectionIterator<'data, 'file, Pe, R = &'data [u8]>
 where
@@ -191,7 +190,6 @@ pub type PeSection64<'data, 'file, R = &'data [u8]> =
 
 /// A section of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeSection<'data, 'file, Pe, R = &'data [u8]>
 where
@@ -467,7 +465,6 @@ impl pe::ImageSectionHeader {
 
 /// An iterator over the relocations in an `PeSection`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct PeRelocationIterator<'data, 'file, R = &'data [u8]>(
     PhantomData<(&'data (), &'file (), R)>,

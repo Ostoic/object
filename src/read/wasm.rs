@@ -35,7 +35,6 @@ const MAX_SECTION_ID: usize = SECTION_DATA_COUNT;
 
 /// A WebAssembly object file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmFile<'data, R = &'data [u8]> {
     // All sections, including custom sections.
@@ -59,6 +58,7 @@ enum LocalFunctionKind {
 }
 
 impl<T> ReadError<T> for wasmparser::Result<T> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn read_error(self, error: &'static str) -> Result<T> {
         self.map_err(|_| Error(error))
     }
@@ -66,10 +66,16 @@ impl<T> ReadError<T> for wasmparser::Result<T> {
 
 impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
     /// Parse the raw wasm data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(data: R) -> Result<Self> {
-        let len = data.len().read_error(crate::nosym!("Unknown Wasm file size"))?;
-        let data = data.read_bytes_at(0, len).read_error(crate::nosym!("Wasm read failed"))?;
-        let module = wp::ModuleReader::new(data).read_error(crate::nosym!("Invalid Wasm header"))?;
+        let len = data
+            .len()
+            .read_error(crate::nosym!("Unknown Wasm file size"))?;
+        let data = data
+            .read_bytes_at(0, len)
+            .read_error(crate::nosym!("Wasm read failed"))?;
+        let module =
+            wp::ModuleReader::new(data).read_error(crate::nosym!("Invalid Wasm header"))?;
 
         let mut file = WasmFile {
             sections: Vec::new(),
@@ -104,7 +110,8 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
                         .get_import_section_reader()
                         .read_error(crate::nosym!("Couldn't read header of the import section"))?
                     {
-                        let import = import.read_error(crate::nosym!("Couldn't read an import item"))?;
+                        let import =
+                            import.read_error(crate::nosym!("Couldn't read an import item"))?;
                         let module_name = import.module;
 
                         if last_module_name != Some(module_name) {
@@ -144,7 +151,9 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
                         LocalFunctionKind::Unknown;
                         section
                             .get_function_section_reader()
-                            .read_error(crate::nosym!("Couldn't read header of the function section"))?
+                            .read_error(crate::nosym!(
+                                "Couldn't read header of the function section"
+                            ))?
                             .get_count() as usize
                     ];
                 }
@@ -157,7 +166,8 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
                         .get_export_section_reader()
                         .read_error(crate::nosym!("Couldn't read header of the export section"))?
                     {
-                        let export = export.read_error(crate::nosym!("Couldn't read an export item"))?;
+                        let export =
+                            export.read_error(crate::nosym!("Couldn't read an export item"))?;
 
                         let (kind, section_idx) = match export.kind {
                             wp::ExternalKind::Function => {
@@ -195,11 +205,9 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
                     }
                 }
                 wp::SectionCode::Start => {
-                    entry_func_id = Some(
-                        section
-                            .get_start_section_content()
-                            .read_error(crate::nosym!("Couldn't read contents of the start section"))?,
-                    );
+                    entry_func_id = Some(section.get_start_section_content().read_error(
+                        crate::nosym!("Couldn't read contents of the start section"),
+                    )?);
                 }
                 wp::SectionCode::Code => {
                     if let Some(main_file_symbol) = main_file_symbol.take() {
@@ -213,7 +221,8 @@ impl<'data, R: ReadRef<'data>> WasmFile<'data, R> {
                         .zip(&mut local_func_kinds)
                         .enumerate()
                     {
-                        let body = body.read_error(crate::nosym!("Couldn't read a function body"))?;
+                        let body =
+                            body.read_error(crate::nosym!("Couldn't read a function body"))?;
                         let range = body.range();
 
                         let address = range.start as u64 - section.range().start as u64;
@@ -337,15 +346,18 @@ where
         false
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ObjectKind {
         // TODO: check for `linking` custom section
         ObjectKind::Unknown
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segments(&'file self) -> Self::SegmentIterator {
         WasmSegmentIterator { file: self }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_name_bytes(
         &'file self,
         section_name: &[u8],
@@ -354,6 +366,7 @@ where
             .find(|section| section.name_bytes() == Ok(section_name))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_index(&'file self, index: SectionIndex) -> Result<WasmSection<'data, 'file, R>> {
         // TODO: Missing sections should return an empty section.
         let id_section = self
@@ -368,6 +381,7 @@ where
         })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&'file self) -> Self::SectionIterator {
         WasmSectionIterator {
             sections: self.sections.iter(),
@@ -375,6 +389,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn comdats(&'file self) -> Self::ComdatIterator {
         WasmComdatIterator { file: self }
     }
@@ -389,18 +404,21 @@ where
         Ok(WasmSymbol { index, symbol })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&'file self) -> Self::SymbolIterator {
         WasmSymbolIterator {
             symbols: self.symbols.iter().enumerate(),
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_table(&'file self) -> Option<WasmSymbolTable<'data, 'file>> {
         Some(WasmSymbolTable {
             symbols: &self.symbols,
         })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbols(&'file self) -> Self::SymbolIterator {
         WasmSymbolIterator {
             symbols: [].iter().enumerate(),
@@ -419,20 +437,24 @@ where
         None
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn imports(&self) -> Result<Vec<Import<'data>>> {
         // TODO: return entries in the import section
         Ok(Vec::new())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn exports(&self) -> Result<Vec<Export<'data>>> {
         // TODO: return entries in the export section
         Ok(Vec::new())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn has_debug_symbols(&self) -> bool {
         self.has_debug_symbols
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relative_address_base(&self) -> u64 {
         0
     }
@@ -452,7 +474,6 @@ where
 
 /// An iterator over the segments of a `WasmFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSegmentIterator<'data, 'file, R = &'data [u8]> {
     #[allow(unused)]
@@ -471,7 +492,6 @@ impl<'data, 'file, R> Iterator for WasmSegmentIterator<'data, 'file, R> {
 
 /// A segment of a `WasmFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSegment<'data, 'file, R = &'data [u8]> {
     #[allow(unused)]
@@ -505,10 +525,12 @@ impl<'data, 'file, R> ObjectSegment<'data> for WasmSegment<'data, 'file, R> {
         unreachable!()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]> {
         unreachable!()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, _address: u64, _size: u64) -> Result<Option<&'data [u8]>> {
         unreachable!()
     }
@@ -534,7 +556,6 @@ impl<'data, 'file, R> ObjectSegment<'data> for WasmSegment<'data, 'file, R> {
 
 /// An iterator over the sections of a `WasmFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSectionIterator<'data, 'file, R = &'data [u8]> {
     sections: slice::Iter<'file, wp::Section<'data>>,
@@ -544,6 +565,7 @@ pub struct WasmSectionIterator<'data, 'file, R = &'data [u8]> {
 impl<'data, 'file, R> Iterator for WasmSectionIterator<'data, 'file, R> {
     type Item = WasmSection<'data, 'file, R>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         let section = self.sections.next()?;
         Some(WasmSection {
@@ -555,7 +577,6 @@ impl<'data, 'file, R> Iterator for WasmSectionIterator<'data, 'file, R> {
 
 /// A section of a `WasmFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSection<'data, 'file, R = &'data [u8]> {
     section: &'file wp::Section<'data>,
@@ -610,6 +631,7 @@ impl<'data, 'file, R> ObjectSection<'data> for WasmSection<'data, 'file, R> {
         Ok(reader.read_bytes(reader.bytes_remaining()).unwrap())
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, _address: u64, _size: u64) -> Result<Option<&'data [u8]>> {
         unimplemented!()
     }
@@ -704,7 +726,6 @@ impl<'data, 'file, R> ObjectSection<'data> for WasmSection<'data, 'file, R> {
 
 /// An iterator over the COMDAT section groups of a `WasmFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmComdatIterator<'data, 'file, R = &'data [u8]> {
     #[allow(unused)]
@@ -723,7 +744,6 @@ impl<'data, 'file, R> Iterator for WasmComdatIterator<'data, 'file, R> {
 
 /// A COMDAT section group of a `WasmFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmComdat<'data, 'file, R = &'data [u8]> {
     #[allow(unused)]
@@ -768,7 +788,6 @@ impl<'data, 'file, R> ObjectComdat<'data> for WasmComdat<'data, 'file, R> {
 
 /// An iterator over the sections in a COMDAT section group of a `WasmFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmComdatSectionIterator<'data, 'file, R = &'data [u8]>
 where
@@ -781,6 +800,7 @@ where
 impl<'data, 'file, R> Iterator for WasmComdatSectionIterator<'data, 'file, R> {
     type Item = SectionIndex;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         None
     }
@@ -788,7 +808,6 @@ impl<'data, 'file, R> Iterator for WasmComdatSectionIterator<'data, 'file, R> {
 
 /// A symbol table of a `WasmFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSymbolTable<'data, 'file> {
     symbols: &'file [WasmSymbolInternal<'data>],
@@ -800,12 +819,14 @@ impl<'data, 'file> ObjectSymbolTable<'data> for WasmSymbolTable<'data, 'file> {
     type Symbol = WasmSymbol<'data, 'file>;
     type SymbolIterator = WasmSymbolIterator<'data, 'file>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&self) -> Self::SymbolIterator {
         WasmSymbolIterator {
             symbols: self.symbols.iter().enumerate(),
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&self, index: SymbolIndex) -> Result<Self::Symbol> {
         let symbol = self
             .symbols
@@ -817,7 +838,6 @@ impl<'data, 'file> ObjectSymbolTable<'data> for WasmSymbolTable<'data, 'file> {
 
 /// An iterator over the symbols of a `WasmFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmSymbolIterator<'data, 'file> {
     symbols: core::iter::Enumerate<slice::Iter<'file, WasmSymbolInternal<'data>>>,
@@ -826,6 +846,7 @@ pub struct WasmSymbolIterator<'data, 'file> {
 impl<'data, 'file> Iterator for WasmSymbolIterator<'data, 'file> {
     type Item = WasmSymbol<'data, 'file>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         let (index, symbol) = self.symbols.next()?;
         Some(WasmSymbol {
@@ -952,7 +973,6 @@ impl<'data, 'file> ObjectSymbol<'data> for WasmSymbol<'data, 'file> {
 
 /// An iterator over the relocations in a `WasmSection`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct WasmRelocationIterator<'data, 'file, R = &'data [u8]>(
     PhantomData<(&'data (), &'file (), R)>,

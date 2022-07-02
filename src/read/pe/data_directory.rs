@@ -20,6 +20,7 @@ impl<'data> DataDirectories<'data> {
     /// [optional header](pe::ImageOptionalHeader64).  `number` must be from the
     /// [`number_of_rva_and_sizes`](pe::ImageOptionalHeader64::number_of_rva_and_sizes)
     /// field of the optional header.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(data: &'data [u8], number: u32) -> Result<Self> {
         let entries = data
             .read_slice_at(0, number as usize)
@@ -29,16 +30,19 @@ impl<'data> DataDirectories<'data> {
 
     /// The number of data directories.
     #[allow(clippy::len_without_is_empty)]
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn len(&self) -> usize {
         self.entries.len()
     }
 
     /// Iterator over the data directories.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn iter(&self) -> slice::Iter<'data, pe::ImageDataDirectory> {
         self.entries.iter()
     }
 
     /// Iterator which gives the directories as well as their index (one of the IMAGE_DIRECTORY_ENTRY_* constants).
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn enumerate(&self) -> core::iter::Enumerate<slice::Iter<'data, pe::ImageDataDirectory>> {
         self.entries.iter().enumerate()
     }
@@ -49,6 +53,7 @@ impl<'data> DataDirectories<'data> {
     ///
     /// Returns `None` if the index is larger than the table size,
     /// or if the entry at the index has a zero virtual address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn get(&self, index: usize) -> Option<&'data pe::ImageDataDirectory> {
         self.entries
             .get(index)
@@ -58,6 +63,7 @@ impl<'data> DataDirectories<'data> {
     /// Returns the unparsed export directory.
     ///
     /// `data` must be the entire file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn export_directory<R: ReadRef<'data>>(
         &self,
         data: R,
@@ -74,6 +80,7 @@ impl<'data> DataDirectories<'data> {
     /// Returns the partially parsed export directory.
     ///
     /// `data` must be the entire file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn export_table<R: ReadRef<'data>>(
         &self,
         data: R,
@@ -91,6 +98,7 @@ impl<'data> DataDirectories<'data> {
     /// Returns the partially parsed import directory.
     ///
     /// `data` must be the entire file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn import_table<R: ReadRef<'data>>(
         &self,
         data: R,
@@ -110,6 +118,7 @@ impl<'data> DataDirectories<'data> {
     /// Returns the blocks in the base relocation directory.
     ///
     /// `data` must be the entire file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn relocation_blocks<R: ReadRef<'data>>(
         &self,
         data: R,
@@ -126,6 +135,7 @@ impl<'data> DataDirectories<'data> {
     /// Returns the resource directory.
     ///
     /// `data` must be the entire file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn resource_directory<R: ReadRef<'data>>(
         &self,
         data: R,
@@ -142,6 +152,7 @@ impl<'data> DataDirectories<'data> {
 
 impl pe::ImageDataDirectory {
     /// Return the virtual address range of this directory entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn address_range(&self) -> (u32, u32) {
         (self.virtual_address.get(LE), self.size.get(LE))
     }
@@ -154,6 +165,7 @@ impl pe::ImageDataDirectory {
     /// not desirable for all data directories.
     /// - It uses the `virtual_address` of the directory entry as an address,
     /// which is not valid for `IMAGE_DIRECTORY_ENTRY_SECURITY`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn file_range<'data>(&self, sections: &SectionTable<'data>) -> Result<(u32, u32)> {
         let (offset, section_size) = sections
             .pe_file_range_at(self.virtual_address.get(LE))
@@ -173,6 +185,7 @@ impl pe::ImageDataDirectory {
     /// not desirable for all data directories.
     /// - It uses the `virtual_address` of the directory entry as an address,
     /// which is not valid for `IMAGE_DIRECTORY_ENTRY_SECURITY`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn data<'data, R: ReadRef<'data>>(
         &self,
         data: R,

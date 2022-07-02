@@ -13,21 +13,25 @@ pub struct VersionIndex(pub u16);
 
 impl VersionIndex {
     /// Return the version index.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn index(&self) -> u16 {
         self.0 & elf::VERSYM_VERSION
     }
 
     /// Return true if it is the local index.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_local(&self) -> bool {
         self.index() == elf::VER_NDX_LOCAL
     }
 
     /// Return true if it is the global index.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_global(&self) -> bool {
         self.index() == elf::VER_NDX_GLOBAL
     }
 
     /// Return the hidden flag.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_hidden(&self) -> bool {
         self.0 & elf::VERSYM_HIDDEN != 0
     }
@@ -48,11 +52,13 @@ pub struct Version<'data> {
 
 impl<'data> Version<'data> {
     /// Return the version name.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(&self) -> &'data [u8] {
         self.name
     }
 
     /// Return hash of the version name.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn hash(&self) -> u32 {
         self.hash
     }
@@ -72,6 +78,7 @@ pub struct VersionTable<'data, Elf: FileHeader> {
 }
 
 impl<'data, Elf: FileHeader> Default for VersionTable<'data, Elf> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn default() -> Self {
         VersionTable {
             symbols: &[],
@@ -82,6 +89,7 @@ impl<'data, Elf: FileHeader> Default for VersionTable<'data, Elf> {
 
 impl<'data, Elf: FileHeader> VersionTable<'data, Elf> {
     /// Parse the version sections.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse<R: ReadRef<'data>>(
         endian: Elf::Endian,
         versyms: &'data [elf::Versym<Elf::Endian>],
@@ -159,11 +167,13 @@ impl<'data, Elf: FileHeader> VersionTable<'data, Elf> {
     }
 
     /// Return true if the version table is empty.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_empty(&self) -> bool {
         self.symbols.is_empty()
     }
 
     /// Return version index for a given symbol index.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn version_index(&self, endian: Elf::Endian, index: usize) -> VersionIndex {
         let version_index = match self.symbols.get(index) {
             Some(x) => x.0.get(endian),
@@ -178,6 +188,7 @@ impl<'data, Elf: FileHeader> VersionTable<'data, Elf> {
     ///
     /// Returns `Ok(None)` for local and global versions.
     /// Returns `Err(_)` if index is invalid.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn version(&self, index: VersionIndex) -> Result<Option<&Version<'data>>> {
         if index.index() <= elf::VER_NDX_GLOBAL {
             return Ok(None);
@@ -194,6 +205,7 @@ impl<'data, Elf: FileHeader> VersionTable<'data, Elf> {
     /// Returns false for any error.
     ///
     /// Note: this function hasn't been fully tested and is likely to be incomplete.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn matches(&self, endian: Elf::Endian, index: usize, need: Option<&Version>) -> bool {
         let version_index = self.version_index(endian, index);
         let def = match self.version(version_index) {
@@ -226,6 +238,7 @@ pub struct VerdefIterator<'data, Elf: FileHeader> {
 }
 
 impl<'data, Elf: FileHeader> VerdefIterator<'data, Elf> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn new(endian: Elf::Endian, data: &'data [u8]) -> Self {
         VerdefIterator {
             endian,
@@ -234,6 +247,7 @@ impl<'data, Elf: FileHeader> VerdefIterator<'data, Elf> {
     }
 
     /// Return the next `Verdef` entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn next(
         &mut self,
     ) -> Result<Option<(&'data elf::Verdef<Elf::Endian>, VerdauxIterator<'data, Elf>)>> {
@@ -276,6 +290,7 @@ pub struct VerdauxIterator<'data, Elf: FileHeader> {
 }
 
 impl<'data, Elf: FileHeader> VerdauxIterator<'data, Elf> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn new(endian: Elf::Endian, data: &'data [u8], count: u16) -> Self {
         VerdauxIterator {
             endian,
@@ -285,6 +300,7 @@ impl<'data, Elf: FileHeader> VerdauxIterator<'data, Elf> {
     }
 
     /// Return the next `Verdaux` entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn next(&mut self) -> Result<Option<&'data elf::Verdaux<Elf::Endian>>> {
         if self.count == 0 {
             return Ok(None);
@@ -313,6 +329,7 @@ pub struct VerneedIterator<'data, Elf: FileHeader> {
 }
 
 impl<'data, Elf: FileHeader> VerneedIterator<'data, Elf> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn new(endian: Elf::Endian, data: &'data [u8]) -> Self {
         VerneedIterator {
             endian,
@@ -321,6 +338,7 @@ impl<'data, Elf: FileHeader> VerneedIterator<'data, Elf> {
     }
 
     /// Return the next `Verneed` entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn next(
         &mut self,
     ) -> Result<
@@ -368,6 +386,7 @@ pub struct VernauxIterator<'data, Elf: FileHeader> {
 }
 
 impl<'data, Elf: FileHeader> VernauxIterator<'data, Elf> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn new(endian: Elf::Endian, data: &'data [u8], count: u16) -> Self {
         VernauxIterator {
             endian,
@@ -377,6 +396,7 @@ impl<'data, Elf: FileHeader> VernauxIterator<'data, Elf> {
     }
 
     /// Return the next `Vernaux` entry.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn next(&mut self) -> Result<Option<&'data elf::Vernaux<Elf::Endian>>> {
         if self.count == 0 {
             return Ok(None);
@@ -397,6 +417,7 @@ impl<'data, Elf: FileHeader> VernauxIterator<'data, Elf> {
 
 impl<Endian: endian::Endian> elf::Verdaux<Endian> {
     /// Parse the version name from the string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name<'data, R: ReadRef<'data>>(
         &self,
         endian: Endian,
@@ -410,6 +431,7 @@ impl<Endian: endian::Endian> elf::Verdaux<Endian> {
 
 impl<Endian: endian::Endian> elf::Verneed<Endian> {
     /// Parse the file from the string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn file<'data, R: ReadRef<'data>>(
         &self,
         endian: Endian,
@@ -423,6 +445,7 @@ impl<Endian: endian::Endian> elf::Verneed<Endian> {
 
 impl<Endian: endian::Endian> elf::Vernaux<Endian> {
     /// Parse the version name from the string table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name<'data, R: ReadRef<'data>>(
         &self,
         endian: Endian,

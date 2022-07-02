@@ -2,12 +2,15 @@ use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::{mem, str};
 
-use crate::{read::{
-    self, Architecture, ComdatKind, Error, Export, FileFlags, Import, NoDynamicRelocationIterator,
-    Object, ObjectComdat, ObjectKind, ObjectMap, ObjectSection, ReadError, ReadRef, Result,
-    SectionIndex, SymbolIndex,
-}, DebugPod};
 use crate::{endian, macho, BigEndian, ByteString, Endian, Endianness, Pod};
+use crate::{
+    read::{
+        self, Architecture, ComdatKind, Error, Export, FileFlags, Import,
+        NoDynamicRelocationIterator, Object, ObjectComdat, ObjectKind, ObjectMap, ObjectSection,
+        ReadError, ReadRef, Result, SectionIndex, SymbolIndex,
+    },
+    DebugPod,
+};
 
 use super::{
     DyldCacheImage, LoadCommandIterator, MachOSection, MachOSectionInternal, MachOSectionIterator,
@@ -26,7 +29,6 @@ pub type MachOFile64<'data, Endian = Endianness, R = &'data [u8]> =
 ///
 /// Most of the functionality of this type is provided by the `Object` trait implementation.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOFile<'data, Mach, R = &'data [u8]>
 where
@@ -48,6 +50,7 @@ where
     R: ReadRef<'data>,
 {
     /// Parse the raw Mach-O file data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse(data: R) -> Result<Self> {
         let header = Mach::parse(data, 0)?;
         let endian = header.endian()?;
@@ -84,6 +87,7 @@ where
 
     /// Parse the Mach-O file for the given image from the dyld shared cache.
     /// This will read different sections from different subcaches, if necessary.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn parse_dyld_cache_image<'cache, E: Endian>(
         image: &DyldCacheImage<'data, 'cache, E, R>,
     ) -> Result<Self> {
@@ -108,7 +112,9 @@ where
                     let (data, _offset) = image
                         .cache
                         .data_and_offset_for_address(addr)
-                        .read_error(crate::nosym!("Could not find segment data in dyld shared cache"))?;
+                        .read_error(crate::nosym!(
+                            "Could not find segment data in dyld shared cache"
+                        ))?;
                     if segment.name() == macho::SEG_LINKEDIT.as_bytes() {
                         linkedit_data = Some(data);
                     }
@@ -157,6 +163,7 @@ where
             .read_error(crate::nosym!("Invalid Mach-O section index"))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn segment_internal(
         &self,
         index: usize,
@@ -191,6 +198,7 @@ where
     type SymbolTable = MachOSymbolTable<'data, 'file, Mach, R>;
     type DynamicRelocationIterator = NoDynamicRelocationIterator;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn architecture(&self) -> Architecture {
         match self.header.cputype(self.endian) {
             macho::CPU_TYPE_ARM => Architecture::Arm,
@@ -214,6 +222,7 @@ where
         self.header.is_type_64()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ObjectKind {
         match self.header.filetype(self.endian) {
             macho::MH_OBJECT => ObjectKind::Relocatable,
@@ -224,6 +233,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segments(&'file self) -> MachOSegmentIterator<'data, 'file, Mach, R> {
         MachOSegmentIterator {
             file: self,
@@ -231,6 +241,7 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_name_bytes(
         &'file self,
         section_name: &[u8],
@@ -263,6 +274,7 @@ where
         self.sections().find(cmp_section_name)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_index(
         &'file self,
         index: SectionIndex,
@@ -274,6 +286,7 @@ where
         })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&'file self) -> MachOSectionIterator<'data, 'file, Mach, R> {
         MachOSectionIterator {
             file: self,
@@ -281,18 +294,22 @@ where
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn comdats(&'file self) -> MachOComdatIterator<'data, 'file, Mach, R> {
         MachOComdatIterator { file: self }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(
         &'file self,
         index: SymbolIndex,
     ) -> Result<MachOSymbol<'data, 'file, Mach, R>> {
         let nlist = self.symbols.symbol(index.0)?;
-        MachOSymbol::new(self, index, nlist).read_error(crate::nosym!("Unsupported Mach-O symbol index"))
+        MachOSymbol::new(self, index, nlist)
+            .read_error(crate::nosym!("Unsupported Mach-O symbol index"))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&'file self) -> MachOSymbolIterator<'data, 'file, Mach, R> {
         MachOSymbolIterator {
             file: self,
@@ -306,6 +323,7 @@ where
         Some(MachOSymbolTable { file: self })
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbols(&'file self) -> MachOSymbolIterator<'data, 'file, Mach, R> {
         MachOSymbolIterator {
             file: self,
@@ -319,10 +337,12 @@ where
         None
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn object_map(&'file self) -> ObjectMap<'data> {
         self.symbols.object_map(self.endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn imports(&self) -> Result<Vec<Import<'data>>> {
         let mut dysymtab = None;
         let mut libraries = Vec::new();
@@ -368,6 +388,7 @@ where
         Ok(imports)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn exports(&self) -> Result<Vec<Export<'data>>> {
         let mut dysymtab = None;
         let mut commands = self
@@ -403,18 +424,22 @@ where
         None
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn has_debug_symbols(&self) -> bool {
         self.section_by_name(".debug_info").is_some()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn mach_uuid(&self) -> Result<Option<[u8; 16]>> {
         self.header.uuid(self.endian, self.data, self.header_offset)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relative_address_base(&self) -> u64 {
         0
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn entry(&self) -> u64 {
         if let Ok(mut commands) =
             self.header
@@ -429,6 +454,7 @@ where
         0
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> FileFlags {
         FileFlags::MachO {
             flags: self.header.flags(self.endian),
@@ -445,7 +471,6 @@ pub type MachOComdatIterator64<'data, 'file, Endian = Endianness, R = &'data [u8
 
 /// An iterator over the COMDAT section groups of a `MachOFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOComdatIterator<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -480,7 +505,6 @@ pub type MachOComdat64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A COMDAT section group of a `MachOFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOComdat<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -545,7 +569,6 @@ pub type MachOComdatSectionIterator64<'data, 'file, Endian = Endianness, R = &'d
 
 /// An iterator over the sections in a COMDAT section group of a `MachOFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct MachOComdatSectionIterator<'data, 'file, Mach, R = &'data [u8]>
 where
@@ -564,6 +587,7 @@ where
 {
     type Item = SectionIndex;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
         None
     }
@@ -581,20 +605,30 @@ pub trait MachHeader: DebugPod {
     /// Return true if this type is a 64-bit header.
     ///
     /// This is a property of the type, not a value in the header data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_type_64(&self) -> bool;
 
     /// Return true if the `magic` field signifies big-endian.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_big_endian(&self) -> bool;
 
     /// Return true if the `magic` field signifies little-endian.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_little_endian(&self) -> bool;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn magic(&self) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cputype(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cpusubtype(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn filetype(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn ncmds(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sizeofcmds(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self, endian: Self::Endian) -> u32;
 
     // Provided methods.
@@ -602,6 +636,7 @@ pub trait MachHeader: DebugPod {
     /// Read the file header.
     ///
     /// Also checks that the magic field in the file header is a supported format.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn parse<'data, R: ReadRef<'data>>(data: R, offset: u64) -> read::Result<&'data Self> {
         let header = data
             .read_at::<Self>(offset)
@@ -612,14 +647,18 @@ pub trait MachHeader: DebugPod {
         Ok(header)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_supported(&self) -> bool {
         self.is_little_endian() || self.is_big_endian()
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn endian(&self) -> Result<Self::Endian> {
-        Self::Endian::from_big_endian(self.is_big_endian()).read_error(crate::nosym!("Unsupported Mach-O endian"))
+        Self::Endian::from_big_endian(self.is_big_endian())
+            .read_error(crate::nosym!("Unsupported Mach-O endian"))
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn load_commands<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -636,6 +675,7 @@ pub trait MachHeader: DebugPod {
     }
 
     /// Return the UUID from the `LC_UUID` load command, if one is present.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn uuid<'data, R: ReadRef<'data>>(
         &self,
         endian: Self::Endian,
@@ -659,42 +699,52 @@ impl<Endian: endian::Endian> MachHeader for macho::MachHeader32<Endian> {
     type Section = macho::Section32<Endian>;
     type Nlist = macho::Nlist32<Endian>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_type_64(&self) -> bool {
         false
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_big_endian(&self) -> bool {
         self.magic() == macho::MH_MAGIC
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_little_endian(&self) -> bool {
         self.magic() == macho::MH_CIGAM
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn magic(&self) -> u32 {
         self.magic.get(BigEndian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cputype(&self, endian: Self::Endian) -> u32 {
         self.cputype.get(endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cpusubtype(&self, endian: Self::Endian) -> u32 {
         self.cpusubtype.get(endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn filetype(&self, endian: Self::Endian) -> u32 {
         self.filetype.get(endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn ncmds(&self, endian: Self::Endian) -> u32 {
         self.ncmds.get(endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sizeofcmds(&self, endian: Self::Endian) -> u32 {
         self.sizeofcmds.get(endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self, endian: Self::Endian) -> u32 {
         self.flags.get(endian)
     }
@@ -707,42 +757,52 @@ impl<Endian: endian::Endian> MachHeader for macho::MachHeader64<Endian> {
     type Section = macho::Section64<Endian>;
     type Nlist = macho::Nlist64<Endian>;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_type_64(&self) -> bool {
         true
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_big_endian(&self) -> bool {
         self.magic() == macho::MH_MAGIC_64
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_little_endian(&self) -> bool {
         self.magic() == macho::MH_CIGAM_64
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn magic(&self) -> u32 {
         self.magic.get(BigEndian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cputype(&self, endian: Self::Endian) -> u32 {
         self.cputype.get(endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn cpusubtype(&self, endian: Self::Endian) -> u32 {
         self.cpusubtype.get(endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn filetype(&self, endian: Self::Endian) -> u32 {
         self.filetype.get(endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn ncmds(&self, endian: Self::Endian) -> u32 {
         self.ncmds.get(endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sizeofcmds(&self, endian: Self::Endian) -> u32 {
         self.sizeofcmds.get(endian)
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self, endian: Self::Endian) -> u32 {
         self.flags.get(endian)
     }

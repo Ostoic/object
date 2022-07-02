@@ -179,21 +179,26 @@ pub enum Import<'data> {
 
 /// A trait for generic access to [`pe::ImageThunkData32`] and [`pe::ImageThunkData64`].
 #[allow(missing_docs)]
-pub trait ImageThunkData: Pod { // Optionall Debug
+pub trait ImageThunkData: Pod {
+    // Optionall Debug
     /// Return the raw thunk value.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn raw(self) -> u64;
 
     /// Returns true if the ordinal flag is set.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_ordinal(self) -> bool;
 
     /// Return the ordinal portion of the thunk.
     ///
     /// Does not check the ordinal flag.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn ordinal(self) -> u16;
 
     /// Return the RVA portion of the thunk.
     ///
     /// Does not check the ordinal flag.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(self) -> u32;
 }
 

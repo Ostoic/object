@@ -1,17 +1,16 @@
 use core::fmt::Debug;
 use core::mem;
 
-use crate::{elf, DebugPod};
 use crate::endian;
 use crate::pod::Pod;
 use crate::read::util;
 use crate::read::{self, Bytes, Error, ReadError};
+use crate::{elf, DebugPod};
 
 use super::FileHeader;
 
 /// An iterator over the notes in an ELF section or segment.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct NoteIterator<'data, Elf>
 where
@@ -27,6 +26,7 @@ where
     Elf: FileHeader,
 {
     /// Returns `Err` if `align` is invalid.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub(super) fn new(
         endian: Elf::Endian,
         align: Elf::Word,
@@ -46,6 +46,7 @@ where
     }
 
     /// Returns the next note.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn next(&mut self) -> read::Result<Option<Note<'data, Elf>>> {
         let mut data = self.data;
         if data.is_empty() {
@@ -85,7 +86,6 @@ where
 
 /// A parsed `NoteHeader`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct Note<'data, Elf>
 where
@@ -100,16 +100,19 @@ impl<'data, Elf: FileHeader> Note<'data, Elf> {
     /// Return the `n_type` field of the `NoteHeader`.
     ///
     /// The meaning of this field is determined by `name`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn n_type(&self, endian: Elf::Endian) -> u32 {
         self.header.n_type(endian)
     }
 
     /// Return the `n_namesz` field of the `NoteHeader`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn n_namesz(&self, endian: Elf::Endian) -> u32 {
         self.header.n_namesz(endian)
     }
 
     /// Return the `n_descsz` field of the `NoteHeader`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn n_descsz(&self, endian: Elf::Endian) -> u32 {
         self.header.n_descsz(endian)
     }
@@ -122,6 +125,7 @@ impl<'data, Elf: FileHeader> Note<'data, Elf> {
     ///
     /// The length of this field (including any null terminator) is given by
     /// `n_namesz`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn name(&self) -> &'data [u8] {
         if let Some((last, name)) = self.name.split_last() {
             if *last == 0 {
@@ -135,6 +139,7 @@ impl<'data, Elf: FileHeader> Note<'data, Elf> {
     ///
     /// The length of this field is given by `n_descsz`. The meaning
     /// of this field is determined by `name` and `n_type`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn desc(&self) -> &'data [u8] {
         self.desc
     }
@@ -145,8 +150,11 @@ impl<'data, Elf: FileHeader> Note<'data, Elf> {
 pub trait NoteHeader: DebugPod {
     type Endian: endian::Endian;
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_namesz(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_descsz(&self, endian: Self::Endian) -> u32;
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn n_type(&self, endian: Self::Endian) -> u32;
 }
 

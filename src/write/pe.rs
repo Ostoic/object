@@ -145,6 +145,7 @@ impl<'a> Writer<'a> {
     /// Reserve a file range with the given size and using the file alignment.
     ///
     /// Returns the aligned offset of the start of the range.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn reserve_file(&mut self, len: u32) -> u32 {
         self.reserve(len, self.file_alignment)
     }
@@ -893,6 +894,7 @@ struct RelocBlock {
 }
 
 impl RelocBlock {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u32 {
         mem::size_of::<pe::ImageBaseRelocation>() as u32 + self.count * mem::size_of::<u16>() as u32
     }

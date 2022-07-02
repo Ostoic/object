@@ -31,6 +31,7 @@ impl Architecture {
     /// The size of an address value for this architecture.
     ///
     /// Returns `None` for unknown architectures.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn address_size(self) -> Option<AddressSize> {
         match self {
             Architecture::Unknown => None,
@@ -184,6 +185,7 @@ pub enum SectionKind {
 
 impl SectionKind {
     /// Return true if this section contains zerofill data.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     pub fn is_bss(self) -> bool {
         self == SectionKind::UninitializedData
             || self == SectionKind::UninitializedTls

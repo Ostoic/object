@@ -5,6 +5,7 @@ use object::read::archive::ArchiveFile;
 use object::read::macho::{FatArch, FatHeader};
 use object::Endianness;
 
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub fn print(w: &'_ mut dyn Write, e: &'_ mut dyn Write, file: &[u8]) {
     let mut printer = Printer::new(w, e);
     print_object(&mut printer, &*file);
@@ -18,24 +19,29 @@ struct Printer<'a> {
 }
 
 impl<'a> Printer<'a> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn new(w: &'a mut dyn Write, e: &'a mut dyn Write) -> Self {
         Self { w, e, indent: 0 }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn w(&mut self) -> &mut dyn Write {
         self.w
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn blank(&mut self) {
         writeln!(self.w).unwrap();
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn print_indent(&mut self) {
         if self.indent != 0 {
             write!(self.w, "{:-1$}", " ", self.indent * 4).unwrap();
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn print_string(&mut self, s: &[u8]) {
         if let Ok(s) = str::from_utf8(s) {
             write!(self.w, "\"{}\"", s).unwrap();
@@ -44,12 +50,14 @@ impl<'a> Printer<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn indent<F: FnOnce(&mut Self)>(&mut self, f: F) {
         self.indent += 1;
         f(self);
         self.indent -= 1;
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn group<F: FnOnce(&mut Self)>(&mut self, name: &str, f: F) {
         self.print_indent();
         writeln!(self.w, "{} {{", name).unwrap();
@@ -58,6 +66,7 @@ impl<'a> Printer<'a> {
         writeln!(self.w, "}}").unwrap();
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn field_name(&mut self, name: &str) {
         self.print_indent();
         if !name.is_empty() {
@@ -65,21 +74,25 @@ impl<'a> Printer<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn field<T: fmt::Display>(&mut self, name: &str, value: T) {
         self.field_name(name);
         writeln!(self.w, "{}", value).unwrap();
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn field_hex<T: fmt::UpperHex>(&mut self, name: &str, value: T) {
         self.field_name(name);
         writeln!(self.w, "0x{:X}", value).unwrap();
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn field_bytes(&mut self, name: &str, value: &[u8]) {
         self.field_name(name);
         writeln!(self.w, "{:X?}", value).unwrap();
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn field_string_option<T: fmt::UpperHex>(&mut self, name: &str, value: T, s: Option<&[u8]>) {
         if let Some(s) = s {
             self.field_name(name);
@@ -90,6 +103,7 @@ impl<'a> Printer<'a> {
         }
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn field_string<T: fmt::UpperHex, E: fmt::Display>(
         &mut self,
         name: &str,
@@ -100,12 +114,14 @@ impl<'a> Printer<'a> {
         self.field_string_option(name, value, s);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn field_inline_string(&mut self, name: &str, s: &[u8]) {
         self.field_name(name);
         self.print_string(s);
         writeln!(self.w).unwrap();
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn field_enum<T: Eq + fmt::UpperHex>(&mut self, name: &str, value: T, flags: &[Flag<T>]) {
         for flag in flags {
             if value == flag.value {
@@ -117,6 +133,7 @@ impl<'a> Printer<'a> {
         self.field_hex(name, value);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn field_enums<T: Eq + fmt::UpperHex>(&mut self, name: &str, value: T, enums: &[&[Flag<T>]]) {
         for flags in enums {
             for flag in *flags {
@@ -130,6 +147,7 @@ impl<'a> Printer<'a> {
         self.field_hex(name, value);
     }
 
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags<T: Into<u64>, U: Copy + Into<u64>>(&mut self, value: T, mask: U, flags: &[Flag<U>]) {
         let value = value.into();
         let mask = mask.into();
@@ -224,10 +242,12 @@ fn print_archive(p: &mut Printer<'_>, data: &[u8]) {
 }
 
 trait PrintErr<T> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn print_err(self, p: &mut Printer<'_>) -> Option<T>;
 }
 
 impl<T, E: fmt::Display> PrintErr<T> for Result<T, E> {
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn print_err(self, p: &mut Printer<'_>) -> Option<T> {
         match self {
             Ok(val) => Some(val),

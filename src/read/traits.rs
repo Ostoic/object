@@ -49,6 +49,7 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     type DynamicRelocationIterator: Iterator<Item = (u64, Relocation)>;
 
     /// Get the architecture type of the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn architecture(&self) -> Architecture;
 
     /// Get the endianness of the file.
@@ -63,15 +64,19 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     }
 
     /// Return true if the file is little endian, false if it is big endian.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_little_endian(&self) -> bool;
 
     /// Return true if the file can contain 64-bit addresses.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_64(&self) -> bool;
 
     /// Return the kind of this object.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ObjectKind;
 
     /// Get an iterator over the segments in the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segments(&'file self) -> Self::SegmentIterator;
 
     /// Get the section named `section_name`, if such a section exists.
@@ -88,11 +93,13 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     /// name. In this case, the first matching section will be used.
     ///
     /// This method skips over sections with invalid names.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_name(&'file self, section_name: &str) -> Option<Self::Section> {
         self.section_by_name_bytes(section_name.as_bytes())
     }
 
     /// Like [`Self::section_by_name`], but allows names that are not UTF-8.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_name_bytes(&'file self, section_name: &[u8]) -> Option<Self::Section>;
 
     /// Get the section at the given index.
@@ -102,15 +109,19 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     /// For some object files, this requires iterating through all sections.
     ///
     /// Returns an error if the index is invalid.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_by_index(&'file self, index: SectionIndex) -> Result<Self::Section>;
 
     /// Get an iterator over the sections in the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&'file self) -> Self::SectionIterator;
 
     /// Get an iterator over the COMDAT section groups in the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn comdats(&'file self) -> Self::ComdatIterator;
 
     /// Get the symbol table, if any.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_table(&'file self) -> Option<Self::SymbolTable>;
 
     /// Get the debugging symbol at the given index.
@@ -118,6 +129,7 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     /// The meaning of the index depends on the object file.
     ///
     /// Returns an error if the index is invalid.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&'file self, index: SymbolIndex) -> Result<Self::Symbol>;
 
     /// Get an iterator over the debugging symbols in the file.
@@ -125,11 +137,13 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     /// This may skip over symbols that are malformed or unsupported.
     ///
     /// For Mach-O files, this does not include STAB entries.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&'file self) -> Self::SymbolIterator;
 
     /// Get the dynamic linking symbol table, if any.
     ///
     /// Only ELF has a separate dynamic linking symbol table.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbol_table(&'file self) -> Option<Self::SymbolTable>;
 
     /// Get an iterator over the dynamic linking symbols in the file.
@@ -138,6 +152,7 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     ///
     /// Only ELF has separate dynamic linking symbols.
     /// Other file formats will return an empty iterator.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_symbols(&'file self) -> Self::SymbolIterator;
 
     /// Get the dynamic relocations for this file.
@@ -145,12 +160,14 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     /// Symbol indices in these relocations refer to the dynamic symbol table.
     ///
     /// Only ELF has dynamic relocations.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn dynamic_relocations(&'file self) -> Option<Self::DynamicRelocationIterator>;
 
     /// Construct a map from addresses to symbol names.
     ///
     /// The map will only contain defined text and data symbols.
     /// The dynamic symbol table will only be used if there are no debugging symbols.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_map(&'file self) -> SymbolMap<SymbolMapName<'data>> {
         let mut symbols = Vec::new();
         if let Some(table) = self.symbol_table().or_else(|| self.dynamic_symbol_table()) {
@@ -169,20 +186,24 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     /// Construct a map from addresses to symbol names and object file names.
     ///
     /// This is derived from Mach-O STAB entries.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn object_map(&'file self) -> ObjectMap<'data> {
         ObjectMap::default()
     }
 
     /// Get the imported symbols.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn imports(&self) -> Result<Vec<Import<'data>>>;
 
     /// Get the exported symbols that expose both a name and an address.
     ///
     /// Some file formats may provide other kinds of symbols, that can be retrieved using
     /// the lower-level API.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn exports(&self) -> Result<Vec<Export<'data>>>;
 
     /// Return true if the file contains debug information sections, false if not.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn has_debug_symbols(&self) -> bool;
 
     /// The UUID from a Mach-O `LC_UUID` load command.
@@ -223,12 +244,15 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
     /// Get the base address used for relative virtual addresses.
     ///
     /// Currently this is only non-zero for PE.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relative_address_base(&'file self) -> u64;
 
     /// Get the virtual address of the entry point of the binary
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn entry(&'file self) -> u64;
 
     /// File flags that are specific to each file format.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> FileFlags;
 }
 
@@ -238,37 +262,46 @@ pub trait Object<'data: 'file, 'file>: read::private::Sealed {
 /// For Mach-O, this is a load command with type `LC_SEGMENT` or `LC_SEGMENT_64`.
 pub trait ObjectSegment<'data>: read::private::Sealed {
     /// Returns the virtual address of the segment.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64;
 
     /// Returns the size of the segment in memory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64;
 
     /// Returns the alignment of the segment in memory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64;
 
     /// Returns the offset and size of the segment in the file.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> (u64, u64);
 
     /// Returns a reference to the file contents of the segment.
     ///
     /// The length of this data may be different from the size of the
     /// segment in memory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]>;
 
     /// Return the segment data in the given range.
     ///
     /// Returns `Ok(None)` if the segment does not contain the given range.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> Result<Option<&'data [u8]>>;
 
     /// Returns the name of the segment.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<Option<&[u8]>>;
 
     /// Returns the name of the segment.
     ///
     /// Returns an error if the name is not UTF-8.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<Option<&str>>;
 
     /// Return the flags of segment.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SegmentFlags;
 }
 
@@ -281,18 +314,23 @@ pub trait ObjectSection<'data>: read::private::Sealed {
     type RelocationIterator: Iterator<Item = (u64, Relocation)>;
 
     /// Returns the section index.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SectionIndex;
 
     /// Returns the address of the section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64;
 
     /// Returns the size of the section in memory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64;
 
     /// Returns the alignment of the section in memory.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64;
 
     /// Returns offset and size of on-disk segment (if any).
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn file_range(&self) -> Option<(u64, u64)>;
 
     /// Returns the raw contents of the section.
@@ -301,6 +339,7 @@ pub trait ObjectSection<'data>: read::private::Sealed {
     /// section in memory.
     ///
     /// This does not do any decompression.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data(&self) -> Result<&'data [u8]>;
 
     /// Return the raw contents of the section data in the given range.
@@ -308,14 +347,17 @@ pub trait ObjectSection<'data>: read::private::Sealed {
     /// This does not do any decompression.
     ///
     /// Returns `Ok(None)` if the section does not contain the given range.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn data_range(&self, address: u64, size: u64) -> Result<Option<&'data [u8]>>;
 
     /// Returns the potentially compressed file range of the section,
     /// along with information about the compression.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_file_range(&self) -> Result<CompressedFileRange>;
 
     /// Returns the potentially compressed contents of the section,
     /// along with information about the compression.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn compressed_data(&self) -> Result<CompressedData<'data>>;
 
     /// Returns the uncompressed contents of the section.
@@ -325,33 +367,41 @@ pub trait ObjectSection<'data>: read::private::Sealed {
     ///
     /// If no compression is detected, then returns the data unchanged.
     /// Returns `Err` if decompression fails.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn uncompressed_data(&self) -> Result<Cow<'data, [u8]>> {
         self.compressed_data()?.decompress()
     }
 
     /// Returns the name of the section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&[u8]>;
 
     /// Returns the name of the section.
     ///
     /// Returns an error if the name is not UTF-8.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&str>;
 
     /// Returns the name of the segment for this section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name_bytes(&self) -> Result<Option<&[u8]>>;
 
     /// Returns the name of the segment for this section.
     ///
     /// Returns an error if the name is not UTF-8.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn segment_name(&self) -> Result<Option<&str>>;
 
     /// Return the kind of this section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SectionKind;
 
     /// Get the relocations for this section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn relocations(&self) -> Self::RelocationIterator;
 
     /// Section flags that are specific to each file format.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SectionFlags;
 }
 
@@ -361,20 +411,25 @@ pub trait ObjectComdat<'data>: read::private::Sealed {
     type SectionIterator: Iterator<Item = SectionIndex>;
 
     /// Returns the COMDAT selection kind.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> ComdatKind;
 
     /// Returns the index of the symbol used for the name of COMDAT section group.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol(&self) -> SymbolIndex;
 
     /// Returns the name of the COMDAT section group.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&[u8]>;
 
     /// Returns the name of the COMDAT section group.
     ///
     /// Returns an error if the name is not UTF-8.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&str>;
 
     /// Get the sections in this section group.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn sections(&self) -> Self::SectionIterator;
 }
 
@@ -389,6 +444,7 @@ pub trait ObjectSymbolTable<'data>: read::private::Sealed {
     /// Get an iterator over the symbols in the table.
     ///
     /// This may skip over symbols that are malformed or unsupported.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbols(&self) -> Self::SymbolIterator;
 
     /// Get the symbol at the given index.
@@ -396,74 +452,90 @@ pub trait ObjectSymbolTable<'data>: read::private::Sealed {
     /// The meaning of the index depends on the object file.
     ///
     /// Returns an error if the index is invalid.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn symbol_by_index(&self, index: SymbolIndex) -> Result<Self::Symbol>;
 }
 
 /// A symbol table entry.
 pub trait ObjectSymbol<'data>: read::private::Sealed {
     /// The index of the symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn index(&self) -> SymbolIndex;
 
     /// The name of the symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name_bytes(&self) -> Result<&'data [u8]>;
 
     /// The name of the symbol.
     ///
     /// Returns an error if the name is not UTF-8.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn name(&self) -> Result<&'data str>;
 
     /// The address of the symbol. May be zero if the address is unknown.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn address(&self) -> u64;
 
     /// The size of the symbol. May be zero if the size is unknown.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn size(&self) -> u64;
 
     /// Return the kind of this symbol.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn kind(&self) -> SymbolKind;
 
     /// Returns the section where the symbol is defined.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section(&self) -> SymbolSection;
 
     /// Returns the section index for the section containing this symbol.
     ///
     /// May return `None` if the symbol is not defined in a section.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn section_index(&self) -> Option<SectionIndex> {
         self.section().index()
     }
 
     /// Return true if the symbol is undefined.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_undefined(&self) -> bool;
 
     /// Return true if the symbol is a definition of a function or data object
     /// that has a known address.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_definition(&self) -> bool;
 
     /// Return true if the symbol is common data.
     ///
     /// Note: does not check for `SymbolSection::Section` with `SectionKind::Common`.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_common(&self) -> bool;
 
     /// Return true if the symbol is weak.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_weak(&self) -> bool;
 
     /// Returns the symbol scope.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn scope(&self) -> SymbolScope;
 
     /// Return true if the symbol visible outside of the compilation unit.
     ///
     /// This treats `SymbolScope::Unknown` as global.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_global(&self) -> bool;
 
     /// Return true if the symbol is only visible within the compilation unit.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn is_local(&self) -> bool;
 
     /// Symbol flags that are specific to each file format.
+    #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn flags(&self) -> SymbolFlags<SectionIndex>;
 }
 
 /// An iterator for files that don't have dynamic relocations.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-
 #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct NoDynamicRelocationIterator;
 
