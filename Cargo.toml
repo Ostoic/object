@@ -21,7 +21,7 @@ crc32fast = { version = "1.2", default-features = false, optional = true }
 flate2 = { version = "1", optional = true }
 indexmap = { version = "1.6", optional = true }
 wasmparser = { version = "0.57", optional = true }
-memchr = { version = "2.5.0", default-features = false }
+memchr = { git = "https://github.com/Ostoic/memchr", default-features = false }
 hashbrown = { version = "0.12.0", features = ["ahash"], default-features = false, optional = true }
 
 # Internal feature, only used when building as part of libstd, not part of the
@@ -38,7 +38,7 @@ optional = true
 
 [features]
 aggressive-inline = ["memchr/aggressive-inline"]
-nosym = []
+nosym = ["memchr/nosym"]
 
 #=======================================
 # Read/write features.
