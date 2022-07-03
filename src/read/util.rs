@@ -181,6 +181,7 @@ impl<'data> Bytes<'data> {
 }
 
 // Only for Debug impl of `Bytes`.
+#[cfg_attr(feature = "aggressive-inline", inline(always))]
 fn debug_list_bytes(bytes: &[u8], fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
     let mut list = fmt.debug_list();
     list.entries(bytes.iter().take(8).copied().map(DebugByte));
@@ -228,11 +229,13 @@ impl<'data> fmt::Debug for ByteString<'data> {
 #[allow(dead_code)]
 #[cfg_attr(not(feature = "aggressive-inline"), inline)]
 #[cfg_attr(feature = "aggressive-inline", inline(always))]
+#[inline(always)]
 pub(crate) fn align(offset: usize, size: usize) -> usize {
     (offset + (size - 1)) & !(size - 1)
 }
 
 #[allow(dead_code)]
+#[inline(always)]
 pub(crate) fn data_range(
     data: &[u8],
     data_address: u64,
