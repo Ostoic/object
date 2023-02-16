@@ -6,7 +6,7 @@ use crate::{macho, Architecture, Endian, Endianness};
 
 /// A parsed representation of the dyld shared cache.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DyldCache<'data, E = Endianness, R = &'data [u8]>
 where
     E: Endian,
@@ -22,7 +22,7 @@ where
 
 /// Information about a subcache.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DyldSubCache<'data, E = Endianness, R = &'data [u8]>
 where
     E: Endian,
@@ -155,7 +155,7 @@ where
 
 /// An iterator over all the images (dylibs) in the dyld shared cache.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DyldCacheImageIterator<'data, 'cache, E = Endianness, R = &'data [u8]>
 where
     E: Endian,
@@ -184,7 +184,7 @@ where
 
 /// One image (dylib) from inside the dyld shared cache.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DyldCacheImage<'data, 'cache, E = Endianness, R = &'data [u8]>
 where
     E: Endian,

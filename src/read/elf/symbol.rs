@@ -11,7 +11,7 @@ use crate::read::{
     self, ObjectSymbol, ObjectSymbolTable, ReadError, ReadRef, SectionIndex, SymbolFlags,
     SymbolIndex, SymbolKind, SymbolMap, SymbolMapEntry, SymbolScope, SymbolSection,
 };
-use crate::{elf, DebugPod};
+use crate::{elf, U32};
 
 use super::{FileHeader, SectionHeader, SectionTable};
 
@@ -30,7 +30,7 @@ where
     shndx_section: SectionIndex,
     symbols: &'data [Elf::Sym],
     strings: StringTable<'data, R>,
-    shndx: &'data [u32],
+    shndx: &'data [U32<Elf::Endian>],
 }
 
 impl<'data, Elf: FileHeader, R: ReadRef<'data>> Default for SymbolTable<'data, Elf, R> {
@@ -157,10 +157,9 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
     }
 
     /// Return the extended section index for the given symbol if present.
-    #[cfg_attr(not(feature = "aggressive-inline"), inline)]
-    #[cfg_attr(feature = "aggressive-inline", inline(always))]
-    pub fn shndx(&self, index: usize) -> Option<u32> {
-        self.shndx.get(index).copied()
+    #[inline]
+    pub fn shndx(&self, endian: Elf::Endian, index: usize) -> Option<u32> {
+        self.shndx.get(index).map(|x| x.get(endian))
     }
 
     /// Return the section index for the given symbol.
@@ -176,8 +175,8 @@ impl<'data, Elf: FileHeader, R: ReadRef<'data>> SymbolTable<'data, Elf, R> {
         match symbol.st_shndx(endian) {
             elf::SHN_UNDEF => Ok(None),
             elf::SHN_XINDEX => self
-                .shndx(index)
-                .read_error(crate::nosym!("Missing ELF symbol extended index"))
+                .shndx(endian, index)
+                .read_error("Missing ELF symbol extended index")
                 .map(|index| Some(SectionIndex(index as usize))),
             shndx if shndx < elf::SHN_LORESERVE => Ok(Some(SectionIndex(shndx.into()))),
             _ => Ok(None),
@@ -381,8 +380,9 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
     fn kind(&self) -> SymbolKind {
         match self.symbol.st_type() {
             elf::STT_NOTYPE if self.index.0 == 0 => SymbolKind::Null,
+            elf::STT_NOTYPE => SymbolKind::Label,
             elf::STT_OBJECT | elf::STT_COMMON => SymbolKind::Data,
-            elf::STT_FUNC => SymbolKind::Text,
+            elf::STT_FUNC | elf::STT_GNU_IFUNC => SymbolKind::Text,
             elf::STT_SECTION => SymbolKind::Section,
             elf::STT_FILE => SymbolKind::File,
             elf::STT_TLS => SymbolKind::Tls,
@@ -402,7 +402,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
                 }
             }
             elf::SHN_COMMON => SymbolSection::Common,
-            elf::SHN_XINDEX => match self.symbols.shndx(self.index.0) {
+            elf::SHN_XINDEX => match self.symbols.shndx(self.endian, self.index.0) {
                 Some(index) => SymbolSection::Section(SectionIndex(index as usize)),
                 None => SymbolSection::Unknown,
             },

@@ -16,7 +16,7 @@ pub type ElfComdatIterator64<'data, 'file, Endian = Endianness, R = &'data [u8]>
 
 /// An iterator over the COMDAT section groups of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ElfComdatIterator<'data, 'file, Elf, R = &'data [u8]>
 where
     'data: 'file,
@@ -36,7 +36,7 @@ where
 
     #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some((_index, section)) = self.iter.next() {
+        for (_index, section) in self.iter.by_ref() {
             if let Some(comdat) = ElfComdat::parse(self.file, section) {
                 return Some(comdat);
             }
@@ -54,7 +54,7 @@ pub type ElfComdat64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A COMDAT section group of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ElfComdat<'data, 'file, Elf, R = &'data [u8]>
 where
     Elf: FileHeader,
@@ -147,7 +147,7 @@ pub type ElfComdatSectionIterator64<'data, 'file, Endian = Endianness, R = &'dat
 
 /// An iterator over the sections in a COMDAT section group of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ElfComdatSectionIterator<'data, 'file, Elf, R = &'data [u8]>
 where
     'data: 'file,

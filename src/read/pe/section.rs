@@ -20,7 +20,7 @@ pub type PeSegmentIterator64<'data, 'file, R = &'data [u8]> =
 
 /// An iterator over the loadable sections of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct PeSegmentIterator<'data, 'file, Pe, R = &'data [u8]>
 where
     Pe: ImageNtHeaders,
@@ -55,7 +55,7 @@ pub type PeSegment64<'data, 'file, R = &'data [u8]> =
 
 /// A loadable section of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct PeSegment<'data, 'file, Pe, R = &'data [u8]>
 where
     Pe: ImageNtHeaders,
@@ -153,7 +153,7 @@ pub type PeSectionIterator64<'data, 'file, R = &'data [u8]> =
 
 /// An iterator over the sections of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct PeSectionIterator<'data, 'file, Pe, R = &'data [u8]>
 where
     'data: 'file,
@@ -190,7 +190,7 @@ pub type PeSection64<'data, 'file, R = &'data [u8]> =
 
 /// A section of a `PeFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct PeSection<'data, 'file, Pe, R = &'data [u8]>
 where
     'data: 'file,
@@ -465,7 +465,7 @@ impl pe::ImageSectionHeader {
 
 /// An iterator over the relocations in an `PeSection`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct PeRelocationIterator<'data, 'file, R = &'data [u8]>(
     PhantomData<(&'data (), &'file (), R)>,
 );

@@ -12,13 +12,13 @@ use crate::write::{Error, Result, WritableBuffer};
 /// The index of an ELF section.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SectionIndex(pub u32);
 
 /// The index of an ELF symbol.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SymbolIndex(pub u32);
 
 /// A helper for writing ELF files.
@@ -39,7 +39,7 @@ pub struct SymbolIndex(pub u32);
 /// is in the same order that file ranges were reserved. There are debug asserts to assist
 /// with checking this.
 #[allow(missing_debug_implementations)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Writer<'a> {
     endian: Endianness,
     is_64: bool,
@@ -1974,7 +1974,7 @@ impl<'a> Writer<'a> {
 #[allow(missing_docs)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct FileHeader {
     pub os_abi: u8,
     pub abi_version: u8,
@@ -1988,7 +1988,7 @@ pub struct FileHeader {
 #[allow(missing_docs)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ProgramHeader {
     pub p_type: u32,
     pub p_flags: u32,
@@ -2004,7 +2004,7 @@ pub struct ProgramHeader {
 #[allow(missing_docs)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SectionHeader {
     pub name: Option<StringId>,
     pub sh_type: u32,
@@ -2022,7 +2022,7 @@ pub struct SectionHeader {
 #[allow(missing_docs)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Sym {
     pub name: Option<StringId>,
     pub section: Option<SectionIndex>,
@@ -2037,7 +2037,7 @@ pub struct Sym {
 #[allow(missing_docs)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Rel {
     pub r_offset: u64,
     pub r_sym: u32,
@@ -2049,7 +2049,7 @@ pub struct Rel {
 #[allow(missing_docs)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Verdef {
     pub version: u16,
     pub flags: u16,
@@ -2063,7 +2063,7 @@ pub struct Verdef {
 #[allow(missing_docs)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Verneed {
     pub version: u16,
     pub aux_count: u16,
@@ -2074,7 +2074,7 @@ pub struct Verneed {
 #[allow(missing_docs)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Vernaux {
     pub flags: u16,
     pub index: u16,

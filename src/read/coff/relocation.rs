@@ -10,7 +10,7 @@ use crate::read::{
 use super::CoffFile;
 
 /// An iterator over the relocations in a `CoffSection`.
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct CoffRelocationIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]> {
     pub(super) file: &'file CoffFile<'data, R>,
     pub(super) iter: slice::Iter<'data, pe::ImageRelocation>,

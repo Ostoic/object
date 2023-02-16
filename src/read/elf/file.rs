@@ -30,7 +30,7 @@ pub type ElfFile64<'data, Endian = Endianness, R = &'data [u8]> =
 ///
 /// Most of the functionality of this type is provided by the `Object` trait implementation.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ElfFile<'data, Elf, R = &'data [u8]>
 where
     Elf: FileHeader,
@@ -169,7 +169,8 @@ where
             self.header.e_machine(self.endian),
             self.header.is_class_64(),
         ) {
-            (elf::EM_AARCH64, _) => Architecture::Aarch64,
+            (elf::EM_AARCH64, true) => Architecture::Aarch64,
+            (elf::EM_AARCH64, false) => Architecture::Aarch64_Ilp32,
             (elf::EM_ARM, _) => Architecture::Arm,
             (elf::EM_AVR, _) => Architecture::Avr,
             (elf::EM_BPF, _) => Architecture::Bpf,
@@ -188,7 +189,9 @@ where
             // This is either s390 or s390x, depending on the ELF class.
             // We only support the 64-bit variant s390x here.
             (elf::EM_S390, true) => Architecture::S390x,
+            (elf::EM_SBF, _) => Architecture::Sbf,
             (elf::EM_SPARCV9, true) => Architecture::Sparc64,
+            (elf::EM_XTENSA, false) => Architecture::Xtensa,
             _ => Architecture::Unknown,
         }
     }

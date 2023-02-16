@@ -296,7 +296,7 @@ pub const VM_PROT_EXECUTE: u32 = 0x04;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DyldCacheHeader<E: Endian> {
     /// e.g. "dyld_v0    i386"
     pub magic: [u8; 16],
@@ -356,7 +356,7 @@ pub struct DyldCacheHeader<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DyldCacheMappingInfo<E: Endian> {
     ///
     pub address: U64<E>,
@@ -374,7 +374,7 @@ pub struct DyldCacheMappingInfo<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DyldCacheImageInfo<E: Endian> {
     ///
     pub address: U64<E>,
@@ -393,7 +393,7 @@ pub struct DyldCacheImageInfo<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DyldSubCacheInfo<E: Endian> {
     /// The UUID of this subcache.
     pub uuid: [u8; 16],
@@ -425,7 +425,7 @@ pub const FAT_CIGAM: u32 = 0xbeba_feca;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct FatHeader {
     /// FAT_MAGIC or FAT_MAGIC_64
     pub magic: U32<BigEndian>,
@@ -436,7 +436,7 @@ pub struct FatHeader {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct FatArch32 {
     /// cpu specifier (int)
     pub cputype: U32<BigEndian>,
@@ -464,7 +464,7 @@ pub const FAT_CIGAM_64: u32 = 0xbfba_feca;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct FatArch64 {
     /// cpu specifier (int)
     pub cputype: U32<BigEndian>,
@@ -488,7 +488,7 @@ pub struct FatArch64 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct MachHeader32<E: Endian> {
     /// mach magic number identifier
     pub magic: U32<BigEndian>,
@@ -518,7 +518,7 @@ pub const MH_CIGAM: u32 = 0xcefa_edfe;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct MachHeader64<E: Endian> {
     /// mach magic number identifier
     pub magic: U32<BigEndian>,
@@ -674,7 +674,7 @@ pub const MH_DYLIB_IN_CACHE: u32 = 0x8000_0000;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct LoadCommand<E: Endian> {
     /// Type of load command.
     ///
@@ -816,7 +816,7 @@ pub const LC_FILESET_ENTRY: u32 = 0x35 | LC_REQ_DYLD;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct LcStr<E: Endian> {
     /// offset to the string
     pub offset: U32<E>,
@@ -837,7 +837,7 @@ pub struct LcStr<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SegmentCommand32<E: Endian> {
     /// LC_SEGMENT
     pub cmd: U32<E>,
@@ -872,7 +872,7 @@ pub struct SegmentCommand32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SegmentCommand64<E: Endian> {
     /// LC_SEGMENT_64
     pub cmd: U32<E>,
@@ -941,7 +941,7 @@ pub const SG_READ_ONLY: u32 = 0x10;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Section32<E: Endian> {
     /// name of this section
     pub sectname: [u8; 16],
@@ -971,7 +971,7 @@ pub struct Section32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Section64<E: Endian> {
     /// name of this section
     pub sectname: [u8; 16],
@@ -1187,7 +1187,7 @@ pub const SEG_IMPORT: &str = "__IMPORT";
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Fvmlib<E: Endian> {
     /// library's target pathname
     pub name: LcStr<E>,
@@ -1207,7 +1207,7 @@ pub struct Fvmlib<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct FvmlibCommand<E: Endian> {
     /// LC_IDFVMLIB or LC_LOADFVMLIB
     pub cmd: U32<E>,
@@ -1229,7 +1229,7 @@ pub struct FvmlibCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Dylib<E: Endian> {
     /// library's path name
     pub name: LcStr<E>,
@@ -1251,7 +1251,7 @@ pub struct Dylib<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DylibCommand<E: Endian> {
     /// LC_ID_DYLIB, LC_LOAD_{,WEAK_}DYLIB, LC_REEXPORT_DYLIB
     pub cmd: U32<E>,
@@ -1274,7 +1274,7 @@ pub struct DylibCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SubFrameworkCommand<E: Endian> {
     /// LC_SUB_FRAMEWORK
     pub cmd: U32<E>,
@@ -1296,7 +1296,7 @@ pub struct SubFrameworkCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SubClientCommand<E: Endian> {
     /// LC_SUB_CLIENT
     pub cmd: U32<E>,
@@ -1322,7 +1322,7 @@ pub struct SubClientCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SubUmbrellaCommand<E: Endian> {
     /// LC_SUB_UMBRELLA
     pub cmd: U32<E>,
@@ -1350,7 +1350,7 @@ pub struct SubUmbrellaCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SubLibraryCommand<E: Endian> {
     /// LC_SUB_LIBRARY
     pub cmd: U32<E>,
@@ -1372,7 +1372,7 @@ pub struct SubLibraryCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct PreboundDylibCommand<E: Endian> {
     /// LC_PREBOUND_DYLIB
     pub cmd: U32<E>,
@@ -1397,7 +1397,7 @@ pub struct PreboundDylibCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DylinkerCommand<E: Endian> {
     /// LC_ID_DYLINKER, LC_LOAD_DYLINKER or LC_DYLD_ENVIRONMENT
     pub cmd: U32<E>,
@@ -1431,7 +1431,7 @@ pub struct DylinkerCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ThreadCommand<E: Endian> {
     /// LC_THREAD or  LC_UNIXTHREAD
     pub cmd: U32<E>,
@@ -1454,7 +1454,7 @@ pub struct ThreadCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct RoutinesCommand32<E: Endian> {
     /* for 32-bit architectures */
     /// LC_ROUTINES
@@ -1479,7 +1479,7 @@ pub struct RoutinesCommand32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct RoutinesCommand64<E: Endian> {
     /* for 64-bit architectures */
     /// LC_ROUTINES_64
@@ -1506,7 +1506,7 @@ pub struct RoutinesCommand64<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SymtabCommand<E: Endian> {
     /// LC_SYMTAB
     pub cmd: U32<E>,
@@ -1565,7 +1565,7 @@ pub struct SymtabCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DysymtabCommand<E: Endian> {
     /// LC_DYSYMTAB
     pub cmd: U32<E>,
@@ -1715,7 +1715,7 @@ pub const INDIRECT_SYMBOL_ABS: u32 = 0x4000_0000;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DylibTableOfContents<E: Endian> {
     /// the defined external symbol (index into the symbol table)
     pub symbol_index: U32<E>,
@@ -1727,7 +1727,7 @@ pub struct DylibTableOfContents<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DylibModule32<E: Endian> {
     /// the module name (index into string table)
     pub module_name: U32<E>,
@@ -1765,7 +1765,7 @@ pub struct DylibModule32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DylibModule64<E: Endian> {
     /// the module name (index into string table)
     pub module_name: U32<E>,
@@ -1810,7 +1810,7 @@ pub struct DylibModule64<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DylibReference<E: Endian> {
     /* TODO:
     uint32_t isym:24,		/* index into the symbol table */
@@ -1826,7 +1826,7 @@ pub struct DylibReference<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct TwolevelHintsCommand<E: Endian> {
     /// LC_TWOLEVEL_HINTS
     pub cmd: U32<E>,
@@ -1857,7 +1857,7 @@ pub struct TwolevelHintsCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct TwolevelHint<E: Endian> {
     /* TODO:
     uint32_t
@@ -1880,7 +1880,7 @@ pub struct TwolevelHint<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct PrebindCksumCommand<E: Endian> {
     /// LC_PREBIND_CKSUM
     pub cmd: U32<E>,
@@ -1897,7 +1897,7 @@ pub struct PrebindCksumCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct UuidCommand<E: Endian> {
     /// LC_UUID
     pub cmd: U32<E>,
@@ -1914,7 +1914,7 @@ pub struct UuidCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct RpathCommand<E: Endian> {
     /// LC_RPATH
     pub cmd: U32<E>,
@@ -1931,7 +1931,7 @@ pub struct RpathCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct LinkeditDataCommand<E: Endian> {
     /// `LC_CODE_SIGNATURE`, `LC_SEGMENT_SPLIT_INFO`, `LC_FUNCTION_STARTS`,
     /// `LC_DATA_IN_CODE`, `LC_DYLIB_CODE_SIGN_DRS`, `LC_LINKER_OPTIMIZATION_HINT`,
@@ -1948,7 +1948,7 @@ pub struct LinkeditDataCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct FilesetEntryCommand<E: Endian> {
     // LC_FILESET_ENTRY
     pub cmd: U32<E>,
@@ -1971,7 +1971,7 @@ pub struct FilesetEntryCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct EncryptionInfoCommand32<E: Endian> {
     /// LC_ENCRYPTION_INFO
     pub cmd: U32<E>,
@@ -1992,7 +1992,7 @@ pub struct EncryptionInfoCommand32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct EncryptionInfoCommand64<E: Endian> {
     /// LC_ENCRYPTION_INFO_64
     pub cmd: U32<E>,
@@ -2015,7 +2015,7 @@ pub struct EncryptionInfoCommand64<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct VersionMinCommand<E: Endian> {
     /// LC_VERSION_MIN_MACOSX or LC_VERSION_MIN_IPHONEOS or LC_VERSION_MIN_WATCHOS or LC_VERSION_MIN_TVOS
     pub cmd: U32<E>,
@@ -2035,7 +2035,7 @@ pub struct VersionMinCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct BuildVersionCommand<E: Endian> {
     /// LC_BUILD_VERSION
     pub cmd: U32<E>,
@@ -2054,7 +2054,7 @@ pub struct BuildVersionCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct BuildToolVersion<E: Endian> {
     /// enum for the tool
     pub tool: U32<E>,
@@ -2090,7 +2090,7 @@ pub const TOOL_LD: u32 = 3;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DyldInfoCommand<E: Endian> {
     /// LC_DYLD_INFO or LC_DYLD_INFO_ONLY
     pub cmd: U32<E>,
@@ -2277,7 +2277,7 @@ pub const EXPORT_SYMBOL_FLAGS_STUB_AND_RESOLVER: u32 = 0x10;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct LinkerOptionCommand<E: Endian> {
     /// LC_LINKER_OPTION only used in MH_OBJECT filetypes
     pub cmd: U32<E>,
@@ -2300,7 +2300,7 @@ pub struct LinkerOptionCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SymsegCommand<E: Endian> {
     /// LC_SYMSEG
     pub cmd: U32<E>,
@@ -2321,7 +2321,7 @@ pub struct SymsegCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct IdentCommand<E: Endian> {
     /// LC_IDENT
     pub cmd: U32<E>,
@@ -2338,7 +2338,7 @@ pub struct IdentCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct FvmfileCommand<E: Endian> {
     /// LC_FVMFILE
     pub cmd: U32<E>,
@@ -2359,7 +2359,7 @@ pub struct FvmfileCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct EntryPointCommand<E: Endian> {
     /// LC_MAIN only used in MH_EXECUTE filetypes
     pub cmd: U32<E>,
@@ -2378,7 +2378,7 @@ pub struct EntryPointCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SourceVersionCommand<E: Endian> {
     /// LC_SOURCE_VERSION
     pub cmd: U32<E>,
@@ -2396,7 +2396,7 @@ pub struct SourceVersionCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DataInCodeEntry<E: Endian> {
     /// from mach_header to start of data range
     pub offset: U32<E>,
@@ -2419,7 +2419,7 @@ pub const DICE_KIND_ABS_JUMP_TABLE32: u32 = 0x0005;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct TlvDescriptor<E: Endian>
 {
     void*		(*thunk)(struct TlvDescriptor*);
@@ -2435,7 +2435,7 @@ pub struct TlvDescriptor<E: Endian>
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct NoteCommand<E: Endian> {
     /// LC_NOTE
     pub cmd: U32<E>,
@@ -2454,7 +2454,7 @@ pub struct NoteCommand<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Nlist32<E: Endian> {
     /// index into the string table
     pub n_strx: U32<E>,
@@ -2474,7 +2474,7 @@ pub struct Nlist32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Nlist64<E: Endian> {
     /// index into the string table
     pub n_strx: U32<E>,
@@ -2819,7 +2819,7 @@ pub const N_PC: u8 = 0x30;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Relocation<E: Endian> {
     pub r_word0: U32<E>,
     pub r_word1: U32<E>,
@@ -2889,7 +2889,7 @@ impl<E: Endian> Relocation<E> {
 
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct RelocationInfo {
     /// offset in the section to what is being relocated
     pub r_address: u32,
@@ -3001,7 +3001,7 @@ pub const R_SCATTERED: u32 = 0x8000_0000;
 
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ScatteredRelocationInfo {
     /// offset in the section to what is being relocated
     pub r_address: u32,

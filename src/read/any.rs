@@ -12,6 +12,8 @@ use crate::read::macho;
 use crate::read::pe;
 #[cfg(feature = "wasm")]
 use crate::read::wasm;
+#[cfg(feature = "xcoff")]
+use crate::read::xcoff;
 use crate::read::{
     self, Architecture, BinaryFormat, CodeView, ComdatKind, CompressedData, CompressedFileRange,
     Error, Export, FileFlags, FileKind, Import, Object, ObjectComdat, ObjectKind, ObjectMap,
@@ -44,6 +46,10 @@ macro_rules! with_inner {
             $enum::Pe64(ref $var) => $body,
             #[cfg(feature = "wasm")]
             $enum::Wasm(ref $var) => $body,
+            #[cfg(feature = "xcoff")]
+            $enum::Xcoff32(ref $var) => $body,
+            #[cfg(feature = "xcoff")]
+            $enum::Xcoff64(ref $var) => $body,
         }
     };
 }
@@ -67,6 +73,10 @@ macro_rules! with_inner_mut {
             $enum::Pe64(ref mut $var) => $body,
             #[cfg(feature = "wasm")]
             $enum::Wasm(ref mut $var) => $body,
+            #[cfg(feature = "xcoff")]
+            $enum::Xcoff32(ref mut $var) => $body,
+            #[cfg(feature = "xcoff")]
+            $enum::Xcoff64(ref mut $var) => $body,
         }
     };
 }
@@ -91,6 +101,10 @@ macro_rules! map_inner {
             $from::Pe64(ref $var) => $to::Pe64($body),
             #[cfg(feature = "wasm")]
             $from::Wasm(ref $var) => $to::Wasm($body),
+            #[cfg(feature = "xcoff")]
+            $from::Xcoff32(ref $var) => $to::Xcoff32($body),
+            #[cfg(feature = "xcoff")]
+            $from::Xcoff64(ref $var) => $to::Xcoff64($body),
         }
     };
 }
@@ -115,6 +129,10 @@ macro_rules! map_inner_option {
             $from::Pe64(ref $var) => $body.map($to::Pe64),
             #[cfg(feature = "wasm")]
             $from::Wasm(ref $var) => $body.map($to::Wasm),
+            #[cfg(feature = "xcoff")]
+            $from::Xcoff32(ref $var) => $body.map($to::Xcoff32),
+            #[cfg(feature = "xcoff")]
+            $from::Xcoff64(ref $var) => $body.map($to::Xcoff64),
         }
     };
 }
@@ -138,6 +156,10 @@ macro_rules! map_inner_option_mut {
             $from::Pe64(ref mut $var) => $body.map($to::Pe64),
             #[cfg(feature = "wasm")]
             $from::Wasm(ref mut $var) => $body.map($to::Wasm),
+            #[cfg(feature = "xcoff")]
+            $from::Xcoff32(ref mut $var) => $body.map($to::Xcoff32),
+            #[cfg(feature = "xcoff")]
+            $from::Xcoff64(ref mut $var) => $body.map($to::Xcoff64),
         }
     };
 }
@@ -162,6 +184,10 @@ macro_rules! next_inner {
             $from::Pe64(ref mut iter) => iter.next().map($to::Pe64),
             #[cfg(feature = "wasm")]
             $from::Wasm(ref mut iter) => iter.next().map($to::Wasm),
+            #[cfg(feature = "xcoff")]
+            $from::Xcoff32(ref mut iter) => iter.next().map($to::Xcoff32),
+            #[cfg(feature = "xcoff")]
+            $from::Xcoff64(ref mut iter) => iter.next().map($to::Xcoff64),
         }
     };
 }
@@ -170,7 +196,7 @@ macro_rules! next_inner {
 ///
 /// Most functionality is provided by the `Object` trait implementation.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct File<'data, R: ReadRef<'data> = &'data [u8]> {
     inner: FileInternal<'data, R>,
 }
@@ -194,6 +220,10 @@ enum FileInternal<'data, R: ReadRef<'data>> {
     Pe64(pe::PeFile64<'data, R>),
     #[cfg(feature = "wasm")]
     Wasm(wasm::WasmFile<'data, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff32(xcoff::XcoffFile32<'data, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff64(xcoff::XcoffFile64<'data, R>),
 }
 
 impl<'data, R: ReadRef<'data>> File<'data, R> {
@@ -217,6 +247,10 @@ impl<'data, R: ReadRef<'data>> File<'data, R> {
             FileKind::Pe64 => FileInternal::Pe64(pe::PeFile64::parse(data)?),
             #[cfg(feature = "coff")]
             FileKind::Coff => FileInternal::Coff(coff::CoffFile::parse(data)?),
+            #[cfg(feature = "xcoff")]
+            FileKind::Xcoff32 => FileInternal::Xcoff32(xcoff::XcoffFile32::parse(data)?),
+            #[cfg(feature = "xcoff")]
+            FileKind::Xcoff64 => FileInternal::Xcoff64(xcoff::XcoffFile64::parse(data)?),
             #[allow(unreachable_patterns)]
             _ => return Err(Error(crate::nosym!("Unsupported file format"))),
         };
@@ -255,6 +289,8 @@ impl<'data, R: ReadRef<'data>> File<'data, R> {
             FileInternal::Pe32(_) | FileInternal::Pe64(_) => BinaryFormat::Pe,
             #[cfg(feature = "wasm")]
             FileInternal::Wasm(_) => BinaryFormat::Wasm,
+            #[cfg(feature = "xcoff")]
+            FileInternal::Xcoff32(_) | FileInternal::Xcoff64(_) => BinaryFormat::Xcoff,
         }
     }
 }
@@ -474,7 +510,7 @@ where
 
 /// An iterator over the segments of a `File`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SegmentIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -504,6 +540,10 @@ where
     Pe64(pe::PeSegmentIterator64<'data, 'file, R>),
     #[cfg(feature = "wasm")]
     Wasm(wasm::WasmSegmentIterator<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff32(xcoff::XcoffSegmentIterator32<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff64(xcoff::XcoffSegmentIterator64<'data, 'file, R>),
 }
 
 impl<'data, 'file, R: ReadRef<'data>> Iterator for SegmentIterator<'data, 'file, R> {
@@ -517,7 +557,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for SegmentIterator<'data, 'file,
 }
 
 /// A segment of a `File`.
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Segment<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -547,6 +587,10 @@ where
     Pe64(pe::PeSegment64<'data, 'file, R>),
     #[cfg(feature = "wasm")]
     Wasm(wasm::WasmSegment<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff32(xcoff::XcoffSegment32<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff64(xcoff::XcoffSegment64<'data, 'file, R>),
 }
 
 impl<'data, 'file, R: ReadRef<'data>> fmt::Debug for Segment<'data, 'file, R> {
@@ -620,7 +664,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSegment<'data> for Segment<'data, 'f
 
 /// An iterator of the sections of a `File`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -651,6 +695,10 @@ where
     Pe64(pe::PeSectionIterator64<'data, 'file, R>),
     #[cfg(feature = "wasm")]
     Wasm(wasm::WasmSectionIterator<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff32(xcoff::XcoffSectionIterator32<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff64(xcoff::XcoffSectionIterator64<'data, 'file, R>),
 }
 
 impl<'data, 'file, R: ReadRef<'data>> Iterator for SectionIterator<'data, 'file, R> {
@@ -664,7 +712,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for SectionIterator<'data, 'file,
 }
 
 /// A Section of a File
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Section<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -692,6 +740,10 @@ where
     Pe64(pe::PeSection64<'data, 'file, R>),
     #[cfg(feature = "wasm")]
     Wasm(wasm::WasmSection<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff32(xcoff::XcoffSection32<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff64(xcoff::XcoffSection64<'data, 'file, R>),
 }
 
 #[cfg(not(feature = "nosym"))]
@@ -814,7 +866,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSection<'data> for Section<'data, 'f
 
 /// An iterator of the COMDAT section groups of a `File`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ComdatIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -844,6 +896,10 @@ where
     Pe64(pe::PeComdatIterator64<'data, 'file, R>),
     #[cfg(feature = "wasm")]
     Wasm(wasm::WasmComdatIterator<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff32(xcoff::XcoffComdatIterator32<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff64(xcoff::XcoffComdatIterator64<'data, 'file, R>),
 }
 
 impl<'data, 'file, R: ReadRef<'data>> Iterator for ComdatIterator<'data, 'file, R> {
@@ -857,7 +913,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for ComdatIterator<'data, 'file, 
 }
 
 /// A COMDAT section group of a `File`.
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Comdat<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -885,6 +941,10 @@ where
     Pe64(pe::PeComdat64<'data, 'file, R>),
     #[cfg(feature = "wasm")]
     Wasm(wasm::WasmComdat<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff32(xcoff::XcoffComdat32<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff64(xcoff::XcoffComdat64<'data, 'file, R>),
 }
 
 #[cfg(not(feature = "nosym"))]
@@ -939,7 +999,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectComdat<'data> for Comdat<'data, 'fil
 
 /// An iterator over COMDAT section entries.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ComdatSectionIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -969,6 +1029,10 @@ where
     Pe64(pe::PeComdatSectionIterator64<'data, 'file, R>),
     #[cfg(feature = "wasm")]
     Wasm(wasm::WasmComdatSectionIterator<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff32(xcoff::XcoffComdatSectionIterator32<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff64(xcoff::XcoffComdatSectionIterator64<'data, 'file, R>),
 }
 
 impl<'data, 'file, R: ReadRef<'data>> Iterator for ComdatSectionIterator<'data, 'file, R> {
@@ -982,7 +1046,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for ComdatSectionIterator<'data, 
 
 /// A symbol table.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SymbolTable<'data, 'file, R = &'data [u8]>
 where
     'data: 'file,
@@ -1034,6 +1098,10 @@ where
     Pe64((coff::CoffSymbolTable<'data, 'file, R>, PhantomData<R>)),
     #[cfg(feature = "wasm")]
     Wasm((wasm::WasmSymbolTable<'data, 'file>, PhantomData<R>)),
+    #[cfg(feature = "xcoff")]
+    Xcoff32((xcoff::XcoffSymbolTable32<'data, 'file, R>, PhantomData<R>)),
+    #[cfg(feature = "xcoff")]
+    Xcoff64((xcoff::XcoffSymbolTable64<'data, 'file, R>, PhantomData<R>)),
 }
 
 impl<'data, 'file, R: ReadRef<'data>> read::private::Sealed for SymbolTable<'data, 'file, R> {}
@@ -1066,7 +1134,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbolTable<'data> for SymbolTable<'
 
 /// An iterator over symbol table entries.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SymbolIterator<'data, 'file, R = &'data [u8]>
 where
     'data: 'file,
@@ -1118,6 +1186,20 @@ where
     Pe64((coff::CoffSymbolIterator<'data, 'file, R>, PhantomData<R>)),
     #[cfg(feature = "wasm")]
     Wasm((wasm::WasmSymbolIterator<'data, 'file>, PhantomData<R>)),
+    #[cfg(feature = "xcoff")]
+    Xcoff32(
+        (
+            xcoff::XcoffSymbolIterator32<'data, 'file, R>,
+            PhantomData<R>,
+        ),
+    ),
+    #[cfg(feature = "xcoff")]
+    Xcoff64(
+        (
+            xcoff::XcoffSymbolIterator64<'data, 'file, R>,
+            PhantomData<R>,
+        ),
+    ),
 }
 
 impl<'data, 'file, R: ReadRef<'data>> Iterator for SymbolIterator<'data, 'file, R> {
@@ -1133,7 +1215,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for SymbolIterator<'data, 'file, 
 }
 
 /// A symbol table entry.
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Symbol<'data, 'file, R = &'data [u8]>
 where
     'data: 'file,
@@ -1183,6 +1265,10 @@ where
     Pe64((coff::CoffSymbol<'data, 'file, R>, PhantomData<R>)),
     #[cfg(feature = "wasm")]
     Wasm((wasm::WasmSymbol<'data, 'file>, PhantomData<R>)),
+    #[cfg(feature = "xcoff")]
+    Xcoff32((xcoff::XcoffSymbol32<'data, 'file, R>, PhantomData<R>)),
+    #[cfg(feature = "xcoff")]
+    Xcoff64((xcoff::XcoffSymbol64<'data, 'file, R>, PhantomData<R>)),
 }
 
 #[cfg(not(feature = "nosym"))]
@@ -1283,7 +1369,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbol<'data> for Symbol<'data, 'fil
 
 /// An iterator over dynamic relocation entries.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DynamicRelocationIterator<'data, 'file, R = &'data [u8]>
 where
     'data: 'file,
@@ -1325,7 +1411,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for DynamicRelocationIterator<'da
 
 /// An iterator over section relocation entries.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SectionRelocationIterator<'data, 'file, R: ReadRef<'data> = &'data [u8]>
 where
     'data: 'file,
@@ -1355,6 +1441,10 @@ where
     Pe64(pe::PeRelocationIterator<'data, 'file, R>),
     #[cfg(feature = "wasm")]
     Wasm(wasm::WasmRelocationIterator<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff32(xcoff::XcoffRelocationIterator32<'data, 'file, R>),
+    #[cfg(feature = "xcoff")]
+    Xcoff64(xcoff::XcoffRelocationIterator64<'data, 'file, R>),
 }
 
 impl<'data, 'file, R: ReadRef<'data>> Iterator for SectionRelocationIterator<'data, 'file, R> {

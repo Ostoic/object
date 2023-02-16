@@ -8,7 +8,7 @@ use super::{FileHeader, Sym, SymbolTable, Version, VersionTable};
 
 /// A SysV symbol hash table in an ELF file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct HashTable<'data, Elf: FileHeader> {
     buckets: &'data [U32<Elf::Endian>],
     chains: &'data [U32<Elf::Endian>],
@@ -75,7 +75,7 @@ impl<'data, Elf: FileHeader> HashTable<'data, Elf> {
 
 /// A GNU symbol hash table in an ELF file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct GnuHashTable<'data, Elf: FileHeader> {
     symbol_base: u32,
     bloom_shift: u32,

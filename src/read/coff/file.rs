@@ -24,7 +24,7 @@ pub(crate) struct CoffCommon<'data, R: ReadRef<'data>> {
 
 /// A COFF object file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct CoffFile<'data, R: ReadRef<'data> = &'data [u8]> {
     pub(super) header: &'data pe::ImageFileHeader,
     pub(super) common: CoffCommon<'data, R>,

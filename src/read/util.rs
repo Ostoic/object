@@ -13,7 +13,7 @@ use crate::ReadRef;
 /// - convenience methods for `Pod` types
 /// - a useful `Debug` implementation
 #[derive(Default, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Bytes<'data>(pub &'data [u8]);
 
 impl<'data> fmt::Debug for Bytes<'data> {
@@ -191,7 +191,6 @@ fn debug_list_bytes(bytes: &[u8], fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
     list.finish()
 }
 
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct DebugByte(u8);
 
 impl fmt::Debug for DebugByte {
@@ -201,7 +200,6 @@ impl fmt::Debug for DebugByte {
     }
 }
 
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 struct DebugLen(usize);
 
 impl fmt::Debug for DebugLen {
@@ -252,7 +250,7 @@ pub(crate) fn data_range(
 /// This is used for most file formats.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct StringTable<'data, R = &'data [u8]>
 where
     R: ReadRef<'data>,

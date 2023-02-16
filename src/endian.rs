@@ -353,7 +353,7 @@ impl Endian for Endianness {
 /// Compile-time little endian byte order.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct LittleEndian;
 
 impl Default for LittleEndian {
@@ -385,7 +385,7 @@ impl Endian for LittleEndian {
 /// Compile-time big endian byte order.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct BigEndian;
 
 impl Default for BigEndian {
@@ -471,7 +471,6 @@ mod aligned {
 
     /// A `u32` value with an externally specified endianness of type `E`.
     #[derive(Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    #[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
     #[repr(transparent)]
     pub struct U32<E: Endian>(u32, PhantomData<E>);
 
@@ -666,7 +665,7 @@ pub type I64<E> = I64Bytes<E>;
 /// An unaligned `u16` value with an externally specified endianness of type `E`.
 #[derive(Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct U16Bytes<E: Endian>([u8; 2], PhantomData<E>);
 
 impl<E: Endian> U16Bytes<E> {
@@ -692,7 +691,7 @@ impl<E: Endian> U16Bytes<E> {
 /// An unaligned `u32` value with an externally specified endianness of type `E`.
 #[derive(Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct U32Bytes<E: Endian>([u8; 4], PhantomData<E>);
 
 impl<E: Endian> U32Bytes<E> {
@@ -718,7 +717,7 @@ impl<E: Endian> U32Bytes<E> {
 /// An unaligned `u64` value with an externally specified endianness of type `E`.
 #[derive(Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct U64Bytes<E: Endian>([u8; 8], PhantomData<E>);
 
 impl<E: Endian> U64Bytes<E> {
@@ -744,7 +743,7 @@ impl<E: Endian> U64Bytes<E> {
 /// An unaligned `i16` value with an externally specified endianness of type `E`.
 #[derive(Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct I16Bytes<E: Endian>([u8; 2], PhantomData<E>);
 
 impl<E: Endian> I16Bytes<E> {
@@ -770,7 +769,7 @@ impl<E: Endian> I16Bytes<E> {
 /// An unaligned `i32` value with an externally specified endianness of type `E`.
 #[derive(Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct I32Bytes<E: Endian>([u8; 4], PhantomData<E>);
 
 impl<E: Endian> I32Bytes<E> {
@@ -796,7 +795,7 @@ impl<E: Endian> I32Bytes<E> {
 /// An unaligned `i64` value with an externally specified endianness of type `E`.
 #[derive(Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct I64Bytes<E: Endian>([u8; 8], PhantomData<E>);
 
 impl<E: Endian> I64Bytes<E> {

@@ -74,6 +74,9 @@
 #[cfg(feature = "cargo-all")]
 compile_error!("'--all-features' is not supported; use '--features all' instead");
 
+#[cfg(all(feature = "xcoff", not(feature = "unstable")))]
+compile_error!("'xcoff` is an unstable feature; enable 'unstable' as well");
+
 #[cfg(any(feature = "read_core", feature = "write_core"))]
 #[allow(unused_imports)]
 #[macro_use]
@@ -111,8 +114,9 @@ pub mod elf;
 pub mod macho;
 #[cfg(any(feature = "coff", feature = "pe"))]
 pub mod pe;
+#[cfg(feature = "xcoff")]
+pub mod xcoff;
 
-/// m
 #[cfg(feature = "nosym")]
 #[macro_export]
 macro_rules! nosym {
@@ -121,7 +125,6 @@ macro_rules! nosym {
     };
 }
 
-/// m
 #[cfg(not(feature = "nosym"))]
 #[macro_export]
 macro_rules! nosym {

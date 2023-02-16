@@ -3,12 +3,15 @@ use core::slice;
 use crate::read::{Error, ReadError, ReadRef, Result};
 use crate::{pe, LittleEndian as LE};
 
-use super::{ExportTable, ImportTable, RelocationBlockIterator, ResourceDirectory, SectionTable};
+use super::{
+    DelayLoadImportTable, ExportTable, ImportTable, RelocationBlockIterator, ResourceDirectory,
+    SectionTable,
+};
 
 /// The table of data directories in a PE file.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct DataDirectories<'data> {
     entries: &'data [pe::ImageDataDirectory],
 }
@@ -113,6 +116,29 @@ impl<'data> DataDirectories<'data> {
             .pe_data_containing(data, import_va)
             .read_error(crate::nosym!("Invalid import data dir virtual address"))?;
         Ok(Some(ImportTable::new(section_data, section_va, import_va)))
+    }
+
+    /// Returns the partially parsed delay-load import directory.
+    ///
+    /// `data` must be the entire file data.
+    pub fn delay_load_import_table<R: ReadRef<'data>>(
+        &self,
+        data: R,
+        sections: &SectionTable<'data>,
+    ) -> Result<Option<DelayLoadImportTable<'data>>> {
+        let data_dir = match self.get(pe::IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT) {
+            Some(data_dir) => data_dir,
+            None => return Ok(None),
+        };
+        let import_va = data_dir.virtual_address.get(LE);
+        let (section_data, section_va) = sections
+            .pe_data_containing(data, import_va)
+            .read_error("Invalid import data dir virtual address")?;
+        Ok(Some(DelayLoadImportTable::new(
+            section_data,
+            section_va,
+            import_va,
+        )))
     }
 
     /// Returns the blocks in the base relocation directory.

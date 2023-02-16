@@ -18,13 +18,13 @@ use crate::read::ReadRef;
 /// Entries are keyed on the offset and size of the read.
 /// Currently overlapping reads are considered separate reads.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ReadCache<R: Read + Seek> {
     cache: RefCell<ReadCacheInternal<R>>,
 }
 
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 struct ReadCacheInternal<R: Read + Seek> {
     read: R,
     bufs: HashMap<(u64, u64), Box<[u8]>>,
@@ -145,7 +145,7 @@ impl<'a, R: Read + Seek> ReadRef<'a> for &'a ReadCache<R> {
 ///
 /// Shares an underlying `ReadCache` with a lifetime of `'a`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ReadCacheRange<'a, R: Read + Seek> {
     r: &'a ReadCache<R>,
     offset: u64,

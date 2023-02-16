@@ -25,7 +25,7 @@ pub const IMAGE_NT_SIGNATURE: u32 = 0x0000_4550;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageDosHeader {
     /// Magic number
     pub e_magic: U16<LE>,
@@ -71,7 +71,7 @@ pub struct ImageDosHeader {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageOs2Header {
     /// Magic number
     pub ne_magic: U16<LE>,
@@ -139,7 +139,7 @@ pub struct ImageOs2Header {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageVxdHeader {
     /// Magic number
     pub e32_magic: U16<LE>,
@@ -254,7 +254,7 @@ pub struct ImageVxdHeader {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct MaskedRichHeaderEntry {
     pub masked_comp_id: U32<LE>,
     pub masked_count: U32<LE>,
@@ -267,7 +267,7 @@ pub struct MaskedRichHeaderEntry {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageFileHeader {
     pub machine: U16<LE>,
     pub number_of_sections: U16<LE>,
@@ -382,7 +382,7 @@ pub const IMAGE_FILE_MACHINE_RISCV128: u16 = 0x5128;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageDataDirectory {
     pub virtual_address: U32<LE>,
     pub size: U32<LE>,
@@ -397,7 +397,7 @@ pub const IMAGE_NUMBEROF_DIRECTORY_ENTRIES: usize = 16;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageOptionalHeader32 {
     // Standard fields.
     pub magic: U16<LE>,
@@ -438,7 +438,7 @@ pub struct ImageOptionalHeader32 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageRomOptionalHeader {
     pub magic: U16<LE>,
     pub major_linker_version: u8,
@@ -458,7 +458,7 @@ pub struct ImageRomOptionalHeader {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageOptionalHeader64 {
     pub magic: U16<LE>,
     pub major_linker_version: u8,
@@ -499,7 +499,7 @@ pub const IMAGE_ROM_OPTIONAL_HDR_MAGIC: u16 = 0x107;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageNtHeaders64 {
     pub signature: U32<LE>,
     pub file_header: ImageFileHeader,
@@ -509,7 +509,7 @@ pub struct ImageNtHeaders64 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageNtHeaders32 {
     pub signature: U32<LE>,
     pub file_header: ImageFileHeader,
@@ -519,7 +519,7 @@ pub struct ImageNtHeaders32 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageRomHeaders {
     pub file_header: ImageFileHeader,
     pub optional_header: ImageRomOptionalHeader,
@@ -616,7 +616,7 @@ pub const IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR: usize = 14;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Guid {
     pub data1: U32<LE>,
     pub data2: U16<LE>,
@@ -630,7 +630,7 @@ pub type ClsId = Guid;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct AnonObjectHeader {
     /// Must be IMAGE_FILE_MACHINE_UNKNOWN
     pub sig1: U16<LE>,
@@ -649,7 +649,7 @@ pub struct AnonObjectHeader {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct AnonObjectHeaderV2 {
     /// Must be IMAGE_FILE_MACHINE_UNKNOWN
     pub sig1: U16<LE>,
@@ -674,7 +674,7 @@ pub struct AnonObjectHeaderV2 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct AnonObjectHeaderBigobj {
     /* same as ANON_OBJECT_HEADER_V2 */
     /// Must be IMAGE_FILE_MACHINE_UNKNOWN
@@ -713,7 +713,7 @@ pub const IMAGE_SIZEOF_SHORT_NAME: usize = 8;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Default, Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageSectionHeader {
     pub name: [u8; IMAGE_SIZEOF_SHORT_NAME],
     pub virtual_size: U32<LE>,
@@ -817,7 +817,7 @@ pub const IMAGE_SCN_SCALE_INDEX: u32 = 0x0000_0001;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageSymbol {
     /// If first 4 bytes are 0, then second 4 bytes are offset into string table.
     pub name: [u8; 8],
@@ -833,14 +833,14 @@ pub const IMAGE_SIZEOF_SYMBOL: usize = 18;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageSymbolBytes(pub [u8; IMAGE_SIZEOF_SYMBOL]);
 
 // This struct has alignment 1.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageSymbolEx {
     /// If first 4 bytes are 0, then second 4 bytes are offset into string table.
     pub name: [u8; 8],
@@ -856,7 +856,7 @@ pub const IMAGE_SIZEOF_SYMBOL_EX: usize = 20;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageSymbolExBytes(pub [u8; IMAGE_SIZEOF_SYMBOL_EX]);
 
 // Values for `ImageSymbol::section_number`.
@@ -992,7 +992,7 @@ impl ImageSymbolEx {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageAuxSymbolTokenDef {
     /// IMAGE_AUX_SYMBOL_TYPE
     pub aux_type: u8,
@@ -1010,7 +1010,7 @@ pub const IMAGE_AUX_SYMBOL_TYPE_TOKEN_DEF: u16 = 1;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageAuxSymbolFunction {
     pub tag_index: U32Bytes<LE>,
     pub total_size: U32Bytes<LE>,
@@ -1024,7 +1024,7 @@ pub struct ImageAuxSymbolFunction {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageAuxSymbolFunctionBeginEnd {
     pub unused1: [u8; 4],
     /// declaration line number
@@ -1041,7 +1041,7 @@ pub struct ImageAuxSymbolFunctionBeginEnd {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageAuxSymbolWeak {
     /// the weak extern default symbol index
     pub weak_default_sym_index: U32Bytes<LE>,
@@ -1055,7 +1055,7 @@ pub struct ImageAuxSymbolWeak {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageAuxSymbolSection {
     /// section length
     pub length: U32Bytes<LE>,
@@ -1079,7 +1079,7 @@ pub struct ImageAuxSymbolSection {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageAuxSymbolCrc {
     pub crc: U32Bytes<LE>,
 }
@@ -1109,7 +1109,7 @@ pub const IMAGE_WEAK_EXTERN_ANTI_DEPENDENCY: u16 = 4;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageRelocation {
     /// Also `RelocCount` when IMAGE_SCN_LNK_NRELOC_OVFL is set
     pub virtual_address: U32Bytes<LE>,
@@ -1771,7 +1771,7 @@ pub const X3_EMPTY_INST_VAL_POS_X: u16 = 0;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageLinenumber {
     /// Symbol table index of function name if Linenumber is 0.
     /// Otherwise virtual address of line number.
@@ -1787,7 +1787,7 @@ pub struct ImageLinenumber {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageBaseRelocation {
     pub virtual_address: U32<LE>,
     pub size_of_block: U32<LE>,
@@ -1841,7 +1841,7 @@ pub const IMAGE_ARCHIVE_HYBRIDMAP_MEMBER: &[u8; 16] = b"/<HYBRIDMAP>/   ";
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageArchiveMemberHeader {
     /// File member name - `/' terminated.
     pub name: [u8; 16],
@@ -1872,7 +1872,7 @@ pub const IMAGE_SIZEOF_ARCHIVE_MEMBER_HDR: u16 = 60;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageExportDirectory {
     pub characteristics: U32<LE>,
     pub time_date_stamp: U32<LE>,
@@ -1897,7 +1897,7 @@ pub struct ImageExportDirectory {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageImportByName {
     pub hint: U16<LE>,
     //pub name: [i8; 1],
@@ -1906,7 +1906,7 @@ pub struct ImageImportByName {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageThunkData64(pub U64<LE>);
 /*
     union {
@@ -1923,7 +1923,7 @@ pub struct ImageThunkData64(pub U64<LE>);
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageThunkData32(pub U32<LE>);
 /*
     union {
@@ -1956,7 +1956,7 @@ pub const IMAGE_ORDINAL_FLAG32: u32 = 0x80000000;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageTlsDirectory64 {
     pub start_address_of_raw_data: U64<LE>,
     pub end_address_of_raw_data: U64<LE>,
@@ -1971,7 +1971,7 @@ pub struct ImageTlsDirectory64 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageTlsDirectory32 {
     pub start_address_of_raw_data: U32<LE>,
     pub end_address_of_raw_data: U32<LE>,
@@ -1986,7 +1986,7 @@ pub struct ImageTlsDirectory32 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageImportDescriptor {
     /// RVA to original unbound IAT (`ImageThunkData32`/`ImageThunkData64`)
     /// 0 for terminating null import descriptor
@@ -2023,7 +2023,7 @@ impl ImageImportDescriptor {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageBoundImportDescriptor {
     pub time_date_stamp: U32<LE>,
     pub offset_module_name: U16<LE>,
@@ -2034,7 +2034,7 @@ pub struct ImageBoundImportDescriptor {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageBoundForwarderRef {
     pub time_date_stamp: U32<LE>,
     pub offset_module_name: U16<LE>,
@@ -2044,7 +2044,7 @@ pub struct ImageBoundForwarderRef {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageDelayloadDescriptor {
     pub attributes: U32<LE>,
 
@@ -2062,6 +2062,21 @@ pub struct ImageDelayloadDescriptor {
     pub unload_information_table_rva: U32<LE>,
     /// 0 if not bound, otherwise, date/time of the target DLL
     pub time_date_stamp: U32<LE>,
+}
+
+impl ImageDelayloadDescriptor {
+    /// Tell whether this delay-load import descriptor is the null descriptor
+    /// (used to mark the end of the iterator array in a PE)
+    pub fn is_null(&self) -> bool {
+        self.attributes.get(LE) == 0
+            && self.dll_name_rva.get(LE) == 0
+            && self.module_handle_rva.get(LE) == 0
+            && self.import_address_table_rva.get(LE) == 0
+            && self.import_name_table_rva.get(LE) == 0
+            && self.bound_import_address_table_rva.get(LE) == 0
+            && self.unload_information_table_rva.get(LE) == 0
+            && self.time_date_stamp.get(LE) == 0
+    }
 }
 
 /// Delay load version 2 flag for `ImageDelayloadDescriptor::attributes`.
@@ -2088,7 +2103,7 @@ pub const IMAGE_DELAYLOAD_RVA_BASED: u32 = 0x8000_0000;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageResourceDirectory {
     pub characteristics: U32<LE>,
     pub time_date_stamp: U32<LE>,
@@ -2118,7 +2133,7 @@ pub const IMAGE_RESOURCE_DATA_IS_DIRECTORY: u32 = 0x8000_0000;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageResourceDirectoryEntry {
     pub name_or_id: U32<LE>,
     pub offset_to_data_or_directory: U32<LE>,
@@ -2136,7 +2151,7 @@ pub struct ImageResourceDirectoryEntry {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageResourceDirectoryString {
     pub length: U16<LE>,
     //pub name_string: [i8; 1],
@@ -2145,7 +2160,7 @@ pub struct ImageResourceDirectoryString {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageResourceDirStringU {
     pub length: U16<LE>,
     //pub name_string: [U16<LE>; 1],
@@ -2163,7 +2178,7 @@ pub struct ImageResourceDirStringU {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageResourceDataEntry {
     /// RVA of the data.
     pub offset_to_data: U32<LE>,
@@ -2224,7 +2239,7 @@ pub const RT_MANIFEST: u16 = 24;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageLoadConfigCodeIntegrity {
     /// Flags to indicate if CI information is available, etc.
     pub flags: U16<LE>,
@@ -2242,7 +2257,7 @@ pub struct ImageLoadConfigCodeIntegrity {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageDynamicRelocationTable {
     pub version: U32<LE>,
     pub size: U32<LE>,
@@ -2256,7 +2271,7 @@ pub struct ImageDynamicRelocationTable {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageDynamicRelocation32 {
     pub symbol: U32<LE>,
     pub base_reloc_size: U32<LE>,
@@ -2266,7 +2281,7 @@ pub struct ImageDynamicRelocation32 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageDynamicRelocation64 {
     pub symbol: U64<LE>,
     pub base_reloc_size: U32<LE>,
@@ -2276,7 +2291,7 @@ pub struct ImageDynamicRelocation64 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageDynamicRelocation32V2 {
     pub header_size: U32<LE>,
     pub fixup_info_size: U32<LE>,
@@ -2290,7 +2305,7 @@ pub struct ImageDynamicRelocation32V2 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageDynamicRelocation64V2 {
     pub header_size: U32<LE>,
     pub fixup_info_size: U32<LE>,
@@ -2315,7 +2330,7 @@ pub const IMAGE_DYNAMIC_RELOCATION_GUARD_SWITCHTABLE_BRANCH: u32 = 0x0000_0005;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImagePrologueDynamicRelocationHeader {
     pub prologue_byte_count: u8,
     // pub prologue_bytes: [u8; prologue_byte_count],
@@ -2325,7 +2340,7 @@ pub struct ImagePrologueDynamicRelocationHeader {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageEpilogueDynamicRelocationHeader {
     pub epilogue_count: U32Bytes<LE>,
     pub epilogue_byte_count: u8,
@@ -2341,7 +2356,7 @@ pub struct ImageEpilogueDynamicRelocationHeader {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageImportControlTransferDynamicRelocation {
     DWORD       PageRelativeOffset : 12;
     DWORD       IndirectCall       : 1;
@@ -2352,7 +2367,7 @@ pub struct ImageImportControlTransferDynamicRelocation {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageIndirControlTransferDynamicRelocation {
     WORD        PageRelativeOffset : 12;
     WORD        IndirectCall       : 1;
@@ -2365,7 +2380,7 @@ pub struct ImageIndirControlTransferDynamicRelocation {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageSwitchtableBranchDynamicRelocation {
     WORD        PageRelativeOffset : 12;
     WORD        RegisterNumber     : 4;
@@ -2379,7 +2394,7 @@ pub struct ImageSwitchtableBranchDynamicRelocation {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageLoadConfigDirectory32 {
     pub size: U32<LE>,
     pub time_date_stamp: U32<LE>,
@@ -2443,7 +2458,7 @@ pub struct ImageLoadConfigDirectory32 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageLoadConfigDirectory64 {
     pub size: U32<LE>,
     pub time_date_stamp: U32<LE>,
@@ -2508,7 +2523,7 @@ pub struct ImageLoadConfigDirectory64 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageHotPatchInfo {
     pub version: U32<LE>,
     pub size: U32<LE>,
@@ -2524,7 +2539,7 @@ pub struct ImageHotPatchInfo {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageHotPatchBase {
     pub sequence_number: U32<LE>,
     pub flags: U32<LE>,
@@ -2540,7 +2555,7 @@ pub struct ImageHotPatchBase {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageHotPatchHashes {
     pub sha256: [u8; 32],
     pub sha1: [u8; 20],
@@ -2623,7 +2638,7 @@ pub const IMAGE_GUARD_FLAG_EXPORT_SUPPRESSED: u16 = 0x02;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageCeRuntimeFunctionEntry {
     pub func_start: U32<LE>,
     DWORD PrologLen : 8;
@@ -2636,7 +2651,7 @@ pub struct ImageCeRuntimeFunctionEntry {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageArmRuntimeFunctionEntry {
     pub begin_address: U32<LE>,
     pub unwind_data: U32<LE>,
@@ -2645,7 +2660,7 @@ pub struct ImageArmRuntimeFunctionEntry {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageArm64RuntimeFunctionEntry {
     pub begin_address: U32<LE>,
     pub unwind_data: U32<LE>,
@@ -2654,7 +2669,7 @@ pub struct ImageArm64RuntimeFunctionEntry {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageAlpha64RuntimeFunctionEntry {
     pub begin_address: U64<LE>,
     pub end_address: U64<LE>,
@@ -2666,7 +2681,7 @@ pub struct ImageAlpha64RuntimeFunctionEntry {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageAlphaRuntimeFunctionEntry {
     pub begin_address: U32<LE>,
     pub end_address: U32<LE>,
@@ -2678,7 +2693,7 @@ pub struct ImageAlphaRuntimeFunctionEntry {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageRuntimeFunctionEntry {
     pub begin_address: U32<LE>,
     pub end_address: U32<LE>,
@@ -2695,7 +2710,7 @@ pub const IMAGE_ENCLAVE_SHORT_ID_LENGTH: usize = 16;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageEnclaveConfig32 {
     pub size: U32<LE>,
     pub minimum_required_config_size: U32<LE>,
@@ -2715,7 +2730,7 @@ pub struct ImageEnclaveConfig32 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageEnclaveConfig64 {
     pub size: U32<LE>,
     pub minimum_required_config_size: U32<LE>,
@@ -2741,7 +2756,7 @@ pub const IMAGE_ENCLAVE_FLAG_PRIMARY_IMAGE: u32 = 0x0000_0001;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageEnclaveImport {
     pub match_type: U32<LE>,
     pub minimum_security_version: U32<LE>,
@@ -2765,7 +2780,7 @@ pub const IMAGE_ENCLAVE_IMPORT_MATCH_IMAGE_ID: u32 = 0x0000_0004;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageDebugDirectory {
     pub characteristics: U32<LE>,
     pub time_date_stamp: U32<LE>,
@@ -2798,7 +2813,7 @@ pub const IMAGE_DEBUG_TYPE_REPRO: u32 = 16;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageCoffSymbolsHeader {
     pub number_of_symbols: U32<LE>,
     pub lva_to_first_symbol: U32<LE>,
@@ -2820,7 +2835,7 @@ pub const FRAME_NONFPO: u16 = 3;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct FpoData {
 /// offset 1st byte of function code
     pub ul_off_start: U32<LE>,
@@ -2851,7 +2866,7 @@ pub const IMAGE_DEBUG_MISC_EXENAME: u16 = 1;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageDebugMisc {
     /// type of misc data, see defines
     pub data_type: U32<LE>,
@@ -2873,7 +2888,7 @@ pub struct ImageDebugMisc {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageFunctionEntry {
     pub starting_address: U32<LE>,
     pub ending_address: U32<LE>,
@@ -2883,7 +2898,7 @@ pub struct ImageFunctionEntry {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageFunctionEntry64 {
     pub starting_address: U64<LE>,
     pub ending_address: U64<LE>,
@@ -2913,7 +2928,7 @@ pub struct ImageFunctionEntry64 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageSeparateDebugHeader {
     pub signature: U16<LE>,
     pub flags: U16<LE>,
@@ -2933,7 +2948,7 @@ pub struct ImageSeparateDebugHeader {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct NonPagedDebugInfo {
     pub signature: U16<LE>,
     pub flags: U16<LE>,
@@ -2968,7 +2983,7 @@ pub const IMAGE_SEPARATE_DEBUG_MISMATCH: u16 = 0x8000;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageArchitectureHeader {
     /// 1 -> code section depends on mask bit
     /// 0 -> new instruction depends on mask bit
@@ -2987,7 +3002,7 @@ pub struct ImageArchitectureHeader {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageArchitectureEntry {
     /// RVA of instruction to fixup
     pub fixup_inst_rva: U32<LE>,
@@ -3005,7 +3020,7 @@ pub const IMPORT_OBJECT_HDR_SIG2: u16 = 0xffff;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImportObjectHeader {
     /// Must be IMAGE_FILE_MACHINE_UNKNOWN
     pub sig1: U16<LE>,
@@ -3091,7 +3106,7 @@ pub const MAX_PACKAGE_NAME: usize = 1024;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ImageCor20Header {
     // Header versioning
     pub cb: U32<LE>,

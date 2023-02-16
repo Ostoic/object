@@ -155,7 +155,7 @@ pub(super) fn print_macho64(p: &mut Printer<'_>, data: &[u8], offset: u64) {
 }
 
 #[derive(Default)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 struct MachState {
     section_index: usize,
 }

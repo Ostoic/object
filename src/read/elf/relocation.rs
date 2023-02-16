@@ -15,7 +15,7 @@ use super::{ElfFile, FileHeader, SectionHeader, SectionTable};
 
 /// A mapping from section index to associated relocation sections.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct RelocationSections {
     relocations: Vec<usize>,
 }
@@ -106,7 +106,7 @@ pub type ElfDynamicRelocationIterator64<'data, 'file, Endian = Endianness, R = &
     ElfDynamicRelocationIterator<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// An iterator over the dynamic relocations for an `ElfFile`.
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ElfDynamicRelocationIterator<'data, 'file, Elf, R = &'data [u8]>
 where
     Elf: FileHeader,
@@ -182,7 +182,7 @@ pub type ElfSectionRelocationIterator64<'data, 'file, Endian = Endianness, R = &
     ElfSectionRelocationIterator<'data, 'file, elf::FileHeader64<Endian>, R>;
 
 /// An iterator over the relocations for an `ElfSection`.
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ElfSectionRelocationIterator<'data, 'file, Elf, R = &'data [u8]>
 where
     Elf: FileHeader,
@@ -253,19 +253,28 @@ fn parse_relocation<Elf: FileHeader>(
     let mut encoding = RelocationEncoding::Generic;
     let is_mips64el = header.is_mips64el(endian);
     let (kind, size) = match header.e_machine(endian) {
-        elf::EM_AARCH64 => match reloc.r_type(endian, false) {
-            elf::R_AARCH64_ABS64 => (RelocationKind::Absolute, 64),
-            elf::R_AARCH64_ABS32 => (RelocationKind::Absolute, 32),
-            elf::R_AARCH64_ABS16 => (RelocationKind::Absolute, 16),
-            elf::R_AARCH64_PREL64 => (RelocationKind::Relative, 64),
-            elf::R_AARCH64_PREL32 => (RelocationKind::Relative, 32),
-            elf::R_AARCH64_PREL16 => (RelocationKind::Relative, 16),
-            elf::R_AARCH64_CALL26 => {
-                encoding = RelocationEncoding::AArch64Call;
-                (RelocationKind::PltRelative, 26)
+        elf::EM_AARCH64 => {
+            if header.is_type_64() {
+                match reloc.r_type(endian, false) {
+                    elf::R_AARCH64_ABS64 => (RelocationKind::Absolute, 64),
+                    elf::R_AARCH64_ABS32 => (RelocationKind::Absolute, 32),
+                    elf::R_AARCH64_ABS16 => (RelocationKind::Absolute, 16),
+                    elf::R_AARCH64_PREL64 => (RelocationKind::Relative, 64),
+                    elf::R_AARCH64_PREL32 => (RelocationKind::Relative, 32),
+                    elf::R_AARCH64_PREL16 => (RelocationKind::Relative, 16),
+                    elf::R_AARCH64_CALL26 => {
+                        encoding = RelocationEncoding::AArch64Call;
+                        (RelocationKind::PltRelative, 26)
+                    }
+                    r_type => (RelocationKind::Elf(r_type), 0),
+                }
+            } else {
+                match reloc.r_type(endian, false) {
+                    elf::R_AARCH64_P32_ABS32 => (RelocationKind::Absolute, 32),
+                    r_type => (RelocationKind::Elf(r_type), 0),
+                }
             }
-            r_type => (RelocationKind::Elf(r_type), 0),
-        },
+        }
         elf::EM_ARM => match reloc.r_type(endian, false) {
             elf::R_ARM_ABS32 => (RelocationKind::Absolute, 32),
             r_type => (RelocationKind::Elf(r_type), 0),
@@ -317,6 +326,19 @@ fn parse_relocation<Elf: FileHeader>(
         elf::EM_LOONGARCH => match reloc.r_type(endian, false) {
             elf::R_LARCH_32 => (RelocationKind::Absolute, 32),
             elf::R_LARCH_64 => (RelocationKind::Absolute, 64),
+            elf::R_LARCH_32_PCREL => (RelocationKind::Relative, 32),
+            elf::R_LARCH_B16 => {
+                encoding = RelocationEncoding::LoongArchBranch;
+                (RelocationKind::Relative, 16)
+            }
+            elf::R_LARCH_B21 => {
+                encoding = RelocationEncoding::LoongArchBranch;
+                (RelocationKind::Relative, 21)
+            }
+            elf::R_LARCH_B26 => {
+                encoding = RelocationEncoding::LoongArchBranch;
+                (RelocationKind::Relative, 26)
+            }
             r_type => (RelocationKind::Elf(r_type), 0),
         },
         elf::EM_MIPS => match reloc.r_type(endian, is_mips64el) {
@@ -385,6 +407,11 @@ fn parse_relocation<Elf: FileHeader>(
             }
             r_type => (RelocationKind::Elf(r_type), 0),
         },
+        elf::EM_SBF => match reloc.r_type(endian, false) {
+            elf::R_SBF_64_64 => (RelocationKind::Absolute, 64),
+            elf::R_SBF_64_32 => (RelocationKind::Absolute, 32),
+            r_type => (RelocationKind::Elf(r_type), 0),
+        },
         elf::EM_SPARC | elf::EM_SPARC32PLUS | elf::EM_SPARCV9 => {
             match reloc.r_type(endian, false) {
                 elf::R_SPARC_32 | elf::R_SPARC_UA32 => (RelocationKind::Absolute, 32),
@@ -392,6 +419,11 @@ fn parse_relocation<Elf: FileHeader>(
                 r_type => (RelocationKind::Elf(r_type), 0),
             }
         }
+        elf::EM_XTENSA => match reloc.r_type(endian, false) {
+            elf::R_XTENSA_32 => (RelocationKind::Absolute, 32),
+            elf::R_XTENSA_32_PCREL => (RelocationKind::Relative, 32),
+            r_type => (RelocationKind::Elf(r_type), 0),
+        },
         _ => (RelocationKind::Elf(reloc.r_type(endian, false)), 0),
     };
     let sym = reloc.r_sym(endian, is_mips64el) as usize;

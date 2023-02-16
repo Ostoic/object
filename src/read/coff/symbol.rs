@@ -17,7 +17,7 @@ use crate::read::{
 ///
 /// Also includes the string table used for the symbol names.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SymbolTable<'data, R = &'data [u8]>
 where
     R: ReadRef<'data>,
@@ -176,7 +176,7 @@ impl<'data, R: ReadRef<'data>> SymbolTable<'data, R> {
 ///
 /// Yields the index and symbol structure for each symbol.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SymbolIterator<'data, 'table, R = &'data [u8]>
 where
     R: ReadRef<'data>,
@@ -274,7 +274,7 @@ impl pe::ImageSymbol {
 /// A symbol table of a `CoffFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct CoffSymbolTable<'data, 'file, R = &'data [u8]>
 where
     R: ReadRef<'data>,
@@ -310,7 +310,7 @@ impl<'data, 'file, R: ReadRef<'data>> ObjectSymbolTable<'data>
 }
 
 /// An iterator over the symbols of a `CoffFile`.
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct CoffSymbolIterator<'data, 'file, R = &'data [u8]>
 where
     R: ReadRef<'data>,
@@ -345,7 +345,7 @@ impl<'data, 'file, R: ReadRef<'data>> Iterator for CoffSymbolIterator<'data, 'fi
 /// A symbol of a `CoffFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct CoffSymbol<'data, 'file, R = &'data [u8]>
 where
     R: ReadRef<'data>,
@@ -353,6 +353,14 @@ where
     pub(crate) file: &'file CoffCommon<'data, R>,
     pub(crate) index: SymbolIndex,
     pub(crate) symbol: &'data pe::ImageSymbol,
+}
+
+impl<'data, 'file, R: ReadRef<'data>> CoffSymbol<'data, 'file, R> {
+    #[inline]
+    /// Get the raw `ImageSymbol` struct.
+    pub fn raw_symbol(&self) -> &'data pe::ImageSymbol {
+        self.symbol
+    }
 }
 
 impl<'data, 'file, R: ReadRef<'data>> read::private::Sealed for CoffSymbol<'data, 'file, R> {}

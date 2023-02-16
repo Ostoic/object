@@ -14,7 +14,7 @@ use crate::pod::Pod;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct FileHeader32<E: Endian> {
     /// Magic number and other information.
     pub e_ident: Ident,
@@ -62,7 +62,7 @@ pub struct FileHeader32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct FileHeader64<E: Endian> {
     /// Magic number and other information.
     pub e_ident: Ident,
@@ -112,7 +112,7 @@ pub struct FileHeader64<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Ident {
     /// Magic number. Must be `ELFMAG`.
     pub magic: [u8; 4],
@@ -582,6 +582,8 @@ pub const EM_BPF: u16 = 247;
 pub const EM_CSKY: u16 = 252;
 /// Loongson LoongArch
 pub const EM_LOONGARCH: u16 = 258;
+/// Solana Binary Format
+pub const EM_SBF: u16 = 263;
 /// Digital Alpha
 pub const EM_ALPHA: u16 = 0x9026;
 
@@ -595,7 +597,7 @@ pub const EV_CURRENT: u8 = 1;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SectionHeader32<E: Endian> {
     /// Section name.
     ///
@@ -629,7 +631,7 @@ pub struct SectionHeader32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SectionHeader64<E: Endian> {
     /// Section name.
     ///
@@ -798,7 +800,7 @@ pub const SHF_EXCLUDE: u32 = 0x8000_0000;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Default, Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct CompressionHeader32<E: Endian> {
     /// Compression format. One of the `ELFCOMPRESS_*` values.
     pub ch_type: U32Bytes<E>,
@@ -817,7 +819,7 @@ pub struct CompressionHeader32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Default, Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct CompressionHeader64<E: Endian> {
     /// Compression format. One of the `ELFCOMPRESS_*` values.
     pub ch_type: U32Bytes<E>,
@@ -848,7 +850,7 @@ pub const GRP_COMDAT: u32 = 1;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Default, Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Sym32<E: Endian> {
     /// Symbol name.
     ///
@@ -904,7 +906,7 @@ impl<E: Endian> Sym32<E> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Default, Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Sym64<E: Endian> {
     /// Symbol name.
     ///
@@ -960,7 +962,7 @@ impl<E: Endian> Sym64<E> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Syminfo32<E: Endian> {
     /// Direct bindings, symbol bound to.
     pub si_boundto: U16<E>,
@@ -972,7 +974,7 @@ pub struct Syminfo32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Syminfo64<E: Endian> {
     /// Direct bindings, symbol bound to.
     pub si_boundto: U16<E>,
@@ -1064,7 +1066,7 @@ pub const STV_PROTECTED: u8 = 3;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Rel32<E: Endian> {
     /// Relocation address.
     pub r_offset: U32<E>,
@@ -1104,7 +1106,7 @@ impl<E: Endian> Rel32<E> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Rela32<E: Endian> {
     /// Relocation address.
     pub r_offset: U32<E>,
@@ -1157,7 +1159,7 @@ impl<E: Endian> From<Rel32<E>> for Rela32<E> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Rel64<E: Endian> {
     /// Relocation address.
     pub r_offset: U64<E>,
@@ -1208,7 +1210,7 @@ impl<E: Endian> From<Rel64<E>> for Rela64<E> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Rela64<E: Endian> {
     /// Relocation address.
     pub r_offset: U64<E>,
@@ -1271,7 +1273,7 @@ impl<E: Endian> Rela64<E> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ProgramHeader32<E: Endian> {
     /// Segment type. One of the `PT_*` constants.
     pub p_type: U32<E>,
@@ -1295,7 +1297,7 @@ pub struct ProgramHeader32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ProgramHeader64<E: Endian> {
     /// Segment type. One of the `PT_*` constants.
     pub p_type: U32<E>,
@@ -1513,7 +1515,7 @@ pub const NT_VERSION: u32 = 1;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Dyn32<E: Endian> {
     /// Dynamic entry type.
     pub d_tag: U32<E>,
@@ -1525,7 +1527,7 @@ pub struct Dyn32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Dyn64<E: Endian> {
     /// Dynamic entry type.
     pub d_tag: U64<E>,
@@ -1772,7 +1774,7 @@ pub const DF_1_PIE: u32 = 0x0800_0000;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Versym<E: Endian>(pub U16<E>);
 
 /// Symbol is hidden.
@@ -1784,7 +1786,7 @@ pub const VERSYM_VERSION: u16 = 0x7fff;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Verdef<E: Endian> {
     /// Version revision
     pub vd_version: U16<E>,
@@ -1825,7 +1827,7 @@ pub const VER_NDX_GLOBAL: u16 = 1;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Verdaux<E: Endian> {
     /// Version or dependency names
     pub vda_name: U32<E>,
@@ -1837,7 +1839,7 @@ pub struct Verdaux<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Verneed<E: Endian> {
     /// Version of structure
     pub vn_version: U16<E>,
@@ -1861,7 +1863,7 @@ pub const VER_NEED_CURRENT: u16 = 1;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Vernaux<E: Endian> {
     /// Hash value of dependency name
     pub vna_hash: U32<E>,
@@ -1883,7 +1885,7 @@ pub struct Vernaux<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct NoteHeader32<E: Endian> {
     /// Length of the note's name.
     ///
@@ -1904,7 +1906,7 @@ pub struct NoteHeader32<E: Endian> {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct NoteHeader64<E: Endian> {
     /// Length of the note's name.
     ///
@@ -1979,7 +1981,7 @@ pub const NT_GNU_PROPERTY_TYPE_0: u32 = 5;
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct HashHeader<E: Endian> {
     /// The number of hash buckets.
     pub bucket_count: U32<E>,
@@ -2007,7 +2009,7 @@ pub fn hash(name: &[u8]) -> u32 {
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
 #[repr(C)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct GnuHashHeader<E: Endian> {
     /// The number of hash buckets.
     pub bucket_count: U32<E>,
@@ -4319,12 +4321,128 @@ pub const R_AARCH64_TLSDESC: u32 = 1031;
 /// STT_GNU_IFUNC relocation.
 pub const R_AARCH64_IRELATIVE: u32 = 1032;
 
+// AVR values for `FileHeader*::e_flags`.
+
+/// Bitmask for `EF_AVR_ARCH_*`.
+pub const EF_AVR_ARCH: u32 = 0x7F;
+
+/// If set, it is assumed that the elf file uses local symbols as reference
+/// for the relocations so that linker relaxation is possible.
+pub const EF_AVR_LINKRELAX_PREPARED: u32 = 0x80;
+
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVR1: u32 = 1;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVR2: u32 = 2;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVR25: u32 = 25;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVR3: u32 = 3;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVR31: u32 = 31;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVR35: u32 = 35;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVR4: u32 = 4;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVR5: u32 = 5;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVR51: u32 = 51;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVR6: u32 = 6;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_AVRTINY: u32 = 100;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_XMEGA1: u32 = 101;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_XMEGA2: u32 = 102;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_XMEGA3: u32 = 103;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_XMEGA4: u32 = 104;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_XMEGA5: u32 = 105;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_XMEGA6: u32 = 106;
+#[allow(missing_docs)]
+pub const EF_AVR_ARCH_XMEGA7: u32 = 107;
+
 // AVR values for `Rel*::r_type`.
 
+#[allow(missing_docs)]
+pub const R_AVR_NONE: u32 = 0;
 /// Direct 32 bit
 pub const R_AVR_32: u32 = 1;
+#[allow(missing_docs)]
+pub const R_AVR_7_PCREL: u32 = 2;
+#[allow(missing_docs)]
+pub const R_AVR_13_PCREL: u32 = 3;
 /// Direct 16 bit
 pub const R_AVR_16: u32 = 4;
+#[allow(missing_docs)]
+pub const R_AVR_16_PM: u32 = 5;
+#[allow(missing_docs)]
+pub const R_AVR_LO8_LDI: u32 = 6;
+#[allow(missing_docs)]
+pub const R_AVR_HI8_LDI: u32 = 7;
+#[allow(missing_docs)]
+pub const R_AVR_HH8_LDI: u32 = 8;
+#[allow(missing_docs)]
+pub const R_AVR_LO8_LDI_NEG: u32 = 9;
+#[allow(missing_docs)]
+pub const R_AVR_HI8_LDI_NEG: u32 = 10;
+#[allow(missing_docs)]
+pub const R_AVR_HH8_LDI_NEG: u32 = 11;
+#[allow(missing_docs)]
+pub const R_AVR_LO8_LDI_PM: u32 = 12;
+#[allow(missing_docs)]
+pub const R_AVR_HI8_LDI_PM: u32 = 13;
+#[allow(missing_docs)]
+pub const R_AVR_HH8_LDI_PM: u32 = 14;
+#[allow(missing_docs)]
+pub const R_AVR_LO8_LDI_PM_NEG: u32 = 15;
+#[allow(missing_docs)]
+pub const R_AVR_HI8_LDI_PM_NEG: u32 = 16;
+#[allow(missing_docs)]
+pub const R_AVR_HH8_LDI_PM_NEG: u32 = 17;
+#[allow(missing_docs)]
+pub const R_AVR_CALL: u32 = 18;
+#[allow(missing_docs)]
+pub const R_AVR_LDI: u32 = 19;
+#[allow(missing_docs)]
+pub const R_AVR_6: u32 = 20;
+#[allow(missing_docs)]
+pub const R_AVR_6_ADIW: u32 = 21;
+#[allow(missing_docs)]
+pub const R_AVR_MS8_LDI: u32 = 22;
+#[allow(missing_docs)]
+pub const R_AVR_MS8_LDI_NEG: u32 = 23;
+#[allow(missing_docs)]
+pub const R_AVR_LO8_LDI_GS: u32 = 24;
+#[allow(missing_docs)]
+pub const R_AVR_HI8_LDI_GS: u32 = 25;
+#[allow(missing_docs)]
+pub const R_AVR_8: u32 = 26;
+#[allow(missing_docs)]
+pub const R_AVR_8_LO8: u32 = 27;
+#[allow(missing_docs)]
+pub const R_AVR_8_HI8: u32 = 28;
+#[allow(missing_docs)]
+pub const R_AVR_8_HLO8: u32 = 29;
+#[allow(missing_docs)]
+pub const R_AVR_DIFF8: u32 = 30;
+#[allow(missing_docs)]
+pub const R_AVR_DIFF16: u32 = 31;
+#[allow(missing_docs)]
+pub const R_AVR_DIFF32: u32 = 32;
+#[allow(missing_docs)]
+pub const R_AVR_LDS_STS_16: u32 = 33;
+#[allow(missing_docs)]
+pub const R_AVR_PORT6: u32 = 34;
+#[allow(missing_docs)]
+pub const R_AVR_PORT5: u32 = 35;
+#[allow(missing_docs)]
+pub const R_AVR_32_PCREL: u32 = 36;
 
 // MSP430 values for `Rel*::r_type`.
 
@@ -6086,6 +6204,10 @@ pub const EF_RISCV_FLOAT_ABI_SINGLE: u32 = 0x0002;
 pub const EF_RISCV_FLOAT_ABI_DOUBLE: u32 = 0x0004;
 #[allow(missing_docs)]
 pub const EF_RISCV_FLOAT_ABI_QUAD: u32 = 0x0006;
+#[allow(missing_docs)]
+pub const EF_RISCV_RVE: u32 = 0x0008;
+#[allow(missing_docs)]
+pub const EF_RISCV_TSO: u32 = 0x0010;
 
 // RISC-V values `Rel*::r_type`.
 #[allow(missing_docs)]
@@ -6204,6 +6326,14 @@ pub const R_BPF_NONE: u32 = 0;
 pub const R_BPF_64_64: u32 = 1;
 #[allow(missing_docs)]
 pub const R_BPF_64_32: u32 = 10;
+
+// SBF values `Rel*::r_type`.
+/// No reloc
+pub const R_SBF_NONE: u32 = 0;
+#[allow(missing_docs)]
+pub const R_SBF_64_64: u32 = 1;
+#[allow(missing_docs)]
+pub const R_SBF_64_32: u32 = 10;
 
 // Imagination Meta values `Rel*::r_type`.
 
@@ -6334,18 +6464,17 @@ pub const R_NDS32_TLS_TPOFF: u32 = 102;
 pub const R_NDS32_TLS_DESC: u32 = 119;
 
 // LoongArch values `FileHeader*::e_flags`.
-/// Uses 64-bit GPRs and the stack for parameter passing
-pub const EF_LARCH_ABI_LP64S: u32 = 0x1;
-/// Uses 64-bit GPRs, 32-bit FPRs and the stack for parameter passing
-pub const EF_LARCH_ABI_LP64F: u32 = 0x2;
-/// Uses 64-bit GPRs, 64-bit FPRs and the stack for parameter passing
-pub const EF_LARCH_ABI_LP64D: u32 = 0x3;
-/// Uses 32-bit GPRs and the stack for parameter passing
-pub const EF_LARCH_ABI_ILP32S: u32 = 0x5;
-/// Uses 32-bit GPRs, 32-bit FPRs and the stack for parameter passing
-pub const EF_LARCH_ABI_ILP32F: u32 = 0x6;
-/// Uses 32-bit GPRs, 64-bit FPRs and the stack for parameter passing
-pub const EF_LARCH_ABI_ILP32D: u32 = 0x7;
+/// Additional properties of the base ABI type, including the FP calling
+/// convention.
+pub const EF_LARCH_ABI_MODIFIER_MASK: u32 = 0x7;
+/// Uses GPRs and the stack for parameter passing
+pub const EF_LARCH_ABI_SOFT_FLOAT: u32 = 0x1;
+/// Uses GPRs, 32-bit FPRs and the stack for parameter passing
+pub const EF_LARCH_ABI_SINGLE_FLOAT: u32 = 0x2;
+/// Uses GPRs, 64-bit FPRs and the stack for parameter passing
+pub const EF_LARCH_ABI_DOUBLE_FLOAT: u32 = 0x3;
+/// Uses relocation types directly writing to immediate slots
+pub const EF_LARCH_OBJABI_V1: u32 = 0x40;
 
 // LoongArch values `Rel*::r_type`.
 /// No reloc
@@ -6455,6 +6584,228 @@ pub const R_LARCH_SUB64: u32 = 56;
 pub const R_LARCH_GNU_VTINHERIT: u32 = 57;
 /// GNU C++ vtable member usage
 pub const R_LARCH_GNU_VTENTRY: u32 = 58;
+/// 18-bit PC-relative jump offset with two trailing zeros
+pub const R_LARCH_B16: u32 = 64;
+/// 23-bit PC-relative jump offset with two trailing zeros
+pub const R_LARCH_B21: u32 = 65;
+/// 28-bit PC-relative jump offset with two trailing zeros
+pub const R_LARCH_B26: u32 = 66;
+/// 12..=31 bits of 32/64-bit absolute address
+pub const R_LARCH_ABS_HI20: u32 = 67;
+/// 0..=11 bits of 32/64-bit absolute address
+pub const R_LARCH_ABS_LO12: u32 = 68;
+/// 32..=51 bits of 64-bit absolute address
+pub const R_LARCH_ABS64_LO20: u32 = 69;
+/// 52..=63 bits of 64-bit absolute address
+pub const R_LARCH_ABS64_HI12: u32 = 70;
+/// The signed 32-bit offset `offs` from `PC & 0xfffff000` to
+/// `(S + A + 0x800) & 0xfffff000`, with 12 trailing zeros removed.
+///
+/// We define the *PC relative anchor* for `S + A` as `PC + offs` (`offs`
+/// is sign-extended to VA bits).
+pub const R_LARCH_PCALA_HI20: u32 = 71;
+/// Same as R_LARCH_ABS_LO12.  0..=11 bits of the 32/64-bit offset from the
+/// [PC relative anchor][R_LARCH_PCALA_HI20].
+pub const R_LARCH_PCALA_LO12: u32 = 72;
+/// 32..=51 bits of the 64-bit offset from the
+/// [PC relative anchor][R_LARCH_PCALA_HI20].
+pub const R_LARCH_PCALA64_LO20: u32 = 73;
+/// 52..=63 bits of the 64-bit offset from the
+/// [PC relative anchor][R_LARCH_PCALA_HI20].
+pub const R_LARCH_PCALA64_HI12: u32 = 74;
+/// The signed 32-bit offset `offs` from `PC & 0xfffff000` to
+/// `(GP + G + 0x800) & 0xfffff000`, with 12 trailing zeros removed.
+///
+/// We define the *PC relative anchor* for the GOT entry at `GP + G` as
+/// `PC + offs` (`offs` is sign-extended to VA bits).
+pub const R_LARCH_GOT_PC_HI20: u32 = 75;
+/// 0..=11 bits of the 32/64-bit offset from the
+/// [PC relative anchor][R_LARCH_GOT_PC_HI20] to the GOT entry.
+pub const R_LARCH_GOT_PC_LO12: u32 = 76;
+/// 32..=51 bits of the 64-bit offset from the
+/// [PC relative anchor][R_LARCH_GOT_PC_HI20] to the GOT entry.
+pub const R_LARCH_GOT64_PC_LO20: u32 = 77;
+/// 52..=63 bits of the 64-bit offset from the
+/// [PC relative anchor][R_LARCH_GOT_PC_HI20] to the GOT entry.
+pub const R_LARCH_GOT64_PC_HI12: u32 = 78;
+/// 12..=31 bits of 32/64-bit GOT entry absolute address
+pub const R_LARCH_GOT_HI20: u32 = 79;
+/// 0..=11 bits of 32/64-bit GOT entry absolute address
+pub const R_LARCH_GOT_LO12: u32 = 80;
+/// 32..=51 bits of 64-bit GOT entry absolute address
+pub const R_LARCH_GOT64_LO20: u32 = 81;
+/// 52..=63 bits of 64-bit GOT entry absolute address
+pub const R_LARCH_GOT64_HI12: u32 = 82;
+/// 12..=31 bits of TLS LE 32/64-bit offset from thread pointer
+pub const R_LARCH_TLS_LE_HI20: u32 = 83;
+/// 0..=11 bits of TLS LE 32/64-bit offset from thread pointer
+pub const R_LARCH_TLS_LE_LO12: u32 = 84;
+/// 32..=51 bits of TLS LE 64-bit offset from thread pointer
+pub const R_LARCH_TLS_LE64_LO20: u32 = 85;
+/// 52..=63 bits of TLS LE 64-bit offset from thread pointer
+pub const R_LARCH_TLS_LE64_HI12: u32 = 86;
+/// The signed 32-bit offset `offs` from `PC & 0xfffff000` to
+/// `(GP + IE + 0x800) & 0xfffff000`, with 12 trailing zeros removed.
+///
+/// We define the *PC relative anchor* for the TLS IE GOT entry at
+/// `GP + IE` as `PC + offs` (`offs` is sign-extended to VA bits).
+pub const R_LARCH_TLS_IE_PC_HI20: u32 = 87;
+/// 0..=12 bits of the 32/64-bit offset from the
+/// [PC-relative anchor][R_LARCH_TLS_IE_PC_HI20] to the TLS IE GOT entry.
+pub const R_LARCH_TLS_IE_PC_LO12: u32 = 88;
+/// 32..=51 bits of the 64-bit offset from the
+/// [PC-relative anchor][R_LARCH_TLS_IE_PC_HI20] to the TLS IE GOT entry.
+pub const R_LARCH_TLS_IE64_PC_LO20: u32 = 89;
+/// 52..=63 bits of the 64-bit offset from the
+/// [PC-relative anchor][R_LARCH_TLS_IE_PC_HI20] to the TLS IE GOT entry.
+pub const R_LARCH_TLS_IE64_PC_HI12: u32 = 90;
+/// 12..=31 bits of TLS IE GOT entry 32/64-bit absolute address
+pub const R_LARCH_TLS_IE_HI20: u32 = 91;
+/// 0..=11 bits of TLS IE GOT entry 32/64-bit absolute address
+pub const R_LARCH_TLS_IE_LO12: u32 = 92;
+/// 32..=51 bits of TLS IE GOT entry 64-bit absolute address
+pub const R_LARCH_TLS_IE64_LO20: u32 = 93;
+/// 51..=63 bits of TLS IE GOT entry 64-bit absolute address
+pub const R_LARCH_TLS_IE64_HI12: u32 = 94;
+/// 12..=31 bits of the offset from `PC` to `GP + GD + 0x800`, where
+/// `GP + GD` is a TLS LD GOT entry
+pub const R_LARCH_TLS_LD_PC_HI20: u32 = 95;
+/// 12..=31 bits of TLS LD GOT entry 32/64-bit absolute address
+pub const R_LARCH_TLS_LD_HI20: u32 = 96;
+/// 12..=31 bits of the 32/64-bit PC-relative offset to the PC-relative
+/// anchor for the TLE GD GOT entry.
+pub const R_LARCH_TLS_GD_PC_HI20: u32 = 97;
+/// 12..=31 bits of TLS GD GOT entry 32/64-bit absolute address
+pub const R_LARCH_TLS_GD_HI20: u32 = 98;
+/// 32-bit PC relative
+pub const R_LARCH_32_PCREL: u32 = 99;
+/// Paired with a normal relocation at the same address to indicate the
+/// insturction can be relaxed
+pub const R_LARCH_RELAX: u32 = 100;
+
+// Xtensa values Rel*::r_type`.
+#[allow(missing_docs)]
+pub const R_XTENSA_NONE: u32 = 0;
+#[allow(missing_docs)]
+pub const R_XTENSA_32: u32 = 1;
+#[allow(missing_docs)]
+pub const R_XTENSA_RTLD: u32 = 2;
+#[allow(missing_docs)]
+pub const R_XTENSA_GLOB_DAT: u32 = 3;
+#[allow(missing_docs)]
+pub const R_XTENSA_JMP_SLOT: u32 = 4;
+#[allow(missing_docs)]
+pub const R_XTENSA_RELATIVE: u32 = 5;
+#[allow(missing_docs)]
+pub const R_XTENSA_PLT: u32 = 6;
+#[allow(missing_docs)]
+pub const R_XTENSA_OP0: u32 = 8;
+#[allow(missing_docs)]
+pub const R_XTENSA_OP1: u32 = 9;
+#[allow(missing_docs)]
+pub const R_XTENSA_OP2: u32 = 10;
+#[allow(missing_docs)]
+pub const R_XTENSA_ASM_EXPAND: u32 = 11;
+#[allow(missing_docs)]
+pub const R_XTENSA_ASM_SIMPLIFY: u32 = 12;
+#[allow(missing_docs)]
+pub const R_XTENSA_32_PCREL: u32 = 14;
+#[allow(missing_docs)]
+pub const R_XTENSA_GNU_VTINHERIT: u32 = 15;
+#[allow(missing_docs)]
+pub const R_XTENSA_GNU_VTENTRY: u32 = 16;
+#[allow(missing_docs)]
+pub const R_XTENSA_DIFF8: u32 = 17;
+#[allow(missing_docs)]
+pub const R_XTENSA_DIFF16: u32 = 18;
+#[allow(missing_docs)]
+pub const R_XTENSA_DIFF32: u32 = 19;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT0_OP: u32 = 20;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT1_OP: u32 = 21;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT2_OP: u32 = 22;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT3_OP: u32 = 23;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT4_OP: u32 = 24;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT5_OP: u32 = 25;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT6_OP: u32 = 26;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT7_OP: u32 = 27;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT8_OP: u32 = 28;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT9_OP: u32 = 29;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT10_OP: u32 = 30;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT11_OP: u32 = 31;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT12_OP: u32 = 32;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT13_OP: u32 = 33;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT14_OP: u32 = 34;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT0_ALT: u32 = 35;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT1_ALT: u32 = 36;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT2_ALT: u32 = 37;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT3_ALT: u32 = 38;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT4_ALT: u32 = 39;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT5_ALT: u32 = 40;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT6_ALT: u32 = 41;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT7_ALT: u32 = 42;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT8_ALT: u32 = 43;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT9_ALT: u32 = 44;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT10_ALT: u32 = 45;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT11_ALT: u32 = 46;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT12_ALT: u32 = 47;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT13_ALT: u32 = 48;
+#[allow(missing_docs)]
+pub const R_XTENSA_SLOT14_ALT: u32 = 49;
+#[allow(missing_docs)]
+pub const R_XTENSA_TLSDESC_FN: u32 = 50;
+#[allow(missing_docs)]
+pub const R_XTENSA_TLSDESC_ARG: u32 = 51;
+#[allow(missing_docs)]
+pub const R_XTENSA_TLS_DTPOFF: u32 = 52;
+#[allow(missing_docs)]
+pub const R_XTENSA_TLS_TPOFF: u32 = 53;
+#[allow(missing_docs)]
+pub const R_XTENSA_TLS_FUNC: u32 = 54;
+#[allow(missing_docs)]
+pub const R_XTENSA_TLS_ARG: u32 = 55;
+#[allow(missing_docs)]
+pub const R_XTENSA_TLS_CALL: u32 = 56;
+#[allow(missing_docs)]
+pub const R_XTENSA_PDIFF8: u32 = 57;
+#[allow(missing_docs)]
+pub const R_XTENSA_PDIFF16: u32 = 58;
+#[allow(missing_docs)]
+pub const R_XTENSA_PDIFF32: u32 = 59;
+#[allow(missing_docs)]
+pub const R_XTENSA_NDIFF8: u32 = 60;
+#[allow(missing_docs)]
+pub const R_XTENSA_NDIFF16: u32 = 61;
+#[allow(missing_docs)]
+pub const R_XTENSA_NDIFF32: u32 = 62;
 
 unsafe_impl_endian_pod!(
     FileHeader32,

@@ -40,7 +40,7 @@ impl<'data> ExportTarget<'data> {
 ///
 /// There are multiple kinds of PE exports (with or without a name, and local or forwarded).
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct Export<'data> {
     /// The ordinal of the export.
     ///
@@ -89,7 +89,7 @@ impl<'a> Debug for ExportTarget<'a> {
 /// A partially parsed PE export table.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ExportTable<'data> {
     data: Bytes<'data>,
     virtual_address: u32,

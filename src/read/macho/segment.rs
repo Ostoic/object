@@ -20,7 +20,7 @@ pub type MachOSegmentIterator64<'data, 'file, Endian = Endianness, R = &'data [u
 
 /// An iterator over the segments of a `MachOFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct MachOSegmentIterator<'data, 'file, Mach, R = &'data [u8]>
 where
     'data: 'file,
@@ -56,7 +56,7 @@ pub type MachOSegment64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A segment of a `MachOFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct MachOSegment<'data, 'file, Mach, R = &'data [u8]>
 where
     'data: 'file,

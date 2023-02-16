@@ -7,14 +7,14 @@ use crate::write::*;
 use crate::AddressSize;
 
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 struct ComdatOffsets {
     offset: usize,
     str_id: StringId,
 }
 
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 struct SectionOffsets {
     index: SectionIndex,
     offset: usize,
@@ -24,7 +24,7 @@ struct SectionOffsets {
 }
 
 #[derive(Default, Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 struct SymbolOffsets {
     index: SymbolIndex,
     str_id: Option<StringId>,
@@ -42,7 +42,9 @@ impl<'a> Object<'a> {
             StandardSection::ReadOnlyData | StandardSection::ReadOnlyString => {
                 (&[], &b".rodata"[..], SectionKind::ReadOnlyData)
             }
-            StandardSection::ReadOnlyDataWithRel => (&[], b".data.rel.ro", SectionKind::Data),
+            StandardSection::ReadOnlyDataWithRel => {
+                (&[], b".data.rel.ro", SectionKind::ReadOnlyDataWithRel)
+            }
             StandardSection::UninitializedData => {
                 (&[], &b".bss"[..], SectionKind::UninitializedData)
             }
@@ -73,6 +75,7 @@ impl<'a> Object<'a> {
     fn elf_has_relocation_addend(&self) -> Result<bool> {
         Ok(match self.architecture {
             Architecture::Aarch64 => true,
+            Architecture::Aarch64_Ilp32 => true,
             Architecture::Arm => false,
             Architecture::Avr => true,
             Architecture::Bpf => false,
@@ -89,7 +92,9 @@ impl<'a> Object<'a> {
             Architecture::Riscv64 => true,
             Architecture::Riscv32 => true,
             Architecture::S390x => true,
+            Architecture::Sbf => false,
             Architecture::Sparc64 => true,
+            Architecture::Xtensa => true,
             _ => {
                 return Err(Error(format!(
                     "unimplemented architecture {:?}",
@@ -271,6 +276,7 @@ impl<'a> Object<'a> {
         let e_type = elf::ET_REL;
         let e_machine = match self.architecture {
             Architecture::Aarch64 => elf::EM_AARCH64,
+            Architecture::Aarch64_Ilp32 => elf::EM_AARCH64,
             Architecture::Arm => elf::EM_ARM,
             Architecture::Avr => elf::EM_AVR,
             Architecture::Bpf => elf::EM_BPF,
@@ -287,7 +293,9 @@ impl<'a> Object<'a> {
             Architecture::Riscv32 => elf::EM_RISCV,
             Architecture::Riscv64 => elf::EM_RISCV,
             Architecture::S390x => elf::EM_S390,
+            Architecture::Sbf => elf::EM_SBF,
             Architecture::Sparc64 => elf::EM_SPARCV9,
+            Architecture::Xtensa => elf::EM_XTENSA,
             _ => {
                 return Err(Error(format!(
                     "unimplemented architecture {:?}",
@@ -457,6 +465,20 @@ impl<'a> Object<'a> {
                                 return Err(Error(format!("unimplemented relocation {:?}", reloc)));
                             }
                         },
+                        Architecture::Aarch64_Ilp32 => {
+                            match (reloc.kind, reloc.encoding, reloc.size) {
+                                (RelocationKind::Absolute, RelocationEncoding::Generic, 32) => {
+                                    elf::R_AARCH64_P32_ABS32
+                                }
+                                (RelocationKind::Elf(x), _, _) => x,
+                                _ => {
+                                    return Err(Error(format!(
+                                        "unimplemented relocation {:?}",
+                                        reloc
+                                    )));
+                                }
+                            }
+                        }
                         Architecture::Arm => match (reloc.kind, reloc.encoding, reloc.size) {
                             (RelocationKind::Absolute, _, 32) => elf::R_ARM_ABS32,
                             (RelocationKind::Elf(x), _, _) => x,
@@ -535,6 +557,25 @@ impl<'a> Object<'a> {
                         {
                             (RelocationKind::Absolute, _, 32) => elf::R_LARCH_32,
                             (RelocationKind::Absolute, _, 64) => elf::R_LARCH_64,
+                            (RelocationKind::Relative, _, 32) => elf::R_LARCH_32_PCREL,
+                            (RelocationKind::Relative, RelocationEncoding::LoongArchBranch, 16)
+                            | (
+                                RelocationKind::PltRelative,
+                                RelocationEncoding::LoongArchBranch,
+                                16,
+                            ) => elf::R_LARCH_B16,
+                            (RelocationKind::Relative, RelocationEncoding::LoongArchBranch, 21)
+                            | (
+                                RelocationKind::PltRelative,
+                                RelocationEncoding::LoongArchBranch,
+                                21,
+                            ) => elf::R_LARCH_B21,
+                            (RelocationKind::Relative, RelocationEncoding::LoongArchBranch, 26)
+                            | (
+                                RelocationKind::PltRelative,
+                                RelocationEncoding::LoongArchBranch,
+                                26,
+                            ) => elf::R_LARCH_B26,
                             (RelocationKind::Elf(x), _, _) => x,
                             _ => {
                                 return Err(Error(format!("unimplemented relocation {:?}", reloc)));
@@ -581,6 +622,9 @@ impl<'a> Object<'a> {
                             match (reloc.kind, reloc.encoding, reloc.size) {
                                 (RelocationKind::Absolute, _, 32) => elf::R_RISCV_32,
                                 (RelocationKind::Absolute, _, 64) => elf::R_RISCV_64,
+                                (RelocationKind::Relative, RelocationEncoding::Generic, 32) => {
+                                    elf::R_RISCV_32_PCREL
+                                }
                                 (RelocationKind::Elf(x), _, _) => x,
                                 _ => {
                                     return Err(Error(format!(
@@ -656,10 +700,28 @@ impl<'a> Object<'a> {
                                 return Err(Error(format!("unimplemented relocation {:?}", reloc)));
                             }
                         },
+                        Architecture::Sbf => match (reloc.kind, reloc.encoding, reloc.size) {
+                            (RelocationKind::Absolute, _, 64) => elf::R_SBF_64_64,
+                            (RelocationKind::Absolute, _, 32) => elf::R_SBF_64_32,
+                            (RelocationKind::Elf(x), _, _) => x,
+                            _ => {
+                                return Err(Error(format!("unimplemented relocation {:?}", reloc)));
+                            }
+                        },
                         Architecture::Sparc64 => match (reloc.kind, reloc.encoding, reloc.size) {
                             // TODO: use R_SPARC_32/R_SPARC_64 if aligned.
                             (RelocationKind::Absolute, _, 32) => elf::R_SPARC_UA32,
                             (RelocationKind::Absolute, _, 64) => elf::R_SPARC_UA64,
+                            (RelocationKind::Elf(x), _, _) => x,
+                            _ => {
+                                return Err(Error(format!("unimplemented relocation {:?}", reloc)));
+                            }
+                        },
+                        Architecture::Xtensa => match (reloc.kind, reloc.encoding, reloc.size) {
+                            (RelocationKind::Absolute, _, 32) => elf::R_XTENSA_32,
+                            (RelocationKind::Relative, RelocationEncoding::Generic, 32) => {
+                                elf::R_XTENSA_32_PCREL
+                            }
                             (RelocationKind::Elf(x), _, _) => x,
                             _ => {
                                 return Err(Error(format!("unimplemented relocation {:?}", reloc)));
@@ -714,7 +776,9 @@ impl<'a> Object<'a> {
             } else {
                 match section.kind {
                     SectionKind::Text => elf::SHF_ALLOC | elf::SHF_EXECINSTR,
-                    SectionKind::Data => elf::SHF_ALLOC | elf::SHF_WRITE,
+                    SectionKind::Data | SectionKind::ReadOnlyDataWithRel => {
+                        elf::SHF_ALLOC | elf::SHF_WRITE
+                    }
                     SectionKind::Tls => elf::SHF_ALLOC | elf::SHF_WRITE | elf::SHF_TLS,
                     SectionKind::UninitializedData => elf::SHF_ALLOC | elf::SHF_WRITE,
                     SectionKind::UninitializedTls => elf::SHF_ALLOC | elf::SHF_WRITE | elf::SHF_TLS,

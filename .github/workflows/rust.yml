@@ -25,7 +25,9 @@ jobs:
         rustup install ${{matrix.rust_channel}}
         rustup default ${{matrix.rust_channel}}
     - name: Test debug
-      run: cargo test --verbose --features all
+      run: |
+        cargo test --verbose --features all
+        cargo test --verbose --features unstable-all
     - name: Test release
       run: cargo test --verbose --features all --release
 
@@ -42,7 +44,29 @@ jobs:
       - run: cargo build --no-default-features --features read_core,write_core,macho
       - run: cargo build --no-default-features --features read_core,pe
       - run: cargo build --no-default-features --features read_core,wasm
+      - run: cargo build --no-default-features --features read_core,xcoff,unstable
       - run: cargo build --no-default-features --features doc
+
+  cross:
+    strategy:
+      matrix:
+        target:
+          # A 32-bit target.
+          - "i686-unknown-linux-gnu"
+          # A big-endian target
+          - "mips64-unknown-linux-gnuabi64"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Install rust
+        run: |
+          rustup install stable
+          rustup default stable
+      - run: cargo install cross
+      - run: rustup target add ${{matrix.target}}
+      - run: cross test --target ${{matrix.target}} --features all
 
   msrv-read:
     runs-on: ubuntu-latest
@@ -51,7 +75,7 @@ jobs:
         with:
           submodules: true
       - name: Install rust
-        run: rustup update 1.42.0 && rustup default 1.42.0
+        run: rustup update 1.52.0 && rustup default 1.52.0
       - name: Test
         run: cargo test --verbose --no-default-features --features read,std
 
@@ -62,7 +86,7 @@ jobs:
         with:
           submodules: true
       - name: Install rust
-        run: rustup update 1.56.1 && rustup default 1.56.1
+        run: rustup update 1.61.0 && rustup default 1.61.0
       - name: Test
         run: cargo test --verbose --features all
 
@@ -79,6 +103,9 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
+    container:
+      image: xd009642/tarpaulin
+      options: --security-opt seccomp=unconfined
     steps:
       - uses: actions/checkout@v2
         with:
@@ -88,9 +115,7 @@ jobs:
           rustup install stable
           rustup default stable
       - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          args: '--features all --ignore-tests --out Lcov'
+        run: cargo tarpaulin --features all --ignore-tests --out Lcov
       - name: Upload to Coveralls
         uses: coverallsapp/github-action@master
         with:

@@ -9,7 +9,7 @@ use crate::read::{Bytes, ReadError, ReadRef, Result, StringTable};
 /// An iterator over the load commands of a `MachHeader`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Default, Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct LoadCommandIterator<'data, E: Endian> {
     endian: E,
     data: Bytes<'data>,
@@ -54,7 +54,7 @@ impl<'data, E: Endian> LoadCommandIterator<'data, E> {
 /// The data for a `LoadCommand`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct LoadCommandData<'data, E: Endian> {
     cmd: u32,
     // Includes the header.
@@ -84,6 +84,11 @@ impl<'data, E: Endian> LoadCommandData<'data, E> {
         self.data
             .read_at(0)
             .read_error(crate::nosym!("Invalid Mach-O command size"))
+    }
+
+    /// Raw bytes of this LoadCommand structure.
+    pub fn raw_data(&self) -> &'data [u8] {
+        self.data.0
     }
 
     /// Parse a load command string value.

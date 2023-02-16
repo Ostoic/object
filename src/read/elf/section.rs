@@ -19,7 +19,7 @@ use super::{
 /// Also includes the string table used for the section names.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[derive(Default, Clone, Copy)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct SectionTable<'data, Elf: FileHeader, R = &'data [u8]>
 where
     R: ReadRef<'data>,
@@ -352,7 +352,7 @@ pub type ElfSectionIterator64<'data, 'file, Endian = Endianness, R = &'data [u8]
 
 /// An iterator over the sections of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ElfSectionIterator<'data, 'file, Elf, R = &'data [u8]>
 where
     Elf: FileHeader,
@@ -388,7 +388,7 @@ pub type ElfSection64<'data, 'file, Endian = Endianness, R = &'data [u8]> =
 
 /// A section of an `ElfFile`.
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+
 pub struct ElfSection<'data, 'file, Elf, R = &'data [u8]>
 where
     'data: 'file,

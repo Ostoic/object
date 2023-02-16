@@ -34,51 +34,58 @@ fn print_elf<Elf: FileHeader<Endian = Endianness>>(p: &mut Printer<'_>, elf: &El
 fn print_file_header<Elf: FileHeader>(p: &mut Printer<'_>, endian: Elf::Endian, elf: &Elf) {
     p.group("FileHeader", |p| {
         p.group("Ident", |p| print_ident(p, elf.e_ident()));
-        p.field_enum("Type", elf.e_type(endian), &FLAGS_ET);
-        p.field_enum("Machine", elf.e_machine(endian), &FLAGS_EM);
+        p.field_enum("Type", elf.e_type(endian), FLAGS_ET);
+        p.field_enum("Machine", elf.e_machine(endian), FLAGS_EM);
         let version = elf.e_version(endian);
         if version < 256 {
-            p.field_enum("Version", version as u8, &FLAGS_EV);
+            p.field_enum("Version", version as u8, FLAGS_EV);
         } else {
             p.field_hex("Version", version);
         }
-        p.field_enum("Type", elf.e_type(endian), &FLAGS_ET);
+        p.field_enum("Type", elf.e_type(endian), FLAGS_ET);
         p.field_hex("Entry", elf.e_entry(endian).into());
         p.field_hex("ProgramHeaderOffset", elf.e_phoff(endian).into());
         p.field_hex("SectionHeaderOffset", elf.e_shoff(endian).into());
         let flags = elf.e_flags(endian);
         p.field_hex("Flags", flags);
         match elf.e_machine(endian) {
-            EM_SPARC => p.flags(flags, 0, &FLAGS_EF_SPARC),
-            EM_SPARCV9 => p.flags(flags, 0, &FLAGS_EF_SPARCV9),
+            EM_SPARC => p.flags(flags, 0, FLAGS_EF_SPARC),
+            EM_SPARCV9 => p.flags(flags, 0, FLAGS_EF_SPARCV9),
             EM_MIPS => {
-                p.flags(flags, 0, &FLAGS_EF_MIPS);
-                p.flags(flags, EF_MIPS_ARCH, &FLAGS_EF_MIPS_ARCH);
+                p.flags(flags, 0, FLAGS_EF_MIPS);
+                p.flags(flags, EF_MIPS_ARCH, FLAGS_EF_MIPS_ARCH);
                 // Some ABIs may have all these bits zeroed out
                 if flags & EF_MIPS_ABI != 0 {
-                    p.flags(flags, EF_MIPS_ABI, &FLAGS_EF_MIPS_ABI);
+                    p.flags(flags, EF_MIPS_ABI, FLAGS_EF_MIPS_ABI);
                 }
             }
             EM_PARISC => {
-                p.flags(flags, 0, &FLAGS_EF_PARISC);
-                p.flags(flags, EF_PARISC_ARCH, &FLAGS_EF_PARISC_ARCH);
+                p.flags(flags, 0, FLAGS_EF_PARISC);
+                p.flags(flags, EF_PARISC_ARCH, FLAGS_EF_PARISC_ARCH);
             }
-            EM_ALPHA => p.flags(flags, 0, &FLAGS_EF_ALPHA),
-            EM_PPC => p.flags(flags, 0, &FLAGS_EF_PPC),
-            EM_PPC64 => p.flags(flags, 0, &FLAGS_EF_PPC64),
+            EM_ALPHA => p.flags(flags, 0, FLAGS_EF_ALPHA),
+            EM_PPC => p.flags(flags, 0, FLAGS_EF_PPC),
+            EM_PPC64 => p.flags(flags, 0, FLAGS_EF_PPC64),
             EM_ARM => {
-                p.flags(flags, 0, &FLAGS_EF_ARM);
-                p.flags(flags, EF_ARM_EABIMASK, &FLAGS_EF_ARM_EABI);
+                p.flags(flags, 0, FLAGS_EF_ARM);
+                p.flags(flags, EF_ARM_EABIMASK, FLAGS_EF_ARM_EABI);
             }
-            EM_CSKY => p.flags(flags, EF_CSKY_ABIMASK, &FLAGS_EF_CSKY_ABI),
-            EM_IA_64 => p.flags(flags, 0, &FLAGS_EF_IA_64),
-            EM_SH => p.flags(flags, EF_SH_MACH_MASK, &FLAGS_EF_SH_MACH),
-            EM_S390 => p.flags(flags, 0, &FLAGS_EF_S390),
+            EM_CSKY => p.flags(flags, EF_CSKY_ABIMASK, FLAGS_EF_CSKY_ABI),
+            EM_IA_64 => p.flags(flags, 0, FLAGS_EF_IA_64),
+            EM_SH => p.flags(flags, EF_SH_MACH_MASK, FLAGS_EF_SH_MACH),
+            EM_S390 => p.flags(flags, 0, FLAGS_EF_S390),
             EM_RISCV => {
-                p.flags(flags, 0, &FLAGS_EF_RISCV);
-                p.flags(flags, EF_RISCV_FLOAT_ABI, &FLAGS_EF_RISCV_FLOAT_ABI);
+                p.flags(flags, 0, FLAGS_EF_RISCV);
+                p.flags(flags, EF_RISCV_FLOAT_ABI, FLAGS_EF_RISCV_FLOAT_ABI);
             }
-            EM_LOONGARCH => p.flags(flags, 0, &FLAGS_EF_LOONGARCH),
+            EM_LOONGARCH => {
+                p.flags(flags, 0, FLAGS_EF_LARCH_OBJABI);
+                p.flags(
+                    flags,
+                    EF_LARCH_ABI_MODIFIER_MASK,
+                    FLAGS_EF_LARCH_ABI_MODIFIER,
+                );
+            }
             _ => {}
         };
         p.field_hex("HeaderSize", elf.e_ehsize(endian));
@@ -92,10 +99,10 @@ fn print_file_header<Elf: FileHeader>(p: &mut Printer<'_>, endian: Elf::Endian, 
 
 fn print_ident(p: &mut Printer<'_>, ident: &Ident) {
     p.field("Magic", format!("{:X?}", ident.magic));
-    p.field_enum("Class", ident.class, &FLAGS_EI_CLASS);
-    p.field_enum("Data", ident.data, &FLAGS_EI_DATA);
-    p.field_enum("Version", ident.version, &FLAGS_EV);
-    p.field_enum("OsAbi", ident.os_abi, &FLAGS_EI_OSABI);
+    p.field_enum("Class", ident.class, FLAGS_EI_CLASS);
+    p.field_enum("Data", ident.data, FLAGS_EI_DATA);
+    p.field_enum("Version", ident.version, FLAGS_EV);
+    p.field_enum("OsAbi", ident.os_abi, FLAGS_EI_OSABI);
     p.field_hex("AbiVersion", ident.abi_version);
     p.field("Unused", format!("{:X?}", ident.padding));
 }
@@ -363,7 +370,7 @@ fn print_section_symbols<Elf: FileHeader>(
                 } else {
                     p.field("SectionIndex", shndx);
                 }
-                if let Some(shndx) = symbols.shndx(index) {
+                if let Some(shndx) = symbols.shndx(endian, index) {
                     p.field("ExtendedSectionIndex", shndx);
                 }
             });
@@ -468,6 +475,7 @@ fn rel_flag_type<Elf: FileHeader>(endian: Elf::Endian, elf: &Elf) -> &'static [F
         EM_TILEGX => FLAGS_R_TILEGX,
         EM_RISCV => FLAGS_R_RISCV,
         EM_BPF => FLAGS_R_BPF,
+        EM_SBF => FLAGS_R_SBF,
         EM_LOONGARCH => FLAGS_R_LOONGARCH,
         EM_METAG => FLAGS_R_METAG,
         EM_NDS32 => FLAGS_R_NDS32,
@@ -994,6 +1002,7 @@ static FLAGS_EM: &[Flag<u16>] = &flags!(
     EM_AMDGPU,
     EM_RISCV,
     EM_BPF,
+    EM_SBF,
     EM_CSKY,
     EM_ALPHA,
     EM_LOONGARCH,
@@ -1102,21 +1111,19 @@ static FLAGS_EF_SH_MACH: &[Flag<u32>] = &flags!(
     EF_SH2A_SH3E,
 );
 static FLAGS_EF_S390: &[Flag<u32>] = &flags!(EF_S390_HIGH_GPRS);
-static FLAGS_EF_RISCV: &[Flag<u32>] = &flags!(EF_RISCV_RVC);
+static FLAGS_EF_RISCV: &[Flag<u32>] = &flags!(EF_RISCV_RVC, EF_RISCV_RVE, EF_RISCV_TSO);
 static FLAGS_EF_RISCV_FLOAT_ABI: &[Flag<u32>] = &flags!(
     EF_RISCV_FLOAT_ABI_SOFT,
     EF_RISCV_FLOAT_ABI_SINGLE,
     EF_RISCV_FLOAT_ABI_DOUBLE,
     EF_RISCV_FLOAT_ABI_QUAD,
 );
-static FLAGS_EF_LOONGARCH: &[Flag<u32>] = &flags!(
-    EF_LARCH_ABI_LP64S,
-    EF_LARCH_ABI_LP64F,
-    EF_LARCH_ABI_LP64D,
-    EF_LARCH_ABI_ILP32S,
-    EF_LARCH_ABI_ILP32F,
-    EF_LARCH_ABI_ILP32D,
+static FLAGS_EF_LARCH_ABI_MODIFIER: &[Flag<u32>] = &flags!(
+    EF_LARCH_ABI_SOFT_FLOAT,
+    EF_LARCH_ABI_SINGLE_FLOAT,
+    EF_LARCH_ABI_DOUBLE_FLOAT,
 );
+static FLAGS_EF_LARCH_OBJABI: &[Flag<u32>] = &flags!(EF_LARCH_OBJABI_V1,);
 static FLAGS_PT: &[Flag<u32>] = &flags!(
     PT_NULL,
     PT_LOAD,
@@ -2908,6 +2915,7 @@ static FLAGS_R_RISCV: &[Flag<u32>] = &flags!(
     R_RISCV_32_PCREL,
 );
 static FLAGS_R_BPF: &[Flag<u32>] = &flags!(R_BPF_NONE, R_BPF_64_64, R_BPF_64_32);
+static FLAGS_R_SBF: &[Flag<u32>] = &flags!(R_SBF_NONE, R_SBF_64_64, R_SBF_64_32);
 static FLAGS_R_METAG: &[Flag<u32>] = &flags!(
     R_METAG_HIADDR16,
     R_METAG_LOADDR16,
@@ -3022,6 +3030,43 @@ static FLAGS_R_LOONGARCH: &[Flag<u32>] = &flags!(
     R_LARCH_SUB64,
     R_LARCH_GNU_VTINHERIT,
     R_LARCH_GNU_VTENTRY,
+    R_LARCH_B16,
+    R_LARCH_B21,
+    R_LARCH_B26,
+    R_LARCH_ABS_HI20,
+    R_LARCH_ABS_LO12,
+    R_LARCH_ABS64_LO20,
+    R_LARCH_ABS64_HI12,
+    R_LARCH_PCALA_HI20,
+    R_LARCH_PCALA_LO12,
+    R_LARCH_PCALA64_LO20,
+    R_LARCH_PCALA64_HI12,
+    R_LARCH_GOT_PC_HI20,
+    R_LARCH_GOT_PC_LO12,
+    R_LARCH_GOT64_PC_LO20,
+    R_LARCH_GOT64_PC_HI12,
+    R_LARCH_GOT_HI20,
+    R_LARCH_GOT_LO12,
+    R_LARCH_GOT64_LO20,
+    R_LARCH_GOT64_HI12,
+    R_LARCH_TLS_LE_HI20,
+    R_LARCH_TLS_LE_LO12,
+    R_LARCH_TLS_LE64_LO20,
+    R_LARCH_TLS_LE64_HI12,
+    R_LARCH_TLS_IE_PC_HI20,
+    R_LARCH_TLS_IE_PC_LO12,
+    R_LARCH_TLS_IE64_PC_LO20,
+    R_LARCH_TLS_IE64_PC_HI12,
+    R_LARCH_TLS_IE_HI20,
+    R_LARCH_TLS_IE_LO12,
+    R_LARCH_TLS_IE64_LO20,
+    R_LARCH_TLS_IE64_HI12,
+    R_LARCH_TLS_LD_PC_HI20,
+    R_LARCH_TLS_LD_HI20,
+    R_LARCH_TLS_GD_PC_HI20,
+    R_LARCH_TLS_GD_HI20,
+    R_LARCH_32_PCREL,
+    R_LARCH_RELAX,
 );
 static FLAGS_NT_CORE: &[Flag<u32>] = &flags!(
     NT_PRSTATUS,
