@@ -117,6 +117,10 @@ pub mod pe;
 #[cfg(feature = "xcoff")]
 pub mod xcoff;
 
+/// ## nosym
+/// nosym is a feature that attempts to remove any strings of symbols from the compiled program.
+///
+/// When `nosym` is enabled, this replaces a given string with the empty string.
 #[cfg(feature = "nosym")]
 #[macro_export]
 macro_rules! nosym {
@@ -125,6 +129,7 @@ macro_rules! nosym {
     };
 }
 
+/// When nosym is disabled, nosym! is an identity function.
 #[cfg(not(feature = "nosym"))]
 #[macro_export]
 macro_rules! nosym {

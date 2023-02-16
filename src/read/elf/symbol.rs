@@ -480,7 +480,7 @@ impl<'data, 'file, Elf: FileHeader, R: ReadRef<'data>> ObjectSymbol<'data>
 
 /// A trait for generic access to `Sym32` and `Sym64`.
 #[allow(missing_docs)]
-pub trait Sym: DebugPod {
+pub trait Sym: Debug + Pod {
     type Word: Into<u64>;
     type Endian: endian::Endian;
 
