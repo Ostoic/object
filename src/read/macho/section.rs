@@ -132,7 +132,12 @@ where
     #[cfg_attr(not(feature = "aggressive-inline"), inline)]
     #[cfg_attr(feature = "aggressive-inline", inline(always))]
     fn align(&self) -> u64 {
-        1 << self.internal.section.align(self.file.endian)
+        let align = self.internal.section.align(self.file.endian);
+        if align < 64 {
+            1 << align
+        } else {
+            0
+        }
     }
 
     #[cfg_attr(not(feature = "aggressive-inline"), inline)]
